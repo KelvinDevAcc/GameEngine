@@ -2,6 +2,8 @@
 #include <vector>
 #include <string>
 #include <memory>
+
+#include "GameObject.h"
 #include "Singleton.h"
 
 namespace dae
@@ -15,6 +17,7 @@ namespace dae
 
 		void Update(float deltaTime) const;
 		void Render() const;
+
 	private:
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;

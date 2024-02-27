@@ -1,5 +1,7 @@
 #pragma once
 #include <SDL.h>
+
+#include "RenderComponent.h"
 #include "Singleton.h"
 
 namespace dae

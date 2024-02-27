@@ -1,20 +1,28 @@
 ﻿#pragma once
+
+#include <memory>
+
 #include "Component.h"
 #include "Texture2D.h"
-#include "GameObject.h" // Include GameObject header to access its definition
 
 namespace dae
 {
     class RenderComponent : public Component
     {
     public:
-        RenderComponent(std::shared_ptr<Texture2D> texture, GameObject& gameObject);
+        RenderComponent();
+        ~RenderComponent() override = default;
 
-        virtual void Update(float deltaTime) override;
-        virtual void Render() const override;
+        void Update(float deltaTime) override;
+        void Render() const override;
+        void SetTexture(const std::shared_ptr<Texture2D>& texture);
+        void SetDimensions(float width, float height);
+
+        const char* GetComponentType() const override { return "Render"; }
 
     private:
         std::shared_ptr<Texture2D> m_texture;
-        GameObject& m_gameObject; // Reference to the GameObject
+        float m_width;
+        float m_height;
     };
 }

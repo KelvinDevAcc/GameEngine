@@ -1,8 +1,8 @@
 #include "SceneManager.h"
 #include <stdexcept>
 
+#include "RenderComponent.h"
 #include "Scene.h"
-
 
 namespace dae
 {

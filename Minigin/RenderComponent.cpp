@@ -1,28 +1,47 @@
 ﻿#include "RenderComponent.h"
+#include "GameObject.h"
 #include "Renderer.h"
 
 namespace dae
 {
-    RenderComponent::RenderComponent(std::shared_ptr<Texture2D> texture, GameObject& gameObject)
-        : m_texture(texture), m_gameObject(gameObject)
-    {
-        // Optionally, load the texture here if needed
-    }
+    RenderComponent::RenderComponent()
+        : m_width(0), m_height(0)
+    {}
 
-    void RenderComponent::Update(float deltaTime)
+    void RenderComponent::Update(float /*deltaTime*/)
     {
-        // Optionally, update logic specific to rendering here
     }
 
     void RenderComponent::Render() const
     {
-        // Access the Transform component through the GameObject
-        const auto& transform = m_gameObject.GetTransform();
-        float x = transform.GetPosition().x;
-        float y = transform.GetPosition().y;
-
-        // Render the texture using the Renderer class
         if (m_texture)
-            Renderer::GetInstance().RenderTexture(*m_texture, x, y);
+        {
+	        if (const auto gameObject = GetGameObject())
+            {
+                const auto& pos = gameObject->GetPosition();
+                const float posX = pos.x - m_width / 2.0f;
+                const float posY = pos.y - m_height;
+
+                Renderer::GetInstance().RenderTexture(*m_texture, posX, posY, m_width, m_height);
+            }
+        }
+    }
+
+    void RenderComponent::SetTexture(const std::shared_ptr<Texture2D>& texture)
+    {
+        m_texture = texture;
+        if (m_texture)
+        {
+            // Retrieve the width and height of the texture
+            const auto size = m_texture->GetSize();
+            m_width = static_cast<float>(size.x);
+            m_height = static_cast<float>(size.y);
+        }
+    }
+
+    void RenderComponent::SetDimensions(float width, float height)
+    {
+        m_width = width;
+        m_height = height;
     }
 }
