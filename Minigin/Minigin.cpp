@@ -62,8 +62,8 @@ dae::Minigin::Minigin(const std::string &dataPath)
 		"Programming 4 assignment",
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		640,
-		480,
+		1270,
+		720,
 		SDL_WINDOW_OPENGL
 	);
 	if (g_window == nullptr) 
@@ -89,7 +89,7 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	load();
 
 	const auto& renderer = Renderer::GetInstance();
-	auto& sceneManager = SceneManager::GetInstance();
+	const auto& sceneManager = SceneManager::GetInstance();
 	auto& input = InputManager::GetInstance();
 
 	auto lastTime = std::chrono::high_resolution_clock::now();

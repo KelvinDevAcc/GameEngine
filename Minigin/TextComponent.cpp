@@ -35,8 +35,11 @@ void dae::TextComponent::Render() const
 {
 	if (m_textTexture != nullptr)
 	{
-		const auto& pos = m_transform.GetPosition();
-		Renderer::GetInstance().RenderTexture(*m_textTexture, pos.x, pos.y);
+        const auto& pos = m_transform.GetPosition();
+        const float textureWidth = static_cast<float>(m_textTexture->GetSize().x);
+        const float posX = pos.x - textureWidth / 2.0f;
+
+        Renderer::GetInstance().RenderTexture(*m_textTexture, posX, pos.y);
 	}
 }
 
