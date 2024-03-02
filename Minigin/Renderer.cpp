@@ -66,4 +66,19 @@ void dae::Renderer::RenderTexture(const Texture2D& texture, const float x, const
 	SDL_RenderCopy(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
 }
 
+void dae::Renderer::RenderTexture(const Texture2D& texture, float pos_x, float pos_y, float width, float height, float rotation_angle)
+{
+	// Destination rectangle
+	SDL_Rect dst{};
+	dst.x = static_cast<int>(pos_x);
+	dst.y = static_cast<int>(pos_y);
+	dst.w = static_cast<int>(width);
+	dst.h = static_cast<int>(height);
+
+	// Render texture with rotation
+	SDL_RenderCopyEx(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst, rotation_angle, nullptr, SDL_FLIP_NONE);
+}
+
+
+
 SDL_Renderer* dae::Renderer::GetSDLRenderer() const { return m_renderer; }

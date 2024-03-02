@@ -1,17 +1,24 @@
 #include "GameObject.h"
+
+#include <iostream>
+#include <stdexcept>
+#include <utility>
+#include <windows.h>
+
 #include "ResourceManager.h"
 #include "Renderer.h"
 
 namespace dae
 {
-	GameObject::GameObject()
-		: m_transform(), m_texture(), m_components(), m_width(), m_height(),m_originalTexWidth(),m_originalTexHeight()
-	{
-	}
+    GameObject::GameObject()
+        : m_transform(), m_components(), m_width(), m_height(), m_originalTexWidth(),
+          m_originalTexHeight(), m_localPosition(), m_worldPosition()
+    {
+    }
 
     void GameObject::Update(float deltaTime) const
     {
-        for (const auto& component : m_components)
+        for (auto& component : m_components)
         {
             component->Update(deltaTime);
         }
@@ -19,26 +26,17 @@ namespace dae
 
     void GameObject::Render() const
     {
-        if (m_texture)
-        {
-            const auto& pos = m_transform.GetPosition();
-            float posX = pos.x - m_width / 2.0f;
-            float posY = pos.y - m_height;
-
-
-            Renderer::GetInstance().RenderTexture(*m_texture, posX, posY, m_width, m_height); // Pass adjusted position, width, and height
-        }
-
-        for (const auto& component : m_components)
+        for (auto& component : m_components)
         {
             component->Render();
         }
+
     }
 
     void GameObject::SetTexture(const std::string& filename)
     {
         m_texture = ResourceManager::GetInstance().LoadTexture(filename);
-        glm::ivec2 size = m_texture->GetSize();
+        const glm::ivec2 size = m_texture->GetSize();
         m_width = static_cast<float>(size.x);
         m_height = static_cast<float>(size.y);
 
@@ -46,18 +44,20 @@ namespace dae
         m_originalTexWidth = m_width;
         m_originalTexHeight = m_height;
     }
- 
 
-
-    void GameObject::SetPosition(float x, float y)
+   /* void GameObject::SetPosition(float x, float y)
     {
         m_transform.SetPosition(x, y, 0.0f);
+
+        m_localPosition.x = x;
+        m_localPosition.y = y;
+        m_positionIsDirty = true;
 
         for (const auto& component : m_components)
         {
             component->SetPosition(x, y);
         }
-    }
+    }*/
 
     void GameObject::SetDimensions(float width, float height)
     {
@@ -80,8 +80,88 @@ namespace dae
         }
     }
 
-    glm::vec2 GameObject::GetPosition() const
+    void GameObject::SetParent(GameObject* parent, bool keepWorldPosition)
     {
-        return m_transform.GetPosition();
+        if (IsChild(parent) || parent == this || m_parent == parent)
+            return;
+        if (parent == nullptr)
+            SetLocalPosition(GetWorldPosition());
+        else
+        {
+            if (keepWorldPosition)
+                SetLocalPosition(GetLocalPosition() - parent->GetWorldPosition());
+            SetPositionDirty();
+        }
+        if (m_parent) m_parent->RemoveChild(this);
+        m_parent = parent;
+        if (m_parent) m_parent->AddChild(this);
+
+    }
+
+
+    void GameObject::SetLocalPosition(const glm::vec3& pos)
+    {
+        m_localPosition = pos;
+        SetPositionDirty();
+        for (const auto& component : m_components)
+        {
+            component->SetPosition(pos.x, pos.y);
+        }
+    }
+
+    const glm::vec3& GameObject::GetWorldPosition()
+    {
+        if (m_positionIsDirty)
+            UpdateWorldPosition();
+        return m_worldPosition;
+    }
+
+    glm::vec3 GameObject::GetLocalPosition() const
+    {
+        return m_localPosition;
+    }
+
+    void GameObject::UpdateWorldPosition() 
+    {
+        if (m_positionIsDirty)
+        {
+            if (m_parent == nullptr)
+                m_worldPosition = m_localPosition;
+            else
+                m_worldPosition = m_parent->GetWorldPosition() + m_localPosition;
+
+        }
+        m_positionIsDirty = false;
+    }
+
+    void GameObject::RemoveChild(GameObject* child) {
+        std::erase(m_children, child);
+    }
+
+
+    void GameObject::AddChild(GameObject* child)
+    {
+	    m_children.emplace_back(child);
+    }
+
+    bool GameObject::IsChild(GameObject* potentialChild) const
+    {
+        for (const auto child : m_children)
+        {
+            if (child == potentialChild || child->IsChild(potentialChild))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void GameObject::SetPositionDirty() {
+        m_positionIsDirty = true;
+    }
+
+    float GameObject::GetRotation() const
+    {
+        return m_transform.GetRotation();
     }
 }

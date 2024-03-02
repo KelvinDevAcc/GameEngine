@@ -7,6 +7,7 @@
 #include "Minigin.h"
 
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <thread>
 
@@ -100,7 +101,7 @@ void dae::Minigin::Run(const std::function<void()>& load)
 		const float deltaTime = std::chrono::duration<float>(currentTime - lastTime).count();
 		lastTime = currentTime;
 
-		const bool doContinue = input.ProcessInput();
+		const bool doContinue = dae::InputManager::ProcessInput();
 		if (!doContinue)
 			break;
 

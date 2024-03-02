@@ -16,16 +16,21 @@ namespace dae
     {
         if (m_texture)
         {
-	        if (const auto gameObject = GetGameObject())
+            if (const auto gameObject = GetGameObject())
             {
-                const auto& pos = gameObject->GetPosition();
+                const auto& pos = gameObject->GetWorldPosition();
                 const float posX = pos.x - m_width / 2.0f;
-                const float posY = pos.y - m_height;
+                const float posY = pos.y - m_height / 2.0f; // Adjust for the center of the object
 
-                Renderer::GetInstance().RenderTexture(*m_texture, posX, posY, m_width, m_height);
+                // Get the rotation angle from the GameObject
+                const float rotationAngle = gameObject->GetRotation();
+
+                // Render the texture with rotation
+                Renderer::GetInstance().RenderTexture(*m_texture, posX, posY, m_width, m_height, rotationAngle);
             }
         }
     }
+
 
     void RenderComponent::SetTexture(const std::shared_ptr<Texture2D>& texture)
     {
