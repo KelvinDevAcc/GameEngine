@@ -11,8 +11,8 @@
 namespace dae
 {
     GameObject::GameObject()
-        : m_transform(), m_components(), m_width(), m_height(), m_originalTexWidth(),
-          m_originalTexHeight(), m_localPosition(), m_worldPosition()
+	    : m_components(), m_width(), m_height(), m_originalTexWidth(),
+	      m_originalTexHeight(), m_localPosition(), m_worldPosition(), m_positionIsDirty(false)
     {
     }
 
@@ -30,34 +30,8 @@ namespace dae
         {
             component->Render();
         }
-
     }
 
-    void GameObject::SetTexture(const std::string& filename)
-    {
-        m_texture = ResourceManager::GetInstance().LoadTexture(filename);
-        const glm::ivec2 size = m_texture->GetSize();
-        m_width = static_cast<float>(size.x);
-        m_height = static_cast<float>(size.y);
-
-        // Store original dimensions
-        m_originalTexWidth = m_width;
-        m_originalTexHeight = m_height;
-    }
-
-   /* void GameObject::SetPosition(float x, float y)
-    {
-        m_transform.SetPosition(x, y, 0.0f);
-
-        m_localPosition.x = x;
-        m_localPosition.y = y;
-        m_positionIsDirty = true;
-
-        for (const auto& component : m_components)
-        {
-            component->SetPosition(x, y);
-        }
-    }*/
 
     void GameObject::SetDimensions(float width, float height)
     {
@@ -101,24 +75,26 @@ namespace dae
 
     void GameObject::SetLocalPosition(const glm::vec3& pos)
     {
-        m_localPosition = pos;
+        m_localPosition.SetPosition(pos);
         SetPositionDirty();
         for (const auto& component : m_components)
         {
             component->SetPosition(pos.x, pos.y);
         }
+       
+
     }
 
     const glm::vec3& GameObject::GetWorldPosition()
     {
         if (m_positionIsDirty)
             UpdateWorldPosition();
-        return m_worldPosition;
+        return m_worldPosition.GetPosition();
     }
 
     glm::vec3 GameObject::GetLocalPosition() const
     {
-        return m_localPosition;
+        return m_localPosition.GetPosition();
     }
 
     void GameObject::UpdateWorldPosition() 
@@ -128,7 +104,7 @@ namespace dae
             if (m_parent == nullptr)
                 m_worldPosition = m_localPosition;
             else
-                m_worldPosition = m_parent->GetWorldPosition() + m_localPosition;
+                m_worldPosition.SetPosition(m_parent->GetWorldPosition() + m_localPosition.GetPosition());
 
         }
         m_positionIsDirty = false;
@@ -158,10 +134,15 @@ namespace dae
 
     void GameObject::SetPositionDirty() {
         m_positionIsDirty = true;
+        for (const auto child : m_children)
+        {
+            child->SetPositionDirty();
+        }
+
     }
 
     float GameObject::GetRotation() const
     {
-        return m_transform.GetRotation();
+        return m_worldPosition.GetRotation();
     }
 }

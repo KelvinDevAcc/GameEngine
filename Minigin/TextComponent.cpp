@@ -51,7 +51,7 @@ void dae::TextComponent::SetText(const std::string& text)
 
 void dae::TextComponent::SetPosition(float x, float y)
 {
-    m_transform.SetPosition(x, y, 0.0f);
+    m_transform.SetPosition(glm::vec3(x, y, 0.0f));
 }
 
 

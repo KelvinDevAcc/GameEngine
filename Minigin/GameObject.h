@@ -19,10 +19,8 @@ namespace dae
         void Render() const;
 
         // Function to set rotation
-        void SetRotation(float rotation) { m_transform.SetRotation(rotation); }
+        void SetRotation(float rotation) { m_worldPosition.SetRotation(rotation); }
 
-        void SetTexture(const std::string& filename);
-       // void SetPosition(float x, float y);
         void SetDimensions(float width, float height);
         void AddComponent(const std::shared_ptr<Component>& component);
         void RemoveComponent(const std::shared_ptr<Component>& component);
@@ -56,7 +54,6 @@ namespace dae
         bool IsChild(GameObject* potentialChild) const;
 
     private:
-        Transform m_transform;
         std::shared_ptr<Texture2D> m_texture;
         std::vector<std::shared_ptr<Component>> m_components;
         GameObject* m_parent = nullptr;
@@ -66,14 +63,13 @@ namespace dae
         float m_originalTexWidth;
         float m_originalTexHeight;
 
-        glm::vec3 m_localPosition;
-    	glm::vec3 m_worldPosition; 
-        bool m_positionIsDirty = true;
+        Transform m_localPosition;
+        Transform m_worldPosition;
+        bool m_positionIsDirty;
 
         void UpdateWorldPosition();
         void RemoveChild(GameObject* child);
         void AddChild(GameObject* child);
         void SetPositionDirty();
     };
-
 }

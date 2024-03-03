@@ -94,6 +94,7 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	auto& input = InputManager::GetInstance();
 
 	auto lastTime = std::chrono::high_resolution_clock::now();
+	constexpr auto secondPerFrame = std::chrono::milliseconds(1000 / m_FrameRate);
 
 	while (true)
 	{
@@ -101,7 +102,7 @@ void dae::Minigin::Run(const std::function<void()>& load)
 		const float deltaTime = std::chrono::duration<float>(currentTime - lastTime).count();
 		lastTime = currentTime;
 
-		const bool doContinue = dae::InputManager::ProcessInput();
+		const bool doContinue = input.ProcessInput();
 		if (!doContinue)
 			break;
 
@@ -127,7 +128,7 @@ void dae::Minigin::Run(const std::function<void()>& load)
 		}
 
 		// Sleep to maintain frame rate
-		const auto sleepTime = lastTime + std::chrono::milliseconds(16) - std::chrono::high_resolution_clock::now();
+		const auto sleepTime = currentTime + std::chrono::milliseconds(secondPerFrame) - std::chrono::high_resolution_clock::now();
 		if (sleepTime > std::chrono::milliseconds(0))
 		{
 			std::this_thread::sleep_for(sleepTime);

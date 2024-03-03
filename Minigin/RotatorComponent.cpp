@@ -19,6 +19,5 @@ void dae::RotatorComponent::Update(float deltaTime)
 
         // Set the new position of the object
         m_pGameObject->SetLocalPosition(glm::vec3(newX, newY, 0.0f));
-        //m_pGameObject->SetPosition(newX, newY);
     }
 }
