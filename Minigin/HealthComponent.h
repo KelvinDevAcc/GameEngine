@@ -1,41 +1,33 @@
 #pragma once
 
 #include <list>
+#include <unordered_map>
 
 #include "Component.h"
 #include "Subject.h"
+#include "GameEvent.h"
 
 namespace dae
 {
-    class HealthComponent final : public Component, public Subject // Inherit from Subject interface
+    class HealthComponent final : public Component, public Subject 
     {
     public:
-        HealthComponent(int initialHealth, int initialLives);
+        HealthComponent();
         ~HealthComponent() override = default;
-
-        int GetHealth() const { return m_Health; }
-        void SetHealth(int health);
 
         int GetLives() const { return m_Lives; }
         void SetLives(int lives);
 
-        void Update(float deltaTime) override;
+        void Update(float deltaTime);
         const char* GetComponentType() const override;
 
         // Implementations for Subject interface
-        void Attach(Observer* observer) override { m_observers.push_back(observer); }
-        void Detach(Observer* observer) override { m_observers.remove(observer); }
-        void Notify() override
-        {
-            for (auto* observer : m_observers)
-            {
-                observer->Update();
-            }
-        }
+        void Attach(Observer* observer, GameEvent event) override { m_observers[event].push_back(observer); }
+        void Detach(Observer* observer, GameEvent event) override { m_observers[event].remove(observer); }
+        void Notify(GameEvent event) override;
 
     private:
-        int m_Health = 100;
         int m_Lives = 3;
-        std::list<Observer*> m_observers;
+        std::unordered_map<GameEvent, std::list<Observer*>> m_observers;
     };
 }

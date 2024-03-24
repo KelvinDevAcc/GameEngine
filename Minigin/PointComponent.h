@@ -1,15 +1,18 @@
 #pragma once
+
 #include <list>
+#include <unordered_map>
 
 #include "Component.h"
 #include "Subject.h"
+#include "GameEvent.h" 
 
 namespace dae
 {
     class PointComponent final : public Component, public Subject // Inherit from Subject interface
     {
     public:
-        PointComponent(int initialScore);
+        PointComponent();
         ~PointComponent() override = default;
 
         int GetScore() const { return m_Score; }
@@ -18,19 +21,21 @@ namespace dae
         void Update(float deltaTime) override;
         const char* GetComponentType() const override;
 
-        // Implementations for Subject interface
-        void Attach(Observer* observer) override { m_observers.push_back(observer); }
-        void Detach(Observer* observer) override { m_observers.remove(observer); }
-        void Notify() override
+        void Attach(Observer* observer, GameEvent event) override { m_observers[event].push_back(observer); }
+        void Detach(Observer* observer, GameEvent event) override { m_observers[event].remove(observer); }
+        void Notify(GameEvent event) override
         {
-            for (auto* observer : m_observers)
+            for (auto* observer : m_observers[event])
             {
-                observer->Update();
+                if (observer)
+                {
+                    observer->UpdateObsever(event);
+                }
             }
         }
 
     private:
         int m_Score;
-        std::list<Observer*> m_observers;
+        std::unordered_map<GameEvent, std::list<Observer*>> m_observers;
     };
 }

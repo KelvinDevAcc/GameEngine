@@ -1,5 +1,9 @@
 #pragma once
+
+#include "GameEvent.h"
+
 class Observer {
 public:
-    virtual void Update() = 0;
+	virtual ~Observer() = default;
+	virtual void UpdateObsever(GameEvent event) = 0;
 };

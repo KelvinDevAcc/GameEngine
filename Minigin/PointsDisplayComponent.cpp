@@ -1,4 +1,5 @@
 #include "PointsDisplayComponent.h"
+#include "GameEvent.h" 
 
 #include <SDL_ttf.h>
 #include <stdexcept>
@@ -10,15 +11,15 @@ namespace dae
     {
     }
 
-    void PointsDisplayComponent::Update(float /*deltaTime*/)
+    void PointsDisplayComponent::UpdateObsever(GameEvent event)
     {
-        // Update the text to display current score
-        if (m_pointComponent)
+        if (event == GameEvent::ScoreUpdated && m_pointComponent)
         {
-	        const std::string text = "Points: " + std::to_string(m_pointComponent->GetScore());
+            const std::string text = "Points: " + std::to_string(m_pointComponent->GetScore());
             RenderText(text);
         }
     }
+
 
     void PointsDisplayComponent::Render() const
     {
@@ -31,17 +32,24 @@ namespace dae
             Renderer::GetInstance().RenderTexture(*m_textTexture, posX, pos.y);
         }
     }
+
     void PointsDisplayComponent::SetPosition(float x, float y)
     {
         m_transform.SetPosition(glm::vec3(x, y, 0.0f));
     }
+
+    void PointsDisplayComponent::Update(float /*deltaTime*/)
+    {
+    }
+
     void PointsDisplayComponent::AttachToPointComponent(PointComponent* pointComponent)
     {
         m_pointComponent = pointComponent;
     }
+
     void PointsDisplayComponent::RenderText(const std::string& text)
     {
-        const SDL_Color color = { 255, 255, 255, 255 }; // White color
+        const SDL_Color color = { 255, 255, 255, 255 };
         const auto surf = TTF_RenderText_Blended(m_font->GetFont(), text.c_str(), color);
         if (surf == nullptr)
         {
@@ -51,7 +59,7 @@ namespace dae
         if (m_textTexture != nullptr)
         {
             SDL_DestroyTexture(m_textTexture->GetSDLTexture());
-            m_textTexture = nullptr; // Reset the unique_ptr
+            m_textTexture = nullptr; 
         }
 
         auto texture = SDL_CreateTextureFromSurface(Renderer::GetInstance().GetSDLRenderer(), surf);
@@ -62,8 +70,5 @@ namespace dae
 
         SDL_FreeSurface(surf);
         m_textTexture = std::make_unique<Texture2D>(texture);
-    }
-    void PointsDisplayComponent::Update()
-    {
     }
 }

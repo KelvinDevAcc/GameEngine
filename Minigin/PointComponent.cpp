@@ -1,21 +1,25 @@
 #include "PointComponent.h"
+#include "GameEvent.h" 
 
 namespace dae
 {
-	PointComponent::PointComponent(const int initalscore): m_Score(initalscore)
-	{
-	}
+    PointComponent::PointComponent() : m_Score()
+    {
+    }
 
     void PointComponent::SetScore(int score)
     {
         m_Score = score;
-        Notify(); // Notify observers after updating the score
+        Notify(GameEvent::ScoreUpdated);
+        if (m_Score >= 500)
+        {
+            Notify(GameEvent::ScoredWinningpoints);
+        }
     }
 
-    void PointComponent::Update(float  /*deltaTime*/)
+    void PointComponent::Update(float /*deltaTime*/)
     {
-        // Implement point-related updates here if needed
-        // For example, increase score over time, check for scoring conditions, etc.
+        
     }
 
     const char* PointComponent::GetComponentType() const

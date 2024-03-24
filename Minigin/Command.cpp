@@ -24,8 +24,8 @@ DamageCommand::DamageCommand(dae::HealthComponent* healthComponent, int damageAm
 void DamageCommand::Execute()
 {
     // Reduce health by damage amount
-    const int newHealth = m_healthComponent->GetHealth() - m_damageAmount;
-    m_healthComponent->SetHealth(newHealth);
+    const int newLivesAmout = m_healthComponent->GetLives() - m_damageAmount;
+    m_healthComponent->SetLives(newLivesAmout);
 }
 
 

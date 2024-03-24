@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
 #include <functional>
+#include <memory>
+
+#include "SteamAchievements.h"
 
 namespace dae
 {

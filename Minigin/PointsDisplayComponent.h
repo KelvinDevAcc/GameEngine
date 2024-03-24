@@ -17,11 +17,10 @@ namespace dae
         PointsDisplayComponent(std::unique_ptr<Font> font);
         ~PointsDisplayComponent() override = default;
 
-        void Update(float deltaTime) override;
         void Render() const override;
-        void Update() override;
+        void UpdateObsever(GameEvent event) override;
         void SetPosition(float x, float y) override;
-
+        void Update(float deltaTime) override;
         void AttachToPointComponent(PointComponent* pointComponent);
 
         const char* GetComponentType() const override { return "PointsDisplay"; }

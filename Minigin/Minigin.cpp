@@ -9,6 +9,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <steam_api_common.h>
 #include <thread>
 
 #include "FPSCounterComponent.h"
@@ -126,6 +127,8 @@ void dae::Minigin::Run(const std::function<void()>& load)
 				}
 			}
 		}
+
+		SteamAPI_RunCallbacks();
 
 		// Sleep to maintain frame rate
 		const auto sleepTime = currentTime + std::chrono::milliseconds(secondPerFrame) - std::chrono::high_resolution_clock::now();
