@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include <memory>
+#include <SDL_pixels.h>
+
 #include "Component.h"
 #include "Font.h"
 #include "Texture2D.h"
@@ -15,9 +17,9 @@ namespace dae
         void Render() const override;
 
         void SetText(const std::string& text);
-        void SetPosition(float x, float y) override;
+        void SetColor(const SDL_Color& color);
 
-        TextComponent(std::string text, std::unique_ptr<Font> font);
+        TextComponent(const std::string& text, std::unique_ptr<Font> font, const SDL_Color& color,GameObject& gameObject);
         ~TextComponent() override = default;
         TextComponent(const TextComponent& other) = delete;
         TextComponent(TextComponent&& other) = delete;
@@ -27,10 +29,11 @@ namespace dae
         const char* GetComponentType() const override { return "Text"; }
 
     private:
-        bool m_needsUpdate;
-        std::string m_text;
-        Transform m_transform{};
-        std::unique_ptr<Font> m_font;
-        std::unique_ptr<Texture2D> m_textTexture;
+        bool m_NeedsUpdate{};
+        SDL_Color m_TextColor{ 255,255,255,255 };
+        std::string m_Text{};
+        std::unique_ptr<Font> m_Font{nullptr};
+        std::unique_ptr<Texture2D> m_TextTexture{};
+        GameObject& m_GameObject;
     };
 }
