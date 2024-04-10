@@ -193,6 +193,7 @@
     <ClInclude Include="GameController.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameObjectBenchmark.h" />
+    <ClInclude Include="GameTime.h" />
     <ClInclude Include="imguiExerciseComponent.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="LivesDisplayComponent.h" />
@@ -230,6 +231,7 @@
     <ClCompile Include="GameController.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameObjectBenchmark.cpp" />
+    <ClCompile Include="GameTime.cpp" />
     <ClCompile Include="imguiExerciseComponent.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="LivesDisplayComponent.cpp" />

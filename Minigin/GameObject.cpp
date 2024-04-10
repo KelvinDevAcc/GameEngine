@@ -11,11 +11,11 @@ namespace dae
     {
     }
 
-    void GameObject::Update(float deltaTime) const
+    void GameObject::Update() const
     {
         for (auto& component : m_components)
         {
-            component->Update(deltaTime);
+            component->Update();
         }
     }
 

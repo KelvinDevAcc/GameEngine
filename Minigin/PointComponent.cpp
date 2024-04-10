@@ -12,10 +12,8 @@ namespace dae
         Notify(); // Notify observers after updating the score
     }
 
-    void PointComponent::Update(float  /*deltaTime*/)
+    void PointComponent::Update()
     {
-        // Implement point-related updates here if needed
-        // For example, increase score over time, check for scoring conditions, etc.
     }
 
     const char* PointComponent::GetComponentType() const

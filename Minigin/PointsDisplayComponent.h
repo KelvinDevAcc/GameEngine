@@ -17,7 +17,6 @@ namespace dae
         PointsDisplayComponent(std::unique_ptr<Font> font);
         ~PointsDisplayComponent() override = default;
 
-        void Update(float deltaTime) override;
         void Render() const override;
         void Update() override;
         void SetPosition(float x, float y) override;

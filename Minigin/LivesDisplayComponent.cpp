@@ -10,7 +10,7 @@ namespace dae
     {
     }
 
-    void LivesDisplayComponent::Update(float /*deltaTime*/)
+    void LivesDisplayComponent::Update()
     {
         // Update the text to display current lives
         if (m_healthComponent)
@@ -30,10 +30,6 @@ namespace dae
 
             Renderer::GetInstance().RenderTexture(*m_textTexture, posX, pos.y);
         }
-    }
-
-    void LivesDisplayComponent::Update()
-    {
     }
 
     void LivesDisplayComponent::SetPosition(float x, float y)

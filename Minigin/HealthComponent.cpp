@@ -7,7 +7,7 @@ namespace dae
     {
     }
 
-    void HealthComponent::Update(float /*deltaTime*/)
+    void HealthComponent::Update()
     {
         if (m_Health <= 0)
         {

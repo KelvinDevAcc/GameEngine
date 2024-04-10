@@ -14,7 +14,7 @@ namespace dae
         Scene* CreateScene(const std::string& name);
         Scene* GetActiveScene() const;
 
-        void Update(float deltaTime) const;
+        void Update() const;
         void Render() const;
 
     private:

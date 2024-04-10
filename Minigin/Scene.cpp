@@ -30,11 +30,11 @@ namespace dae
         m_objects.clear();
     }
 
-    void Scene::Update(float deltaTime) const
+    void Scene::Update() const
     {
         for (const auto& object : m_objects)
         {
-            object->Update(deltaTime);
+            object->Update();
         }
     }
 

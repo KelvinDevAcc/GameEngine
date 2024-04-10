@@ -19,6 +19,7 @@
 #include "Scene.h"
 #include "TextComponent.h"
 #include "GameObject.h"
+#include "GameTime.h"
 
 SDL_Window* g_window{};
 
@@ -93,20 +94,16 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	const auto& sceneManager = SceneManager::GetInstance();
 	const auto& input = InputManager::GetInstance();
 
-	auto lastTime = std::chrono::high_resolution_clock::now();
-	constexpr auto secondPerFrame = std::chrono::milliseconds(1000 / m_FrameRate);
+	GameTime::Start();
 
 	while (true)
 	{
-		const auto currentTime = std::chrono::high_resolution_clock::now();
-		const float deltaTime = std::chrono::duration<float>(currentTime - lastTime).count();
-		lastTime = currentTime;
-
+		GameTime::Update();
 		const bool doContinue = input.ProcessInput();
 		if (!doContinue)
 			break;
 
-		sceneManager.Update(deltaTime);
+		sceneManager.Update();
 
 		renderer.Render();
 
@@ -128,7 +125,7 @@ void dae::Minigin::Run(const std::function<void()>& load)
 		}
 
 		// Sleep to maintain frame rate
-		const auto sleepTime = currentTime + std::chrono::milliseconds(secondPerFrame) - std::chrono::high_resolution_clock::now();
+		const auto sleepTime = GameTime::m_LastTime + std::chrono::milliseconds(1000/m_FrameRate) - std::chrono::high_resolution_clock::now();
 		if (sleepTime > std::chrono::milliseconds(0))
 		{
 			std::this_thread::sleep_for(sleepTime);

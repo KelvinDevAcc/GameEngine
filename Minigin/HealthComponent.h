@@ -19,7 +19,7 @@ namespace dae
         int GetLives() const { return m_Lives; }
         void SetLives(int lives);
 
-        void Update(float deltaTime) override;
+        void Update() override;
         const char* GetComponentType() const override;
 
         // Implementations for Subject interface

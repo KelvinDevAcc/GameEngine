@@ -15,7 +15,7 @@ namespace dae
         int GetScore() const { return m_Score; }
         void SetScore(int score);
 
-        void Update(float deltaTime) override;
+        void Update() override;
         const char* GetComponentType() const override;
 
         // Implementations for Subject interface

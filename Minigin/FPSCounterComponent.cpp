@@ -1,11 +1,13 @@
 ﻿#include "FPSCounterComponent.h"
 #include <iostream>
 
-    void dae::FPSCounterComponent::Update(float deltaTime)
+#include "GameTime.h"
+
+void dae::FPSCounterComponent::Update()
     {
         // Update frame count and elapsed time using stored delta time
         m_frameCount++;
-        m_elapsedTime += deltaTime;
+        m_elapsedTime += GameTime::GetDeltaTime();
 
         // If one second has passed, calculate FPS
         if (m_elapsedTime >= 1.0f)

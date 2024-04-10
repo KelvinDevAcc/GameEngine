@@ -10,7 +10,7 @@ namespace dae
     {
     }
 
-    void PointsDisplayComponent::Update(float /*deltaTime*/)
+    void PointsDisplayComponent::Update()
     {
         // Update the text to display current score
         if (m_pointComponent)
@@ -62,8 +62,5 @@ namespace dae
 
         SDL_FreeSurface(surf);
         m_textTexture = std::make_unique<Texture2D>(texture);
-    }
-    void PointsDisplayComponent::Update()
-    {
     }
 }

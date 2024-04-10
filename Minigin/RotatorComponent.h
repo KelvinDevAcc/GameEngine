@@ -10,7 +10,7 @@ namespace dae
     public:
         RotatorComponent(float rotationSpeed, float centerX, float centerY, float radius);
 
-        void Update(float deltaTime) override;
+        void Update() override;
         
 
         const char* GetComponentType() const override { return "RotatorComponent"; }

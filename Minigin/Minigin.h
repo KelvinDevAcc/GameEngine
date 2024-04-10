@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include <string>
 #include <functional>
 
@@ -16,6 +17,6 @@ namespace dae
 		Minigin& operator=(const Minigin& other) = delete;
 		Minigin& operator=(Minigin&& other) = delete;
 	private:
-		static constexpr int m_FrameRate{ 60 };
+		inline static int m_FrameRate = 60;
 	};
 }

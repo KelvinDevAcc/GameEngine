@@ -3,15 +3,17 @@
 #include <iostream>
 #include <SDL_stdinc.h>
 
+#include "GameTime.h"
+
 
 dae::RotatorComponent::RotatorComponent(float rotationSpeed, float centerX, float centerY, float radius)
     : m_RotationSpeed(rotationSpeed), m_CurrentRotation(0.0f), m_CenterX(centerX), m_CenterY(centerY), m_Radius(radius)
 {}
 
-void dae::RotatorComponent::Update(float deltaTime)
+void dae::RotatorComponent::Update()
 {
     // Update rotation based on rotation speed and delta time
-    m_CurrentRotation += m_RotationSpeed * deltaTime;
+    m_CurrentRotation += m_RotationSpeed * GameTime::GetDeltaTime();
 
     // Wrap the angle within the range [0, 2π]
     const float TwoPi = 2.0f * static_cast<float>(M_PI);

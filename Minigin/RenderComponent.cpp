@@ -1,5 +1,6 @@
 ﻿#include "RenderComponent.h"
 #include "GameObject.h"
+#include "GameTime.h"
 #include "Renderer.h"
 
 namespace dae
@@ -9,9 +10,9 @@ namespace dae
     {
     }
 
-    void RenderComponent::Update(float deltaTime) {
+    void RenderComponent::Update() {
         if (m_renderMode == RenderMode::Animated) {
-            m_currentFrame += m_animationSpeed * deltaTime;
+            m_currentFrame += m_animationSpeed * GameTime::GetDeltaTime();
             if (m_currentFrame >= m_animationFrames.size()) {
                 m_currentFrame -= static_cast<float>(m_animationFrames.size());
             }
