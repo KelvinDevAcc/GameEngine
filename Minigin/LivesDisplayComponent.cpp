@@ -39,9 +39,6 @@ namespace dae
         m_transform.SetPosition(glm::vec3(x, y, 0.0f));
     }
 
-    void LivesDisplayComponent::Update(float /*deltaTime*/)
-    {
-    }
 
 
     void LivesDisplayComponent::AttachToHealthComponent(HealthComponent* healthComponent)

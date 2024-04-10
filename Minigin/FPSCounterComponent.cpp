@@ -1,7 +1,7 @@
 ﻿#include "FPSCounterComponent.h"
 #include <iostream>
 
-    void dae::FPSCounterComponent::Update(float deltaTime)
+    void dae::FPSCounterComponent::Update()
     {
         // Update frame count and elapsed time using stored delta time
         m_frameCount++;

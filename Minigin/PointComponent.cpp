@@ -17,10 +17,6 @@ namespace dae
         }
     }
 
-    void PointComponent::Update(float /*deltaTime*/)
-    {
-        
-    }
 
     const char* PointComponent::GetComponentType() const
     {

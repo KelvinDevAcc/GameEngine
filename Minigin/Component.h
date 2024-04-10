@@ -11,7 +11,7 @@ namespace dae
         virtual ~Component() = default;
 
         virtual void Initialize() {}
-        virtual void Update(float deltaTime) = 0;
+        virtual void Update() {}
         virtual void Render() const {} 
         virtual const char* GetComponentType() const = 0;
         virtual void SetPosition(float x, float y) { (void)x; (void)y; }

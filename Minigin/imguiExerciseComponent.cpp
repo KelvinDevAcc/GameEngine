@@ -5,7 +5,6 @@ namespace dae
     imguiExerciseComponent::imguiExerciseComponent() = default;
     imguiExerciseComponent::~imguiExerciseComponent() = default;
 
-    void imguiExerciseComponent::Update(float /* deltaTime */) {}
 
     void imguiExerciseComponent::Render() const
     {

@@ -8,7 +8,7 @@ dae::RotatorComponent::RotatorComponent(float rotationSpeed, float centerX, floa
     : m_RotationSpeed(rotationSpeed), m_CurrentRotation(0.0f), m_CenterX(centerX), m_CenterY(centerY), m_Radius(radius)
 {}
 
-void dae::RotatorComponent::Update(float deltaTime)
+void dae::RotatorComponent::Update()
 {
     // Update rotation based on rotation speed and delta time
     m_CurrentRotation += m_RotationSpeed * deltaTime;

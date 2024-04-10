@@ -10,7 +10,7 @@ dae::TextComponent::TextComponent(std::string text, std::unique_ptr<Font> font)
 	: m_needsUpdate(true), m_text(std::move(text)), m_font(std::move(font)), m_textTexture(nullptr)
 { }
 
-void dae::TextComponent::Update(float /*deltaTime*/)
+void dae::TextComponent::Update()
 {
     if (m_needsUpdate)
     {

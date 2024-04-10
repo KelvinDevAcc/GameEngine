@@ -9,7 +9,7 @@ namespace dae
         FPSCounterComponent() = default;
         ~FPSCounterComponent() override = default;
 
-        void Update(float deltaTime) override;
+        void Update() override;
         float GetFPS() const; // Declaration of GetFPS function
 
         const char* GetComponentType() const override { return "FPSCounter"; } // Implementation of GetComponentType()

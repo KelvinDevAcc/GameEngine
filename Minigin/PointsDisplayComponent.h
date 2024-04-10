@@ -20,7 +20,6 @@ namespace dae
         void Render() const override;
         void UpdateObsever(GameEvent event) override;
         void SetPosition(float x, float y) override;
-        void Update(float deltaTime) override;
         void AttachToPointComponent(PointComponent* pointComponent);
 
         const char* GetComponentType() const override { return "PointsDisplay"; }

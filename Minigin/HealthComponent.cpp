@@ -19,7 +19,7 @@ namespace dae
     {
         m_Lives = lives;
         Notify(GameEvent::LivesUpdated);
-        if (m_Lives >= 0)
+        if (m_Lives <= 0)
         {
             Notify(GameEvent::playerDied);
         }

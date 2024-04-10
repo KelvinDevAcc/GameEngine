@@ -14,7 +14,7 @@ namespace dae
         GameObject();
         ~GameObject() = default;
 
-        void Update(float deltaTime) const;
+        void Update() const;
         void Render() const;
 
         // Function to set rotation

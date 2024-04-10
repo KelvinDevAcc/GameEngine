@@ -26,11 +26,11 @@ namespace dae
         }
     }
 
-    void SceneManager::Update(float deltaTime) const
+    void SceneManager::Update() const
     {
         for (auto& scene : m_scenes)
         {
-            scene->Update(deltaTime);
+            scene->Update();
         }
     }
 

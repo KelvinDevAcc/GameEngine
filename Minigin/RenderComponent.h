@@ -14,7 +14,7 @@ namespace dae
         RenderComponent();
         ~RenderComponent() override = default;
 
-        void Update(float deltaTime) override;
+        void Update() override;
         void Render() const override;
 
         void SetTexture(const std::unique_ptr<Texture2D> texture);

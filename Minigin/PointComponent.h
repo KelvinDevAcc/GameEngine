@@ -18,7 +18,6 @@ namespace dae
         int GetScore() const { return m_Score; }
         void SetScore(int score);
 
-        void Update(float deltaTime) override;
         const char* GetComponentType() const override;
 
         void Attach(Observer* observer, GameEvent event) override { m_observers[event].push_back(observer); }

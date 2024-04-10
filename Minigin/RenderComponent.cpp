@@ -9,7 +9,7 @@ namespace dae
     {
     }
 
-    void RenderComponent::Update(float deltaTime) {
+    void RenderComponent::Update() {
         if (m_renderMode == RenderMode::Animated) {
             m_currentFrame += m_animationSpeed * deltaTime;
             if (m_currentFrame >= m_animationFrames.size()) {

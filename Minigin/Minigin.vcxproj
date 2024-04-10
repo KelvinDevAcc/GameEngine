@@ -222,6 +222,7 @@ xcopy $(solutionDir)3rdParty\steam\lib\win64\*.dll $(OutputPath)/R /Y</Command>
     <ClInclude Include="GameEvent.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameObjectBenchmark.h" />
+    <ClInclude Include="GameTime.h" />
     <ClInclude Include="imguiExerciseComponent.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="LivesDisplayComponent.h" />
@@ -260,6 +261,7 @@ xcopy $(solutionDir)3rdParty\steam\lib\win64\*.dll $(OutputPath)/R /Y</Command>
     <ClCompile Include="GameController.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameObjectBenchmark.cpp" />
+    <ClCompile Include="GameTime.cpp" />
     <ClCompile Include="imguiExerciseComponent.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="LivesDisplayComponent.cpp" />

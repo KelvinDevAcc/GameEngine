@@ -11,7 +11,7 @@ namespace  dae
     public:
         SteamAchievements() = default;
         ~SteamAchievements() override = default;
-        void Update(float deltaTime) override;
+        void Update() override;
         void UpdateObsever(GameEvent event) override;
         const char* GetComponentType() const override { return "SteamAchievements"; }
     };

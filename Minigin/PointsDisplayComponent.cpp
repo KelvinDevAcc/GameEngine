@@ -38,9 +38,6 @@ namespace dae
         m_transform.SetPosition(glm::vec3(x, y, 0.0f));
     }
 
-    void PointsDisplayComponent::Update(float /*deltaTime*/)
-    {
-    }
 
     void PointsDisplayComponent::AttachToPointComponent(PointComponent* pointComponent)
     {

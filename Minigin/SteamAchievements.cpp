@@ -4,15 +4,10 @@
 #include <isteamuserstats.h>
 
 
-void dae::SteamAchievements::Update(float /*deltaTime*/)
-{
-}
-
 void dae::SteamAchievements::UpdateObsever(GameEvent event)
 {
     switch (event)
     {
-
     case GameEvent::ScoredWinningpoints:
         SteamUserStats()->SetAchievement("ACH_WIN_ONE_GAME");
         break;
