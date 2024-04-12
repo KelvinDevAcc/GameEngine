@@ -17,10 +17,11 @@ namespace dae
         void Update() const;
         void Render() const;
 
+        const std::string& GetName() const { return m_name; }
         const std::vector<std::unique_ptr<GameObject>>& GetObjects() const;
 
         explicit Scene(std::string name);
-        ~Scene();
+        ~Scene() = default;
         Scene(const Scene& other) = delete;
         Scene(Scene&& other) = delete;
         Scene& operator=(const Scene& other) = delete;
@@ -31,6 +32,5 @@ namespace dae
         std::string m_name;
         std::vector<std::unique_ptr<GameObject>> m_objects{};
 
-        static unsigned int m_idCounter;
     };
 }

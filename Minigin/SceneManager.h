@@ -13,12 +13,14 @@ namespace dae
     public:
         Scene* CreateScene(const std::string& name);
         Scene* GetActiveScene() const;
+        void SetActiveScene(const std::string& name);
+        void GoToNextScene();
 
         void Update() const;
         void Render() const;
 
     private:
         std::vector<std::unique_ptr<Scene>> m_scenes{};
-        int m_activeSceneIndex = 0; // Index to keep track of the active scene
+        std::vector<std::unique_ptr<Scene>>::iterator m_activeSceneIterator;
     };
 }

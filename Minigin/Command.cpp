@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "SceneManager.h"
+
 
 MoveCommand::MoveCommand(dae::GameObject* gameObject, float deltaX, float deltaY)
     : m_gameObject(gameObject), m_deltaX(deltaX), m_deltaY(deltaY) {}
@@ -39,4 +41,13 @@ void ScorePointCommand::Execute()
     // Increase score by score amount
     const int newScore = m_pointComponent->GetScore() + m_scoreAmount;
     m_pointComponent->SetScore(newScore);
+}
+
+GoToNextSceneCommand::GoToNextSceneCommand() = default;
+
+void GoToNextSceneCommand::Execute()
+{
+    auto& sceneManager = dae::SceneManager::GetInstance();
+    sceneManager.GoToNextScene();
+   
 }

@@ -7,38 +7,55 @@ namespace dae
 {
     Scene* SceneManager::CreateScene(const std::string& name)
     {
-        // Creating a new Scene instance using Scene constructor
         auto scene = std::make_unique<Scene>(name);
         m_scenes.push_back(std::move(scene));
+
+        //// If this is the first scene, or if no scene is currently active, make it active
+        //if (m_scenes.size() == 1 || m_activeSceneIterator == m_scenes.end())
+        //    m_activeSceneIterator = m_scenes.begin();
+
         return m_scenes.back().get();
     }
 
     Scene* SceneManager::GetActiveScene() const
     {
-        if (m_activeSceneIndex >= 0 && m_activeSceneIndex < static_cast<int>(m_scenes.size()))
+        return m_activeSceneIterator->get();
+    }
+
+    void SceneManager::SetActiveScene(const std::string& name)
+    {
+        for (auto it = m_scenes.begin(); it != m_scenes.end(); ++it)
         {
-            return m_scenes[m_activeSceneIndex].get(); // Return a raw pointer
+            if ((*it)->GetName() == name)
+            {
+                m_activeSceneIterator = it;
+                return;
+            }
         }
-        else
-        {
-            // Handle the case where the active scene index is out of range
-            throw std::out_of_range("No active scene available or active scene index out of range");
-        }
+        // Throw an exception if the scene with the specified name is not found
+        throw std::runtime_error("Scene not found: " + name);
+    }
+    void SceneManager::GoToNextScene()
+    {
+        // Advance to the next scene
+        ++m_activeSceneIterator;
+        if (m_activeSceneIterator == m_scenes.end()) // If it reaches the end, loop back to the beginning
+            m_activeSceneIterator = m_scenes.begin();
     }
 
     void SceneManager::Update() const
     {
-        for (auto& scene : m_scenes)
+        if (m_activeSceneIterator != m_scenes.end())
         {
-            scene->Update();
+            (*m_activeSceneIterator)->Update();
         }
     }
 
     void SceneManager::Render() const
     {
-        for (const auto& scene : m_scenes)
+        if (m_activeSceneIterator != m_scenes.end())
         {
-            scene->Render();
+            (*m_activeSceneIterator)->Render();
         }
     }
 }

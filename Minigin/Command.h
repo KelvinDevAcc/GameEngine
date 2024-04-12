@@ -50,3 +50,10 @@ private:
     dae::PointComponent* m_pointComponent;
     int m_scoreAmount;
 };
+
+class GoToNextSceneCommand final : public Command {
+public:
+    GoToNextSceneCommand();
+
+    virtual void Execute() override;
+};
