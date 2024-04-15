@@ -72,12 +72,6 @@ namespace dae
     {
         m_localPosition.SetPosition(pos);
         SetPositionDirty();
-        for (const auto& component : m_components)
-        {
-            component->SetPosition(pos.x, pos.y);
-        }
-       
-
     }
 
     const glm::vec3& GameObject::GetWorldPosition()

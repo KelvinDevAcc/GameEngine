@@ -1,13 +1,12 @@
 ﻿#include "RotatorComponent.h"
 #include <cmath>
-#include <iostream>
 #include <SDL_stdinc.h>
 
 #include "GameTime.h"
 
 
-dae::RotatorComponent::RotatorComponent(float rotationSpeed, float centerX, float centerY, float radius)
-    : m_RotationSpeed(rotationSpeed), m_CurrentRotation(0.0f), m_CenterX(centerX), m_CenterY(centerY), m_Radius(radius)
+dae::RotatorComponent::RotatorComponent(GameObject* gameObject, float rotationSpeed, float centerX, float centerY, float radius)
+    : m_RotationSpeed(rotationSpeed), m_CurrentRotation(0.0f), m_CenterX(centerX), m_CenterY(centerY), m_Radius(radius), m_GameObject(gameObject)
 {}
 
 void dae::RotatorComponent::Update()
@@ -21,13 +20,13 @@ void dae::RotatorComponent::Update()
 
 
     // Apply rotation around the specified center point
-    if (m_pGameObject)
+    if (m_GameObject)
     {
         // Calculate the new positions after rotation
         float newX = m_CenterX + m_Radius * std::cos(m_CurrentRotation);
         float newY = m_CenterY + m_Radius * std::sin(m_CurrentRotation);
 
         // Set the new position of the object
-        m_pGameObject->SetLocalPosition(glm::vec3(newX, newY, 0.0f));
+        m_GameObject->SetLocalPosition(glm::vec3(newX, newY, 0.0f));
     }
 }

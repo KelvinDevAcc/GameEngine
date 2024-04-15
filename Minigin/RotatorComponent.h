@@ -8,7 +8,7 @@ namespace dae
     class RotatorComponent : public Component
     {
     public:
-        RotatorComponent(float rotationSpeed, float centerX, float centerY, float radius);
+        RotatorComponent(GameObject* m_GameObject, float rotationSpeed, float centerX, float centerY, float radius);
 
         void Update() override;
         
@@ -21,6 +21,8 @@ namespace dae
         float m_CenterX;
         float m_CenterY;
         float m_Radius;
+
+        GameObject* m_GameObject;
     };
 }
 
