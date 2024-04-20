@@ -29,9 +29,4 @@ namespace dae
         m_Lives = lives;
         Notify(); // Notify observers after updating lives
     }
-
-    const char* HealthComponent::GetComponentType() const
-    {
-        return "HealthComponent";
-    }
 }

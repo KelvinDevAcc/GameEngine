@@ -107,23 +107,6 @@ void dae::Minigin::Run(const std::function<void()>& load)
 
 		renderer.Render();
 
-		// Update FPS display
-		const auto& activeScene = sceneManager.GetActiveScene();
-		for (const auto& gameObject : activeScene->GetObjects())
-		{
-			if (const auto fpsCounterComponent = gameObject->GetComponent<FPSCounterComponent>())
-			{
-				if (const auto fpsTextObject = gameObject->GetComponent<TextComponent>())
-				{
-					// Format FPS string with one decimal point
-					std::stringstream ss;
-					ss << "FPS: " << std::fixed << std::setprecision(1) << fpsCounterComponent->GetFPS();
-					fpsTextObject->SetText(ss.str());
-					break;
-				}
-			}
-		}
-
 		// Sleep to maintain frame rate
 		const auto sleepTime = GameTime::m_LastTime + std::chrono::milliseconds(1000/m_FrameRate) - std::chrono::high_resolution_clock::now();
 		if (sleepTime > std::chrono::milliseconds(0))

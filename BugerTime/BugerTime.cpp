@@ -16,11 +16,10 @@
 #include "RenderComponent.h"
 #include "Command.h"
 #include "InputManager.h"
-#include "RotatorComponent.h"
-#include "GameController.h" 
 #include "HealthComponent.h"
 #include "LivesDisplayComponent.h"
 #include "PointsDisplayComponent.h"
+#include "RotatorComponent.h"
 
 void load()
 {
@@ -49,18 +48,20 @@ void load()
     logoObject->AddComponent(std::move(logoRotatorComponent));
     scene->Add(std::move(logoObject));
 
-    // Create GameObject for Character 1
+     //Create GameObject for Character 1
     auto CharacterObject1 = std::make_unique<dae::GameObject>();
     auto CharacterRenderComponent1 = std::make_unique<dae::RenderComponent>();
     CharacterRenderComponent1->SetTexture(dae::ResourceManager::GetInstance().LoadTexture("Character.png"));
     CharacterRenderComponent1->SetDimensions(50, 50);
     CharacterObject1->SetLocalPosition(glm::vec3(250.0f, 300.0f, 0.0f));
 
-    // Create HealthComponent and PointComponent
+ 
+
+    //Create HealthComponent and PointComponent
     auto Character1Health = std::make_unique<dae::HealthComponent>(100, 3);
     auto Character1points = std::make_unique<dae::PointComponent>(0);
 
-    // Bind commands for Character 1 movement using WASD (keyboard)
+	//Bind commands for Character 1 movement using WASD (keyboard)
     inputManager.BindCommand(SDL_SCANCODE_W, KeyState::Pressed, std::make_unique<MoveCommand>(CharacterObject1.get(), 0.0f, -5.0f), InputType::Keyboard);
     inputManager.BindCommand(SDL_SCANCODE_S, KeyState::Pressed, std::make_unique<MoveCommand>(CharacterObject1.get(), 0.0f, 5.0f), InputType::Keyboard);
     inputManager.BindCommand(SDL_SCANCODE_A, KeyState::Pressed, std::make_unique<MoveCommand>(CharacterObject1.get(), -5.0f, 0.0f), InputType::Keyboard);
@@ -73,7 +74,7 @@ void load()
 
     inputManager.BindCommand(SDL_SCANCODE_M, KeyState::Up, std::make_unique<GoToNextSceneCommand>(), InputType::Keyboard);
 
-    // Add HealthComponent and PointComponent to CharacterObject1
+     //Add HealthComponent and PointComponent to CharacterObject1
     CharacterObject1->AddComponent(std::move(Character1Health));
     CharacterObject1->AddComponent(std::move(Character1points));
     CharacterObject1->AddComponent(std::move(CharacterRenderComponent1));
@@ -168,14 +169,13 @@ void load()
     scene->Add(std::move(Infocharacter2Txt));
 
 
-    // Create GameObject for FPS counter
+     //Create GameObject for FPS counter
     auto fpsCounterObject = std::make_unique<dae::GameObject>();
-    auto fpsCounterComponent = std::make_unique<dae::FPSCounterComponent>();
-    fpsCounterObject->AddComponent(std::move(fpsCounterComponent));
-
-    // Create TextComponent for displaying FPS
     auto fpsTextComponent = std::make_unique<dae::TextComponent>("FPS: ", dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36), SDL_Color{ 252, 157, 3, 255 }, *fpsCounterObject); // Specify color here
-    fpsCounterObject->AddComponent(std::move(fpsTextComponent));
+    auto fpsCounterComponent = std::make_unique<dae::FPSCounterComponent>(fpsTextComponent.get());
+
+    fpsCounterObject->AddComponent(std::move(fpsCounterComponent));
+	fpsCounterObject->AddComponent(std::move(fpsTextComponent));
     fpsCounterObject->SetLocalPosition(glm::vec3(100.f, 20.f, 0.0f));
     scene->Add(std::move(fpsCounterObject));
 
@@ -184,14 +184,13 @@ void load()
 
     // Create GameObject for FPS counter
     auto fpsCounterObject1 = std::make_unique<dae::GameObject>();
-    auto fpsCounterComponent1 = std::make_unique<dae::FPSCounterComponent>();
-    fpsCounterObject1->AddComponent(std::move(fpsCounterComponent1));
-
-    // Create TextComponent for displaying FPS
     auto fpsTextComponent1 = std::make_unique<dae::TextComponent>("FPS: ", dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36), SDL_Color{ 252, 157, 3, 255 }, *fpsCounterObject1); // Specify color here
     fpsCounterObject1->AddComponent(std::move(fpsTextComponent1));
     fpsCounterObject1->SetLocalPosition(glm::vec3(100.f, 20.f, 0.0f));
+    auto fpsCounterComponent1 = std::make_unique<dae::FPSCounterComponent>(fpsTextComponent1.get());
+    fpsCounterObject1->AddComponent(std::move(fpsCounterComponent1));
     scene2->Add(std::move(fpsCounterObject1));
+
 
     // Create GameObject for Title
     auto TitleObject02 = std::make_unique<dae::GameObject>();
@@ -217,8 +216,6 @@ void load()
     const auto scene3 = sceneManager.CreateScene("Scene3");
 
     // Create GameObject for background
-
-
     auto backgroundObject03 = std::make_unique<dae::GameObject>();
     auto backgroundRenderComponent03 = std::make_unique<dae::RenderComponent>();
     backgroundRenderComponent03->SetTexture(dae::ResourceManager::GetInstance().LoadTexture("Stage01.png"));
@@ -229,12 +226,11 @@ void load()
 
     // Create GameObject for FPS counter 2
     auto fpsCounterObject2 = std::make_unique<dae::GameObject>();
-    auto fpsCounterComponent2 = std::make_unique<dae::FPSCounterComponent>();
+    auto fpsTextComponent2 = std::make_unique<dae::TextComponent>("FPS: ", dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36), SDL_Color{ 252, 157, 3, 255 }, *fpsCounterObject2); // Specify color here
+    auto fpsCounterComponent2 = std::make_unique<dae::FPSCounterComponent>(fpsTextComponent2.get());
+    fpsCounterObject2->AddComponent(std::move(fpsTextComponent2));
     fpsCounterObject2->AddComponent(std::move(fpsCounterComponent2));
 
-    // Create TextComponent for displaying FPS
-    auto fpsTextComponent2 = std::make_unique<dae::TextComponent>("FPS: ", dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36), SDL_Color{ 252, 157, 3, 255 }, *fpsCounterObject2); // Specify color here
-    fpsCounterObject2->AddComponent(std::move(fpsTextComponent2));
     fpsCounterObject2->SetLocalPosition(glm::vec3(100.f, 20.f, 0.0f));
     scene3->Add(std::move(fpsCounterObject2));
 

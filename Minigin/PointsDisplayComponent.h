@@ -20,7 +20,8 @@ namespace dae
 
         void AttachToPointComponent(PointComponent* pointComponent);
 
-        const char* GetComponentType() const override { return "PointsDisplay"; }
+        std::type_info const& GetComponentType() const override { return typeid(PointsDisplayComponent); }
+
 
     private:
         PointComponent* m_pointComponent;

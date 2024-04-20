@@ -37,7 +37,6 @@ namespace dae
     void GameObject::AddComponent(std::unique_ptr<Component> component)
     {
         m_components.push_back(std::move(component));
-        m_components.back()->SetGameObject(this);
     }
 
     void GameObject::RemoveComponent(Component* component)

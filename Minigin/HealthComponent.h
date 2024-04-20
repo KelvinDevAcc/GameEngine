@@ -20,7 +20,7 @@ namespace dae
         void SetLives(int lives);
 
         void Update() override;
-        const char* GetComponentType() const override;
+        std::type_info const& GetComponentType() const override { return typeid(HealthComponent); }
 
         // Implementations for Subject interface
         void Attach(Observer* observer) override { m_observers.push_back(observer); }

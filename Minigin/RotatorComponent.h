@@ -13,7 +13,8 @@ namespace dae
         void Update() override;
         
 
-        const char* GetComponentType() const override { return "RotatorComponent"; }
+        std::type_info const& GetComponentType() const override { return typeid(RotatorComponent); }
+
 
     private:
         float m_RotationSpeed; // Rotation speed in degrees per second

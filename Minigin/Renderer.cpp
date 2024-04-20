@@ -103,6 +103,20 @@ void dae::Renderer::RenderTexture(const Texture2D& texture, float pos_x, float p
 	SDL_RenderCopyEx(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst, rotation_angle, nullptr, SDL_FLIP_NONE);
 }
 
+void dae::Renderer::RenderTexture(const Texture2D& texture, float x, float y, const glm::vec2& cellSize,
+	int pixelsPerUnit) const
+{
+	// Calculate the destination rectangle based on the position and cell size
+	SDL_Rect destRect{
+		static_cast<int>(x),
+		static_cast<int>(y),
+		static_cast<int>(cellSize.x * static_cast<float>(pixelsPerUnit)),
+		static_cast<int>(cellSize.y * static_cast<float>(pixelsPerUnit))
+	};
+
+	// Render the texture to the screen
+	SDL_RenderCopy(m_renderer, texture.GetSDLTexture(), nullptr, &destRect);
+}
 
 
 SDL_Renderer* dae::Renderer::GetSDLRenderer() const { return m_renderer; }

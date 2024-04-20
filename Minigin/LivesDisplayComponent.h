@@ -21,7 +21,8 @@ namespace dae
 
         void AttachToHealthComponent(HealthComponent* healthComponent);
 
-        const char* GetComponentType() const override { return "LivesDisplay"; }
+        std::type_info const& GetComponentType() const override { return typeid(LivesDisplayComponent); }
+
 
     private:
         std::unique_ptr<TextComponent> m_textComponent;

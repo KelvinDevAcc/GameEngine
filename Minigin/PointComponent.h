@@ -16,7 +16,8 @@ namespace dae
         void SetScore(int score);
 
         void Update() override;
-        const char* GetComponentType() const override;
+        std::type_info const& GetComponentType() const override { return typeid(PointComponent); }
+
 
         // Implementations for Subject interface
         void Attach(Observer* observer) override { m_observers.push_back(observer); }

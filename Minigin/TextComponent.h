@@ -26,7 +26,7 @@ namespace dae
         TextComponent& operator=(const TextComponent& other) = delete;
         TextComponent& operator=(TextComponent&& other) = delete;
 
-        const char* GetComponentType() const override { return "Text"; }
+        std::type_info const& GetComponentType() const override { return typeid(TextComponent); }
 
     private:
         bool m_NeedsUpdate{};

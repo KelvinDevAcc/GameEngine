@@ -1,28 +1,43 @@
 ﻿#include "FPSCounterComponent.h"
-#include <iostream>
-
 #include "GameTime.h"
+#include "TextComponent.h"
+
+dae::FPSCounterComponent::FPSCounterComponent(TextComponent* textComponent)
+	:m_TextComponent(textComponent)
+{
+}
 
 void dae::FPSCounterComponent::Update()
+{
+    // Update frame count and elapsed time using stored delta time
+    m_frameCount++;
+    m_elapsedTime += GameTime::GetDeltaTime();
+
+    // If one second has passed, calculate FPS
+    if (m_elapsedTime >= 1.0f)
     {
-        // Update frame count and elapsed time using stored delta time
-        m_frameCount++;
-        m_elapsedTime += GameTime::GetDeltaTime();
+        m_fps = static_cast<float>(m_frameCount) / m_elapsedTime;
 
-        // If one second has passed, calculate FPS
-        if (m_elapsedTime >= 1.0f)
-        {
-            m_fps = static_cast<float>(m_frameCount) / m_elapsedTime;
-
-            // Reset frame count and elapsed time
-            m_frameCount = 0;
-            m_elapsedTime = 0.0f;
-        }
+        // Reset frame count and elapsed time
+        m_frameCount = 0;
+        m_elapsedTime = 0.0f;
     }
 
-    float dae::FPSCounterComponent::GetFPS() const
+    if (m_TextComponent)
     {
-        return m_fps;
+        // Format FPS value with one decimal place precision
+        std::stringstream stream;
+        stream << std::fixed << std::setprecision(1) << m_fps;
+        const std::string fpsText = "FPS: " + stream.str();
+
+        m_TextComponent->SetText(fpsText);
     }
+}
+
+float dae::FPSCounterComponent::GetFPS() const
+{
+    return m_fps;
+}
+
 
 

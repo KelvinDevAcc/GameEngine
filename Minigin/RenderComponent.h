@@ -23,7 +23,8 @@ namespace dae
         void SetAnimationFrames(const std::vector<std::unique_ptr<Texture2D>> frames);
         void SetAnimationSpeed(float framesPerSecond);
 
-        const char* GetComponentType() const override { return "Render"; }
+        std::type_info const& GetComponentType() const override { return typeid(RenderComponent); }
+
 
     private:
         enum class RenderMode {

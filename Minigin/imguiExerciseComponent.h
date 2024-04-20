@@ -19,7 +19,8 @@ namespace dae
 
         void Render() const override;
 
-        const char* GetComponentType() const override;
+        std::type_info const& GetComponentType() const override { return typeid(imguiExerciseComponent); }
+
 
     private:
         static constexpr int buffer_size = 1 << 26; // Define buffer_size as a constant

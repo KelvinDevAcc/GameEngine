@@ -16,8 +16,5 @@ namespace dae
     {
     }
 
-    const char* PointComponent::GetComponentType() const
-    {
-        return "PointComponent";
-    }
+   
 }
