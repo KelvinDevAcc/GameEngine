@@ -89,11 +89,11 @@ namespace dae
     {
         if (m_positionIsDirty)
         {
-            if (m_parent == nullptr)
+            if (m_parent == nullptr) {
                 m_worldPosition = m_localPosition;
+            }
             else
                 m_worldPosition.SetPosition(m_parent->GetWorldPosition() + m_localPosition.GetPosition());
-
         }
         m_positionIsDirty = false;
     }
