@@ -2,7 +2,9 @@
 
 #include <iostream>
 
+#include "EnventQueue.h"
 #include "SceneManager.h"
+#include "servicelocator.h"
 
 
 MoveCommand::MoveCommand(dae::GameObject* gameObject, float deltaX, float deltaY)
@@ -50,4 +52,18 @@ void GoToNextSceneCommand::Execute()
     auto& sceneManager = dae::SceneManager::GetInstance();
     sceneManager.GoToNextScene();
    
+}
+
+PlaySoundCommand::PlaySoundCommand() = default;
+
+void PlaySoundCommand::Execute() {
+
+    dae::Message message;
+
+    message.type = dae::PlaySoundMessageType::deathSound;
+
+    message.arguments.emplace_back(static_cast<sound_id>(1)); // sound ID
+    message.arguments.emplace_back(50.f); // volume
+
+    dae::EventQueue::Broadcast(message);
 }

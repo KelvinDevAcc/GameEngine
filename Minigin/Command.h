@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 #include "GameObject.h"
 #include "HealthComponent.h"
 #include "PointComponent.h"
@@ -56,4 +58,12 @@ public:
     GoToNextSceneCommand();
 
     virtual void Execute() override;
+};
+
+
+class PlaySoundCommand : public Command {
+public:
+    PlaySoundCommand();
+    void Execute() override;
+
 };

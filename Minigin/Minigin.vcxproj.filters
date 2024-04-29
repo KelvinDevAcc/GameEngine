@@ -132,7 +132,16 @@
     <ClInclude Include="Transform.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="Sprite.h">
+    <ClInclude Include="sdl_sound_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="servicelocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sound_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnventQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -159,9 +168,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Font.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Minigin.cpp">
@@ -245,7 +251,16 @@
     <ClCompile Include="Transform.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="Sprite.cpp">
+    <ClCompile Include="sdl_sound_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="servicelocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sound_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EnventQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

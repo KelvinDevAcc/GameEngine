@@ -20,6 +20,7 @@
 #include "TextComponent.h"
 #include "GameObject.h"
 #include "GameTime.h"
+#include "EnventQueue.h"
 
 SDL_Window* g_window{};
 
@@ -98,14 +99,18 @@ void dae::Minigin::Run(const std::function<void()>& load)
 
 	while (true)
 	{
-		GameTime::Update();
 		const bool doContinue = input.ProcessInput();
 		if (!doContinue)
 			break;
 
+		GameTime::Update();
+
 		sceneManager.Update();
 
 		renderer.Render();
+
+		EventQueue::Process();
+
 
 		// Sleep to maintain frame rate
 		const auto sleepTime = GameTime::m_LastTime + std::chrono::milliseconds(1000/m_FrameRate) - std::chrono::high_resolution_clock::now();

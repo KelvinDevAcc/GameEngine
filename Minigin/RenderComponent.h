@@ -11,7 +11,7 @@ namespace dae
     class RenderComponent : public Component
     {
     public:
-        RenderComponent();
+        RenderComponent(GameObject* gameObject);
         ~RenderComponent() override = default;
 
         void Update() override;
@@ -20,7 +20,7 @@ namespace dae
         void SetTexture(const std::unique_ptr<Texture2D> texture);
         void SetDimensions(float width, float height);
 
-        void SetAnimationFrames(const std::vector<std::unique_ptr<Texture2D>> frames);
+        void SetAnimationFrames(int frameWidth, int frameHeight, int numFrames);
         void SetAnimationSpeed(float framesPerSecond);
 
         std::type_info const& GetComponentType() const override { return typeid(RenderComponent); }
@@ -32,6 +32,8 @@ namespace dae
             Animated
         };
 
+        GameObject* m_GameObject;
+
         RenderMode m_renderMode;
 
         // For static images
@@ -42,6 +44,9 @@ namespace dae
         // For animations
         std::vector<std::unique_ptr<Texture2D>> m_animationFrames;
         float m_animationSpeed;
-        float m_currentFrame;
+        int m_currentFrame;
+
+        float m_animationTimer = 0.0f;
+        float m_frameDuration = 0.1f;
     };
 }

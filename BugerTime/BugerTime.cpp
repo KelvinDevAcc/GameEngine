@@ -20,10 +20,32 @@
 #include "LivesDisplayComponent.h"
 #include "PointsDisplayComponent.h"
 #include "RotatorComponent.h"
+#include "sdl_sound_system.h"
+#include "servicelocator.h"
+
 
 void load()
 {
-    //const auto& scene = dae::SceneManager::GetInstance().CreateScene("Demo");
+#if _DEBUG
+    servicelocator::register_sound_system(
+        std::make_unique<logging_sound_system>(std::make_unique<sdl_sound_system>()));
+#else
+    servicelocator::register_sound_system(std::make_unique<sdl_sound_system>());
+#endif
+
+    auto& ss = servicelocator::get_sound_system();
+
+    // Register the sound file with its corresponding ID
+    ss.register_sound_file("../Data/2.mp3");
+    ss.register_sound_file("../Data/04 Lose Life.mp3");
+
+    // Get the ID for the sound file path
+    sound_id soundId = ss.get_sound_id_for_file_path("../Data/04 Lose Life.mp3");
+
+    ss.load_sound(soundId,"../Data/04 Lose Life.mp3");
+
+
+
     auto& sceneManager = dae::SceneManager::GetInstance();
     const auto& inputManager = dae::InputManager::GetInstance();
 
@@ -31,7 +53,7 @@ void load()
 
     // Create GameObject for background
     auto backgroundObject = std::make_unique<dae::GameObject>();
-    auto backgroundRenderComponent = std::make_unique<dae::RenderComponent>();
+    auto backgroundRenderComponent = std::make_unique<dae::RenderComponent>(backgroundObject.get());
     backgroundRenderComponent->SetTexture(dae::ResourceManager::GetInstance().LoadTexture("background.tga"));
     backgroundRenderComponent->SetDimensions(1270, 720);
     backgroundObject->SetLocalPosition(glm::vec3(635, 720, 0.f));
@@ -40,7 +62,7 @@ void load()
 
     // Create GameObject for logo
     auto logoObject = std::make_unique<dae::GameObject>();
-    auto logoRenderComponent = std::make_unique<dae::RenderComponent>();
+    auto logoRenderComponent = std::make_unique<dae::RenderComponent>(logoObject.get());
     logoRenderComponent->SetTexture(dae::ResourceManager::GetInstance().LoadTexture("logo.tga"));
     logoObject->SetLocalPosition(glm::vec3(635.f, 360.f, 0.0f));
     logoObject->AddComponent(std::move(logoRenderComponent));
@@ -48,62 +70,10 @@ void load()
     logoObject->AddComponent(std::move(logoRotatorComponent));
     scene->Add(std::move(logoObject));
 
-     //Create GameObject for Character 1
-    auto CharacterObject1 = std::make_unique<dae::GameObject>();
-    auto CharacterRenderComponent1 = std::make_unique<dae::RenderComponent>();
-    CharacterRenderComponent1->SetTexture(dae::ResourceManager::GetInstance().LoadTexture("Character.png"));
-    CharacterRenderComponent1->SetDimensions(50, 50);
-    CharacterObject1->SetLocalPosition(glm::vec3(250.0f, 300.0f, 0.0f));
-
- 
-
-    //Create HealthComponent and PointComponent
-    auto Character1Health = std::make_unique<dae::HealthComponent>(100, 3);
-    auto Character1points = std::make_unique<dae::PointComponent>(0);
-
-	//Bind commands for Character 1 movement using WASD (keyboard)
-    inputManager.BindCommand(SDL_SCANCODE_W, KeyState::Pressed, std::make_unique<MoveCommand>(CharacterObject1.get(), 0.0f, -5.0f), InputType::Keyboard);
-    inputManager.BindCommand(SDL_SCANCODE_S, KeyState::Pressed, std::make_unique<MoveCommand>(CharacterObject1.get(), 0.0f, 5.0f), InputType::Keyboard);
-    inputManager.BindCommand(SDL_SCANCODE_A, KeyState::Pressed, std::make_unique<MoveCommand>(CharacterObject1.get(), -5.0f, 0.0f), InputType::Keyboard);
-    inputManager.BindCommand(SDL_SCANCODE_D, KeyState::Pressed, std::make_unique<MoveCommand>(CharacterObject1.get(), 5.0f, 0.0f), InputType::Keyboard);
-
-    inputManager.BindCommand(SDL_SCANCODE_X, KeyState::Up, std::make_unique<ScorePointCommand>(Character1points.get(), 100), InputType::Keyboard);
-    inputManager.BindCommand(SDL_SCANCODE_Z, KeyState::Up, std::make_unique<ScorePointCommand>(Character1points.get(), 100), InputType::Keyboard);
-
-    inputManager.BindCommand(SDL_SCANCODE_C, KeyState::Up, std::make_unique<DamageCommand>(Character1Health.get(), 100), InputType::Keyboard);
-
-    inputManager.BindCommand(SDL_SCANCODE_M, KeyState::Up, std::make_unique<GoToNextSceneCommand>(), InputType::Keyboard);
-
-     //Add HealthComponent and PointComponent to CharacterObject1
-    CharacterObject1->AddComponent(std::move(Character1Health));
-    CharacterObject1->AddComponent(std::move(Character1points));
-    CharacterObject1->AddComponent(std::move(CharacterRenderComponent1));
-
-    // Create GameObject for displaying lives
-    auto livesDisplayObject1 = std::make_unique<dae::GameObject>();
-    auto livesDisplayComponent1 = std::make_unique<dae::LivesDisplayComponent>(dae::ResourceManager::GetInstance().LoadFont("arcade-legacy.ttf", 20), *livesDisplayObject1);
-    auto character1HealthComponent = CharacterObject1->GetComponent<dae::HealthComponent>();
-    livesDisplayComponent1->AttachToHealthComponent(character1HealthComponent);
-    livesDisplayObject1->AddComponent(std::move(livesDisplayComponent1));
-    livesDisplayObject1->SetLocalPosition(glm::vec3(70, 200, 0.f));
-
-    //Create GameObject for displaying points of Character 1
-    auto pointsDisplayObject1 = std::make_unique<dae::GameObject>();
-    auto pointsDisplayComponent1 = std::make_unique<dae::PointsDisplayComponent>(dae::ResourceManager::GetInstance().LoadFont("arcade-legacy.ttf", 20), *pointsDisplayObject1); // Assuming a font for displaying points
-    auto character1PointComponent = CharacterObject1->GetComponent<dae::PointComponent>();
-    pointsDisplayComponent1->AttachToPointComponent(character1PointComponent);
-    pointsDisplayObject1->AddComponent(std::move(pointsDisplayComponent1));
-    pointsDisplayObject1->SetLocalPosition(glm::vec3(70, 220, 0.f));
-
-    scene->Add(std::move(pointsDisplayObject1));
-    scene->Add(std::move(livesDisplayObject1));
-    scene->Add(std::move(CharacterObject1));
-
-
 
     // Create GameObject for Character 2
     auto CharacterObject2 = std::make_unique<dae::GameObject>();
-    auto CharacterRenderComponent2 = std::make_unique<dae::RenderComponent>();
+    auto CharacterRenderComponent2 = std::make_unique<dae::RenderComponent>(CharacterObject2.get());
     CharacterRenderComponent2->SetTexture(dae::ResourceManager::GetInstance().LoadTexture("sausage.png"));
     CharacterRenderComponent2->SetDimensions(50, 50);
     CharacterObject2->SetLocalPosition(glm::vec3(200.0f, 300.0f, 0.0f));
@@ -133,7 +103,7 @@ void load()
     auto character2HealthComponent = CharacterObject2->GetComponent<dae::HealthComponent>();
     livesDisplayComponent2->AttachToHealthComponent(character2HealthComponent);
     livesDisplayObject2->AddComponent(std::move(livesDisplayComponent2));
-    livesDisplayObject2->SetLocalPosition(glm::vec3(70, 250, 0.f));
+    livesDisplayObject2->SetLocalPosition(glm::vec3(100, 250, 0.f));
 
     // Create GameObject for displaying points of Character 2
     auto pointsDisplayObject2 = std::make_unique<dae::GameObject>();
@@ -141,7 +111,7 @@ void load()
     auto character2PointComponent = CharacterObject2->GetComponent<dae::PointComponent>();
     pointsDisplayComponent2->AttachToPointComponent(character2PointComponent);
     pointsDisplayObject2->AddComponent(std::move(pointsDisplayComponent2));
-    pointsDisplayObject2->SetLocalPosition(glm::vec3(70, 270, 0.f));
+    pointsDisplayObject2->SetLocalPosition(glm::vec3(100, 270, 0.f));
 
     scene->Add(std::move(pointsDisplayObject2));
     scene->Add(std::move(livesDisplayObject2));
@@ -168,6 +138,13 @@ void load()
     Infocharacter2Txt->SetLocalPosition(glm::vec3(145, 170, 0.f));
     scene->Add(std::move(Infocharacter2Txt));
 
+    // Create GameObject for text shef
+    auto InfoSoundTxt = std::make_unique<dae::GameObject>();
+    auto soundTextcomponent = std::make_unique<dae::TextComponent>("use P to play sound", dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 20), SDL_Color{ 255, 255, 255, 255 }, *InfoSoundTxt); // Specify color here
+    InfoSoundTxt->AddComponent(std::move(soundTextcomponent));
+    InfoSoundTxt->SetLocalPosition(glm::vec3(130, 100, 0.f));
+    scene->Add(std::move(InfoSoundTxt));
+
 
      //Create GameObject for FPS counter
     auto fpsCounterObject = std::make_unique<dae::GameObject>();
@@ -185,9 +162,9 @@ void load()
     // Create GameObject for FPS counter
     auto fpsCounterObject1 = std::make_unique<dae::GameObject>();
     auto fpsTextComponent1 = std::make_unique<dae::TextComponent>("FPS: ", dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36), SDL_Color{ 252, 157, 3, 255 }, *fpsCounterObject1); // Specify color here
-    fpsCounterObject1->AddComponent(std::move(fpsTextComponent1));
-    fpsCounterObject1->SetLocalPosition(glm::vec3(100.f, 20.f, 0.0f));
     auto fpsCounterComponent1 = std::make_unique<dae::FPSCounterComponent>(fpsTextComponent1.get());
+    fpsCounterObject1->SetLocalPosition(glm::vec3(100.f, 20.f, 0.0f));
+    fpsCounterObject1->AddComponent(std::move(fpsTextComponent1));
     fpsCounterObject1->AddComponent(std::move(fpsCounterComponent1));
     scene2->Add(std::move(fpsCounterObject1));
 
@@ -217,7 +194,7 @@ void load()
 
     // Create GameObject for background
     auto backgroundObject03 = std::make_unique<dae::GameObject>();
-    auto backgroundRenderComponent03 = std::make_unique<dae::RenderComponent>();
+    auto backgroundRenderComponent03 = std::make_unique<dae::RenderComponent>(backgroundObject03.get());
     backgroundRenderComponent03->SetTexture(dae::ResourceManager::GetInstance().LoadTexture("Stage01.png"));
     backgroundRenderComponent03->SetDimensions(624, 600);
     backgroundObject03->SetLocalPosition(glm::vec3(635, 360, 0.f));
@@ -233,6 +210,58 @@ void load()
 
     fpsCounterObject2->SetLocalPosition(glm::vec3(100.f, 20.f, 0.0f));
     scene3->Add(std::move(fpsCounterObject2));
+
+
+    //Create GameObject for Character 1
+	auto CharacterObject13 = std::make_unique<dae::GameObject>();
+	auto CharacterRenderComponent13 = std::make_unique<dae::RenderComponent>(CharacterObject13.get());
+	CharacterRenderComponent13->SetTexture(dae::ResourceManager::GetInstance().LoadTexture("Character.png"));
+	CharacterRenderComponent13->SetDimensions(30, 30);
+	CharacterObject13->SetLocalPosition(glm::vec3(921.0f, 81.0f, 0.0f));
+
+	//Create HealthComponent and PointComponent
+    auto Character1Health3 = std::make_unique<dae::HealthComponent>(100, 3);
+    auto Character1points3 = std::make_unique<dae::PointComponent>(0);
+
+    //Bind commands for Character 1 movement using WASD (keyboard)
+    inputManager.BindCommand(SDL_SCANCODE_W, KeyState::Pressed, std::make_unique<MoveCommand>(CharacterObject13.get(), 0.0f, -3.0f), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_S, KeyState::Pressed, std::make_unique<MoveCommand>(CharacterObject13.get(), 0.0f, 3.0f), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_A, KeyState::Pressed, std::make_unique<MoveCommand>(CharacterObject13.get(), -3.0f, 0.0f), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_D, KeyState::Pressed, std::make_unique<MoveCommand>(CharacterObject13.get(), 3.0f, 0.0f), InputType::Keyboard);
+
+    inputManager.BindCommand(SDL_SCANCODE_X, KeyState::Up, std::make_unique<ScorePointCommand>(Character1points3.get(), 100), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_Z, KeyState::Up, std::make_unique<ScorePointCommand>(Character1points3.get(), 100), InputType::Keyboard);
+
+    inputManager.BindCommand(SDL_SCANCODE_C, KeyState::Up, std::make_unique<DamageCommand>(Character1Health3.get(), 100), InputType::Keyboard);
+
+    inputManager.BindCommand(SDL_SCANCODE_M, KeyState::Up, std::make_unique<GoToNextSceneCommand>(), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_P, KeyState::Up, std::make_unique<PlaySoundCommand>(), InputType::Keyboard);
+
+    //Add HealthComponent and PointComponent to CharacterObject1
+    CharacterObject13->AddComponent(std::move(Character1Health3));
+    CharacterObject13->AddComponent(std::move(Character1points3));
+    CharacterObject13->AddComponent(std::move(CharacterRenderComponent13));
+
+    // Create GameObject for displaying lives
+    auto livesDisplayObject13 = std::make_unique<dae::GameObject>();
+    auto livesDisplayComponent13 = std::make_unique<dae::LivesDisplayComponent>(dae::ResourceManager::GetInstance().LoadFont("arcade-legacy.ttf", 20), *livesDisplayObject13);
+    auto character1HealthComponent3 = CharacterObject13->GetComponent<dae::HealthComponent>();
+    livesDisplayComponent13->AttachToHealthComponent(character1HealthComponent3);
+    livesDisplayObject13->AddComponent(std::move(livesDisplayComponent13));
+    livesDisplayObject13->SetLocalPosition(glm::vec3(100, 200, 0.f));
+
+    //Create GameObject for displaying points of Character 1
+    auto pointsDisplayObject13 = std::make_unique<dae::GameObject>();
+    auto pointsDisplayComponent13 = std::make_unique<dae::PointsDisplayComponent>(dae::ResourceManager::GetInstance().LoadFont("arcade-legacy.ttf", 20), *pointsDisplayObject13); // Assuming a font for displaying points
+    auto character1PointComponent3 = CharacterObject13->GetComponent<dae::PointComponent>();
+    pointsDisplayComponent13->AttachToPointComponent(character1PointComponent3);
+    pointsDisplayObject13->AddComponent(std::move(pointsDisplayComponent13));
+    pointsDisplayObject13->SetLocalPosition(glm::vec3(100, 220, 0.f));
+
+    scene3->Add(std::move(pointsDisplayObject13));
+    scene3->Add(std::move(livesDisplayObject13));
+    scene3->Add(std::move(CharacterObject13));
+
 
     sceneManager.SetActiveScene("Scene1");
 
