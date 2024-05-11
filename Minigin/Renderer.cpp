@@ -118,5 +118,18 @@ void dae::Renderer::RenderTexture(const Texture2D& texture, float x, float y, co
 	SDL_RenderCopy(m_renderer, texture.GetSDLTexture(), nullptr, &destRect);
 }
 
+void dae::Renderer::RenderTexture(const Texture2D& texture, float x, float y, float width, float height, float rotation_angle, const SDL_Rect* srcRect, SDL_RendererFlip flip) const
+{
+	// Destination rectangle
+	SDL_Rect dst{};
+	dst.x = static_cast<int>(x);
+	dst.y = static_cast<int>(y);
+	dst.w = static_cast<int>(width);
+	dst.h = static_cast<int>(height);
+
+	// Render texture with rotation and flipping
+	SDL_RenderCopyEx(GetSDLRenderer(), texture.GetSDLTexture(), srcRect, &dst, rotation_angle, nullptr, flip);
+}
+
 
 SDL_Renderer* dae::Renderer::GetSDLRenderer() const { return m_renderer; }

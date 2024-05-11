@@ -29,11 +29,9 @@ dae::Texture2D::Texture2D(SDL_Texture* texture): m_width(0), m_height(0), m_sour
 dae::Texture2D::Texture2D(SDL_Texture* texture, const SDL_Rect& sourceRect): m_width(0), m_height(0), m_sourceRect(sourceRect)
 {
 	// Create a new texture from the existing texture and source rectangle
-	SDL_Surface* surface = SDL_CreateRGBSurface(0, sourceRect.w, sourceRect.h, 32, 0, 0, 0, 0);
-	if (surface)
+	if (SDL_Surface* surface = SDL_CreateRGBSurface(0, sourceRect.w, sourceRect.h, 32, 0, 0, 0, 0))
 	{
-		SDL_Texture* newTexture = SDL_CreateTextureFromSurface(Renderer::GetInstance().GetSDLRenderer(), surface);
-		if (newTexture)
+		if (SDL_Texture* newTexture = SDL_CreateTextureFromSurface(Renderer::GetInstance().GetSDLRenderer(), surface))
 		{
 			// Copy the pixels from the source texture to the new texture
 			SDL_RenderCopy(Renderer::GetInstance().GetSDLRenderer(), texture, &sourceRect, nullptr);

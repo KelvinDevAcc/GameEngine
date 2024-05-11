@@ -31,3 +31,10 @@ std::unique_ptr<dae::Font> dae::ResourceManager::LoadFont(const std::string& fil
 {
 	return std::make_unique<Font>(m_dataPath + file, size);
 }
+
+std::unique_ptr<Sprite> dae::ResourceManager::LoadSpriteSheet(const std::string& file, int frameWidth, int frameHeight, int frameCount) const
+{
+	const auto fullPath = m_dataPath + file;
+	auto spriteSheet = std::make_unique<Sprite>(fullPath, frameWidth, frameHeight, frameCount);
+	return spriteSheet;
+}
