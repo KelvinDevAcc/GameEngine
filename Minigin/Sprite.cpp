@@ -1,32 +1,40 @@
 #include "Sprite.h"
 
+#include <algorithm>
 #include <stdexcept>
 
-#include "ResourceManager.h"
+#include "Texture2D.h"
 
-Sprite::Sprite(const std::string& filePath, int frameWidth, int frameHeight, int frameCount)
-    : m_texture(nullptr), m_frameWidth(frameWidth), m_frameHeight(frameHeight)
+
+dae::SpriteAnimation::SpriteAnimation(const std::vector<glm::ivec2>& cellFrames, int framesPerSecond) :
+    cellFrames(cellFrames),
+    frameCount(static_cast<int>(cellFrames.size())),
+    framesPerSecond(framesPerSecond)
+{}
+
+const glm::ivec2& dae::SpriteAnimation::GetCellFromNormalizedTime(float time) const
 {
-    // Load the spritesheet texture
-    m_texture = dae::ResourceManager::GetInstance().LoadTexture(filePath);
-    if (!m_texture)
-    {
-        throw std::runtime_error("Failed to load spritesheet texture: " + filePath);
-    }
-
-    // Calculate frame positions on the spritesheet
-    for (int i = 0; i < frameCount; ++i)
-    {
-        FrameData frame;
-        frame.rect.x = (i % (frameCount / (frameWidth / frameHeight))) * frameWidth;
-        frame.rect.y = (i / (frameCount / (frameWidth / frameHeight))) * frameHeight;
-        frame.rect.w = frameWidth;
-        frame.rect.h = frameHeight;
-        m_frames.push_back(frame);
-    }
+    int frame = static_cast<int>(time * static_cast<float>(frameCount));
+    frame = std::clamp(frame, 0, frameCount - 1);
+    return cellFrames[frame];
 }
 
-Sprite::~Sprite()
+const dae::SpriteAnimation* dae::Sprite::GetAnimation(const std::string& name) const
+{
+    assert(animations.contains(name) && "Animation does not exist");
+    return &animations.at(name);
+}
+
+dae::Sprite::Sprite(dae::Texture2D* texturePtr, int rowCount, int colCount,
+                    const std::map<std::string, SpriteAnimation>& animations) :
+
+	m_texture(texturePtr),
+	cellSize(texturePtr->GetSize().x / colCount, texturePtr->GetSize().y / rowCount),
+    animations(animations)
+{
+}
+
+dae::Sprite::~Sprite()
 {
     if (m_texture)
     {
@@ -34,16 +42,7 @@ Sprite::~Sprite()
     }
 }
 
-dae::Texture2D* Sprite::GetTexture() const
+dae::Texture2D& dae::Sprite::GetTexture() const
 {
-    return m_texture.get();
-}
-
-const FrameData& Sprite::GetFrame(int index) const
-{
-    if (index < 0 || index >= m_frames.size())
-    {
-        throw std::out_of_range("Frame index out of range");
-    }
-    return m_frames[index];
+    return *m_texture;
 }

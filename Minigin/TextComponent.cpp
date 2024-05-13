@@ -1,14 +1,16 @@
 #include "TextComponent.h"
 
+#include <algorithm>
 #include <stdexcept>
-#include <SDL_ttf.h>
-#include "Renderer.h"
+
 #include "Font.h"
 #include "GameObject.h"
+#include "Renderer.h"
+#include "SDL_ttf.h"
 #include "Texture2D.h"
 
-dae::TextComponent::TextComponent(const std::string& text, std::unique_ptr<Font> font, const SDL_Color& color, GameObject& gameObject)
-    : m_NeedsUpdate(true), m_TextColor(color), m_Text(text), m_Font(std::move(font)),m_TextTexture(nullptr), m_GameObject(gameObject)
+dae::TextComponent::TextComponent(std::string text, dae::Font* font, const SDL_Color& color, dae::GameObject& gameObject)
+    : m_NeedsUpdate(true), m_TextColor(color), m_Text(std::move(text)), m_Font(font), m_TextTexture(nullptr), m_GameObject(gameObject)
 {
 }
 
@@ -59,3 +61,5 @@ void dae::TextComponent::SetColor(const SDL_Color& color)
         m_NeedsUpdate = true;
     }
 }
+
+

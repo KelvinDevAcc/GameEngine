@@ -229,6 +229,7 @@
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="sound_system.h" />
     <ClInclude Include="Sprite.h" />
+    <ClInclude Include="SpriteRenderer.h" />
     <ClInclude Include="Subject.h" />
     <ClInclude Include="TextComponent.h" />
     <ClInclude Include="Texture2D.h" />
@@ -272,6 +273,7 @@
     <ClCompile Include="servicelocator.cpp" />
     <ClCompile Include="sound_system.cpp" />
     <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="SpriteRenderer.cpp" />
     <ClCompile Include="Subject.cpp" />
     <ClCompile Include="TextComponent.cpp" />
     <ClCompile Include="Texture2D.cpp" />

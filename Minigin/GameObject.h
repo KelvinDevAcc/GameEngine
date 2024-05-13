@@ -21,6 +21,7 @@ namespace dae
         void SetRotation(float rotation) { m_worldPosition.SetRotation(rotation); }
 
         void SetDimensions(float width, float height);
+        std::pair<float, float> GetDimensions() const;
         void AddComponent(std::unique_ptr<Component> component);
         void RemoveComponent(Component* component); // Pass raw pointer instead of shared_ptr
         void SetParent(GameObject* parent, bool keepWorldPosition = false);

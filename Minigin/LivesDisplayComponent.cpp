@@ -2,10 +2,10 @@
 
 namespace dae
 {
-    LivesDisplayComponent::LivesDisplayComponent(std::unique_ptr<Font> font, GameObject& gameObject)
+    LivesDisplayComponent::LivesDisplayComponent(Font* font, GameObject& gameObject)
         : m_textComponent(nullptr), m_healthComponent(nullptr)
     {
-        m_textComponent = std::make_unique<TextComponent>("ss ", std::move(font),SDL_Color{ 255, 255, 255, 255 },gameObject); // Initialize TextComponent
+        m_textComponent = std::make_unique<TextComponent>("ss ", font,SDL_Color{ 255, 255, 255, 255 },gameObject);
     }
 
     void LivesDisplayComponent::Update()

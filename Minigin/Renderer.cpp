@@ -118,18 +118,52 @@ void dae::Renderer::RenderTexture(const Texture2D& texture, float x, float y, co
 	SDL_RenderCopy(m_renderer, texture.GetSDLTexture(), nullptr, &destRect);
 }
 
-void dae::Renderer::RenderTexture(const Texture2D& texture, float x, float y, float width, float height, float rotation_angle, const SDL_Rect* srcRect, SDL_RendererFlip flip) const
+//void dae::Renderer::RenderTexture(const Texture2D& texture, float x, float y, float width, float height, float rotation_angle, const SDL_Rect* srcRect, SDL_RendererFlip flip) const
+//{
+//	// Destination rectangle
+//	SDL_Rect dst{};
+//	dst.x = static_cast<int>(x);
+//	dst.y = static_cast<int>(y);
+//	dst.w = static_cast<int>(width);
+//	dst.h = static_cast<int>(height);
+//
+//	// Render texture with rotation and flipping
+//	SDL_RenderCopyEx(GetSDLRenderer(), texture.GetSDLTexture(), srcRect, &dst, rotation_angle, nullptr, flip);
+//}
+
+
+
+void dae::Renderer::RenderTexture(const dae::Texture2D& texture, glm::vec2 drawLocation,
+	glm::vec2 srcLocation, glm::ivec2 cellSize, float width, float height, bool flipX, bool flipY)
 {
-	// Destination rectangle
-	SDL_Rect dst{};
-	dst.x = static_cast<int>(x);
-	dst.y = static_cast<int>(y);
-	dst.w = static_cast<int>(width);
-	dst.h = static_cast<int>(height);
+	SDL_Renderer* sdlRenderer = GetInstance().GetSDLRenderer();
 
-	// Render texture with rotation and flipping
-	SDL_RenderCopyEx(GetSDLRenderer(), texture.GetSDLTexture(), srcRect, &dst, rotation_angle, nullptr, flip);
+	if (sdlRenderer == nullptr || texture.GetSDLTexture() == nullptr)
+		return; // Or throw an error, depending on your error handling strategy
+
+	SDL_Rect srcRect;
+	srcRect.x = static_cast<int>(srcLocation.x * cellSize.x);
+	srcRect.y = static_cast<int>(srcLocation.y * cellSize.y);
+	srcRect.w = static_cast<int>(cellSize.x);
+	srcRect.h = static_cast<int>(cellSize.y);
+
+	SDL_Rect dstRect;
+	dstRect.x = static_cast<int>(drawLocation.x);
+	dstRect.y = static_cast<int>(drawLocation.y);
+	dstRect.w = static_cast<int>(width);
+	dstRect.h = static_cast<int>(height);
+
+	SDL_RendererFlip flip = SDL_FLIP_NONE;
+	if (flipX and flipY)
+		flip = static_cast<SDL_RendererFlip>(SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
+	else if (flipX)
+		flip = SDL_FLIP_HORIZONTAL;
+	else if (flipY)
+		flip = SDL_FLIP_VERTICAL;
+
+	const SDL_Point center{};
+
+	SDL_RenderCopyEx(sdlRenderer, texture.GetSDLTexture(), &srcRect, &dstRect, 0.0f, &center, flip);
 }
-
 
 SDL_Renderer* dae::Renderer::GetSDLRenderer() const { return m_renderer; }

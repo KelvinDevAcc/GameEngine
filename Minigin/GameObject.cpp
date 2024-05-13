@@ -34,6 +34,11 @@ namespace dae
         m_height = height;
     }
 
+    std::pair<float, float> GameObject::GetDimensions() const
+    {
+        return { m_width, m_height };
+    }
+
     void GameObject::AddComponent(std::unique_ptr<Component> component)
     {
         m_components.push_back(std::move(component));

@@ -1,29 +1,38 @@
-#pragma once
+//with help from julian
 #pragma once
 
-#include <memory>
+#include <map>
 #include <string>
 #include <vector>
-#include "SDL.h" // Assuming SDL is used for rendering
+#include <glm/vec2.hpp>
+
 #include "Texture2D.h"
 
-struct FrameData
+namespace dae
 {
-    SDL_Rect rect; // Rectangle representing the position and dimensions of the frame on the spritesheet
-};
 
-class Sprite
-{
-public:
-    Sprite(const std::string& filePath, int frameWidth, int frameHeight, int frameCount);
-    ~Sprite();
+    struct SpriteAnimation final
+    {
+        SpriteAnimation(const std::vector<glm::ivec2>& cellFrames, int framesPerSecond = 0.0f);
 
-    dae::Texture2D* GetTexture() const;
-    const FrameData& GetFrame(int index) const;
+        const glm::ivec2& GetCellFromNormalizedTime(float time) const;
 
-private:
-    std::unique_ptr<dae::Texture2D> m_texture;
-    int m_frameWidth;
-    int m_frameHeight;
-    std::vector<FrameData> m_frames;
-};
+        std::vector<glm::ivec2> cellFrames{};
+        int frameCount{};
+        int framesPerSecond;
+    };
+
+    class Sprite final
+    {
+    public:
+        Sprite(Texture2D* texturePtr, int rowCount = 1, int colCount = 1, const std::map<std::string, SpriteAnimation>& animations = {});
+        ~Sprite();
+
+        Texture2D& GetTexture() const;
+        const SpriteAnimation* GetAnimation(const std::string& name) const;
+
+        Texture2D* m_texture;
+        glm::ivec2 cellSize;
+        std::map<std::string, SpriteAnimation> animations;
+    };
+}

@@ -22,8 +22,8 @@ namespace dae
 		void RenderTexture(const Texture2D& texture, float x, float y, float width, float height) const;
 		void RenderTexture(const Texture2D& texture, float pos_x, float y, float width, float height, float rotation_angle) const;
 		void RenderTexture(const Texture2D& texture, float x, float y, const glm::vec2& cellSize, int pixelsPerUnit) const;
-		void RenderTexture(const Texture2D& texture, float x, float y, float width, float height, float rotation_angle, const SDL_Rect* srcRect, SDL_RendererFlip flip) const;
-
+		//void RenderTexture(const Texture2D& texture, float x, float y, float width, float height, float rotation_angle, const SDL_Rect* srcRect, SDL_RendererFlip flip) const;
+		static void RenderTexture(const Texture2D& texture, glm::vec2 drawLocation, glm::vec2 srcLocation, glm::ivec2 cellSize, float width, float height, bool flipX, bool flipY);
 
 		SDL_Renderer* GetSDLRenderer() const;
 
