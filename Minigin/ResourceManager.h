@@ -1,13 +1,10 @@
-//made with help of julian
+//made with help of julian Rijken
 #pragma once
-#include <filesystem>
 #include <string>
 #include <memory>
-
 #include "Font.h"
 #include "Singleton.h"
 #include "Sprite.h"
-
 #include "Texture2D.h"
 
 namespace dae
@@ -17,11 +14,11 @@ namespace dae
 	public:
 		static void Init(const std::string& data);
 
-		static Font* LoadFont(const std::string& assetName, const std::string& file, unsigned int size);
+		static Font* LoadFont(const std::string& name, const std::string& file, unsigned int size);
 
 
-		static Texture2D* LoadTexture(const std::string& filePath);
-		static Sprite* LoadSprite(const std::string& assetName, const std::string& fileName, int rowCount = 1, int colCount = 1,const std::map<std::string, SpriteAnimation>& animations = {});
+		static Texture2D* LoadTexture(const std::string& fileName);
+		static Sprite* LoadSprite(const std::string& name, const std::string& fileName, int rowCount = 1, int colCount = 1,const std::map<std::string, SpriteAnimation>& animations = {});
 
 		static Sprite* GetSprite(const std::string& name);
 		static Font* GetFont(const std::string& name);

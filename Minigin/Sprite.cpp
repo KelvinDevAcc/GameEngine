@@ -1,8 +1,6 @@
 #include "Sprite.h"
-
 #include <algorithm>
 #include <stdexcept>
-
 #include "Texture2D.h"
 
 
@@ -21,8 +19,11 @@ const glm::ivec2& dae::SpriteAnimation::GetCellFromNormalizedTime(float time) co
 
 const dae::SpriteAnimation* dae::Sprite::GetAnimation(const std::string& name) const
 {
-    assert(animations.contains(name) && "Animation does not exist");
-    return &animations.at(name);
+	const auto animationIt = animations.find(name);
+    if (animationIt == animations.end()) {
+        throw std::invalid_argument("Animation does not exist");
+    }
+    return &animationIt->second;
 }
 
 dae::Sprite::Sprite(dae::Texture2D* texturePtr, int rowCount, int colCount,

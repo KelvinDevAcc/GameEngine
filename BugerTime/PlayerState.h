@@ -22,36 +22,33 @@ namespace game
         PlayerState() = default;
     };
 
-    class PlayerWalkingState final : public PlayerState
+    class MovingState final : public PlayerState
     {
     public:
 
+        void Update(Player& player) override;
+        void OnExitState(Player& player) override;
+    };
+
+    class AttackingState final : public PlayerState
+    {
+    public:
+        void OnEnterState(Player& player) override;
+        void OnExitState(Player& player) override;
+    };
+
+    class DyingState final : public PlayerState
+    {
+    public:
         void OnEnterState(Player& player) override;
         void Update(Player& player) override;
         void OnExitState(Player& player) override;
     };
 
-    class PlayerAttackingState final : public PlayerState
+    class IdleState final : public PlayerState
     {
     public:
         void OnEnterState(Player& player) override;
-        void Update(Player& player) override;
-        void OnExitState(Player& player) override;
-    };
-
-    class PlayerDyingState final : public PlayerState
-    {
-    public:
-        void OnEnterState(Player& player) override;
-        void Update(Player& player) override;
-        void OnExitState(Player& player) override;
-    };
-
-    class PlayerIdleState final : public PlayerState
-    {
-    public:
-        void OnEnterState(Player& player) override;
-        void Update(Player& player) override;
         void OnExitState(Player& player) override;
     };
 }

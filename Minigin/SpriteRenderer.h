@@ -12,7 +12,14 @@ namespace dae
     class SpriteRenderer final : public Component
     {
     public:
-        SpriteRenderer(GameObject* parent, const Sprite* sprite, glm::ivec2 drawCell = {});
+        SpriteRenderer(GameObject* gameObject, const Sprite* sprite, glm::ivec2 drawCell = {});
+
+        ~SpriteRenderer() override = default;
+
+        SpriteRenderer(const SpriteRenderer& other) = delete;
+        SpriteRenderer(SpriteRenderer&& other) noexcept = delete;
+        SpriteRenderer& operator=(const SpriteRenderer& other) = delete;
+        SpriteRenderer& operator=(SpriteRenderer&& other) noexcept = delete;
 
         void SetDrawCell(glm::ivec2 drawCell);
         void SetSprite(const Sprite* spritePtr);

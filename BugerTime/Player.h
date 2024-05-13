@@ -1,5 +1,4 @@
 #pragma once
-
 #include "AnimationComponent.h"
 #include "GameObject.h"
 #include "HealthComponent.h"
@@ -11,13 +10,13 @@ namespace game
     class Player : public dae::Component
     {
 
-        friend class PlayerWalkingState;
-        friend class PlayerAttackingState;
-        friend class PlayerIdleState;
-        friend class PlayerDyingState;
+        friend class MovingState;
+        friend class AttackingState;
+        friend class IdleState;
+        friend class DyingState;
 
     public:
-        Player(dae::GameObject* parentPtr);
+        Player(dae::GameObject* gameObject);
 
         ~Player() override = default;
 
@@ -35,15 +34,15 @@ namespace game
         void Die();
         void Idle();
 
-        void respawn();
+        void Respawn();
 
         std::type_info const& GetComponentType() const override { return typeid(Player); }
 
 
-        std::unique_ptr<PlayerWalkingState> m_walkingState{ std::make_unique<PlayerWalkingState>() };
-        std::unique_ptr<PlayerAttackingState> m_attackignState{ std::make_unique<PlayerAttackingState>() };
-        std::unique_ptr<PlayerIdleState> m_idleState{ std::make_unique<PlayerIdleState>() };
-        std::unique_ptr<PlayerDyingState> m_dyingState{ std::make_unique<PlayerDyingState>() };
+        std::unique_ptr<MovingState> m_walkingState{ std::make_unique<MovingState>() };
+        std::unique_ptr<AttackingState> m_attackignState{ std::make_unique<AttackingState>() };
+        std::unique_ptr<IdleState> m_idleState{ std::make_unique<IdleState>() };
+        std::unique_ptr<DyingState> m_dyingState{ std::make_unique<DyingState>() };
 
         PlayerState* m_CurrentState; 
 
@@ -61,6 +60,9 @@ namespace game
         dae::AnimationComponent* m_animationComponent{};
 
         glm::vec3 m_startPosition{};
+
+        float m_timeSinceLastAction;
+        float m_inactivityThreshold;
         
 
     };

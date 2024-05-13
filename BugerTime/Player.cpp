@@ -1,11 +1,12 @@
 #include "Player.h"
 
-#include "EnventQueue.h"
-#include "sound_system.h"
+#include "GameTime.h"
 
 namespace game
 {
-    Player::Player(dae::GameObject* gameObject) : m_CurrentState(nullptr), m_GameObject(gameObject)
+    Player::Player(dae::GameObject* gameObject) : m_CurrentState(nullptr), m_GameObject(gameObject),
+                                                  m_timeSinceLastAction(0.0f),
+                                                  m_inactivityThreshold(1.0f)
     {
 
         m_animationComponent = m_GameObject->GetComponent<dae::AnimationComponent>();
@@ -24,12 +25,13 @@ namespace game
 
         if (m_CurrentState)
         {
-            m_CurrentState->OnExitState(*this); // Exit the current state
+            m_CurrentState->OnExitState(*this);
         }
         m_CurrentState = state;
         if (m_CurrentState)
         {
-            m_CurrentState->OnEnterState(*this); // Enter the new state
+            m_CurrentState->OnEnterState(*this);
+            m_timeSinceLastAction = 0.0f;
         }
     }
 
@@ -37,7 +39,14 @@ namespace game
     {
         if (m_CurrentState)
         {
-            m_CurrentState->Update(*this); // Update based on the current state
+            m_CurrentState->Update(*this);
+
+            m_timeSinceLastAction += dae::GameTime::GetDeltaTime();
+
+            if (m_timeSinceLastAction >= m_inactivityThreshold)
+            {
+                Idle();
+            }
         }
     }
 
@@ -63,10 +72,6 @@ namespace game
         {
             SetState(m_attackignState.get());
         }
-
-
-        const int newScore = m_pointComponent->GetScore() + 100;
-        m_pointComponent->SetScore(newScore);
     }
 
     void Player::Die()
@@ -75,18 +80,6 @@ namespace game
         {
             SetState(m_dyingState.get());
         }
-       
-        dae::Message message;
-
-        message.type = dae::PlaySoundMessageType::deathSound;
-
-        message.arguments.emplace_back(static_cast<sound_id>(1)); // sound ID
-        message.arguments.emplace_back(50.f); // volume
-
-        dae::EventQueue::Broadcast(message);
-
-        const int newHealth = m_healthComponent->GetHealth() - 100;
-        m_healthComponent->SetHealth(newHealth);
     }
 
     void Player::Idle()
@@ -97,10 +90,11 @@ namespace game
         }
     }
 
-    void Player::respawn()
+    void Player::Respawn()
     {
         m_GameObject->SetLocalPosition(m_startPosition);
         m_healthComponent->SetLives(3);
+        m_pointComponent->SetScore(0);
         Idle();
     }
 }

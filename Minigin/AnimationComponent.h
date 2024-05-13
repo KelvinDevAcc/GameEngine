@@ -1,5 +1,4 @@
 #pragma once
-
 #include "GameObject.h"
 #include "SpriteRenderer.h"
 
@@ -24,8 +23,8 @@ namespace dae
         SpriteRenderer* m_spriteRenderer;
         const SpriteAnimation* m_activeAnimation;
         std::string m_activeAnimationName;
-        bool m_isPlaying;
-        bool m_isLooping;
+        bool m_playingAnimation;
+        bool m_LoopingAnimation;
         float m_frameTime;
         float m_renderScaleX;
         float m_renderScaleY;

@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 #include <glm/vec2.hpp>
-
 #include "Texture2D.h"
 
 namespace dae
@@ -13,19 +12,19 @@ namespace dae
 
     struct SpriteAnimation final
     {
-        SpriteAnimation(const std::vector<glm::ivec2>& cellFrames, int framesPerSecond = 0.0f);
+        SpriteAnimation(const std::vector<glm::ivec2>& cellFrames, int framesPerSecond);
 
         const glm::ivec2& GetCellFromNormalizedTime(float time) const;
 
         std::vector<glm::ivec2> cellFrames{};
         int frameCount{};
-        int framesPerSecond;
+        int framesPerSecond{};
     };
 
     class Sprite final
     {
     public:
-        Sprite(Texture2D* texturePtr, int rowCount = 1, int colCount = 1, const std::map<std::string, SpriteAnimation>& animations = {});
+        Sprite(Texture2D* texturePtr, int rowCount, int colCount, const std::map<std::string, SpriteAnimation>& animations = {});
         ~Sprite();
 
         Texture2D& GetTexture() const;

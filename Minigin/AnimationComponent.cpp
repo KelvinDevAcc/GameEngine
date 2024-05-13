@@ -6,7 +6,7 @@ namespace dae
 {
     AnimationComponent::AnimationComponent(GameObject* gameObject, SpriteRenderer* spriteRenderer, const std::string& defaultAnimation)
         : m_gameObject(gameObject), m_spriteRenderer(spriteRenderer), m_activeAnimation(nullptr),
-        m_activeAnimationName(defaultAnimation), m_isPlaying(false), m_isLooping(false),
+        m_activeAnimationName(defaultAnimation), m_playingAnimation(false), m_LoopingAnimation(false),
         m_frameTime(0.0f), m_renderScaleX(1.0f), m_renderScaleY(1.0f)
     {
 
@@ -22,7 +22,7 @@ namespace dae
 
     void AnimationComponent::Update()
     {
-        if (!m_isPlaying || m_activeAnimation == nullptr)
+        if (!m_playingAnimation || m_activeAnimation == nullptr)
             return;
 
         const float animationDuration = 1.0f / m_activeAnimation->framesPerSecond;
@@ -30,7 +30,7 @@ namespace dae
 
         m_frameTime += normalizedDeltaTime;
 
-        if (m_isLooping)
+        if (m_LoopingAnimation)
         {
             // If looping, wrap the frame time within the animation duration
             m_frameTime = std::fmod(m_frameTime, 1.0f);
@@ -39,7 +39,7 @@ namespace dae
         {
             if (m_frameTime >= 1.0f)
             {
-                m_isPlaying = false;
+                m_playingAnimation = false;
                 m_frameTime = 1.0f;
             }
         }
@@ -60,8 +60,8 @@ namespace dae
 	        if (m_activeAnimation == animation)
                 return;
 	     
-            m_isPlaying = true;
-            m_isLooping = looping;
+            m_playingAnimation = true;
+            m_LoopingAnimation = looping;
             m_frameTime = startFrameTime;
             m_activeAnimationName = name;
             m_activeAnimation = animation;
@@ -75,7 +75,7 @@ namespace dae
 
     void AnimationComponent::Stop()
     {
-        m_isPlaying = false;
+        m_playingAnimation = false;
     }
 
     void AnimationComponent::SetRenderScale(float scaleX, float scaleY)

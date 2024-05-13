@@ -1,11 +1,8 @@
 #include "ResourceManager.h"
-
 #include <stdexcept>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
-
 #include <iostream>
-
 #include "Renderer.h"
 
 std::string dae::ResourceManager::m_dataPath;
@@ -21,14 +18,14 @@ void dae::ResourceManager::Init(const std::string& dataPath)
 }
 
 
-dae::Font* dae::ResourceManager::LoadFont(const std::string& assetName, const std::string& file, unsigned int size)
+dae::Font* dae::ResourceManager::LoadFont(const std::string& name, const std::string& file, unsigned int size)
 {
 	auto fullPath = m_dataPath + file;
 	auto font = std::make_unique<Font>(fullPath, size);
-	auto [it, success] = g_FontUPtrMap.emplace(assetName, std::move(font));
+	auto [it, success] = g_FontUPtrMap.emplace(name, std::move(font));
 	if (!success)
 	{
-		std::cerr << "Error: Font '" << assetName << "' already loaded.\n";
+		std::cerr << "Error: Font '" << name << "' already loaded.\n";
 		return nullptr;
 	}
 	return it->second.get();
@@ -46,9 +43,9 @@ dae::Texture2D* dae::ResourceManager::LoadTexture(const std::string& fileName)
 	return g_LoadedTextureUPtrs.emplace_back(std::make_unique<Texture2D>(texture)).get();
 }
 
-dae::Sprite* dae::ResourceManager::LoadSprite(const std::string& assetName, const std::string& fileName, int rowCount, int colCount, const std::map<std::string, SpriteAnimation>& animations)
+dae::Sprite* dae::ResourceManager::LoadSprite(const std::string& name, const std::string& fileName, int rowCount, int colCount, const std::map<std::string, SpriteAnimation>& animations)
 {
-	return g_SpriteUPtrMap.emplace(assetName,std::make_unique<Sprite>(LoadTexture(m_dataPath + fileName), rowCount, colCount, animations)).first->second.get();
+	return g_SpriteUPtrMap.emplace(name,std::make_unique<Sprite>(LoadTexture(m_dataPath + fileName), rowCount, colCount, animations)).first->second.get();
 }
 
 dae::Sprite* dae::ResourceManager::GetSprite(const std::string& name)

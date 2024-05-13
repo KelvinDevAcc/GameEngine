@@ -14,7 +14,6 @@
 #include "ResourceManager.h"
 #include "TextComponent.h"
 #include "GameObject.h"
-#include "RenderComponent.h"
 #include "Command.h"
 #include "InputManager.h"
 #include "HealthComponent.h"
@@ -82,12 +81,10 @@ void LoadResources()
             { "eggWalk_Up", { { { 4, 6 }, { 4, 6 } }, 1 } },
             { "eggWalk_Down", { { { 0, 6 }, { 1, 6 } }, 1 } },
             { "eggDying", { { { 0, 7 }, { 1, 7 }, { 2, 7 }, { 3, 7 } }, 2 } },
-            { "eggstunned", { { { 4, 7 }, { 5, 7 } }, 1 } }
+            { "eggStunned", { { { 4, 7 }, { 5, 7 } }, 1 } }
         });
 
 }
-
-
 
 
 void HandlePlayerInput(const dae::InputManager& inputManager, dae::GameObject* player)
@@ -133,7 +130,7 @@ void Scene1(const dae::InputManager& inputManager, dae::Scene* scene)
     auto CharacterObject2 = std::make_unique<dae::GameObject>();
     auto CharacterRenderComponent2 = std::make_unique<dae::SpriteRenderer>(CharacterObject2.get(),dae::ResourceManager::GetSprite("sausage"), glm::ivec2(0, 0));
     CharacterObject2->SetLocalPosition(glm::vec3(300.0f, 300.0f, 0.0f));
-    CharacterRenderComponent2->SetDimensions(100, 100);
+    CharacterRenderComponent2->SetDimensions(50, 50);
 
     auto Character2Health = std::make_unique<dae::HealthComponent>(100, 3); // Create HealthComponent with initial health 100 and lives 3
     auto Character2points = std::make_unique<dae::PointComponent>(0);
@@ -173,6 +170,50 @@ void Scene1(const dae::InputManager& inputManager, dae::Scene* scene)
     scene->Add(std::move(pointsDisplayObject2));
     scene->Add(std::move(livesDisplayObject2));
     scene->Add(std::move(CharacterObject2));
+
+
+    // Create GameObject for Character 
+    auto characterObject = std::make_unique<dae::GameObject>();
+
+    // Create and set up SpriteRenderer component
+    auto spriteRendererComponent = std::make_unique<dae::SpriteRenderer>(characterObject.get(), dae::ResourceManager::GetSprite("chef"), glm::ivec2{ 0,0 });
+    spriteRendererComponent->SetDimensions(60, 60);
+    characterObject->AddComponent(std::move(spriteRendererComponent));
+
+    // Create and set up AnimationComponent component
+    auto animationComponent = std::make_unique<dae::AnimationComponent>(characterObject.get(), characterObject->GetComponent<dae::SpriteRenderer>(), "Idle");
+    characterObject->AddComponent(std::move(animationComponent));
+
+    auto healthComponent = std::make_unique<dae::HealthComponent>(100, 3);
+    auto pointComponent = std::make_unique<dae::PointComponent>(0);
+
+    characterObject->AddComponent(std::move(healthComponent));
+    characterObject->AddComponent(std::move(pointComponent));
+
+    characterObject->SetLocalPosition(glm::vec3(221.0f, 281.0f, 0.0f));
+
+    auto playerComponent = std::make_unique<game::Player>(characterObject.get());
+    characterObject->AddComponent(std::move(playerComponent));
+
+    HandlePlayerInput(inputManager, characterObject.get());
+
+    auto livesDisplayObject = std::make_unique<dae::GameObject>();
+    auto livesDisplayComponent = std::make_unique<dae::LivesDisplayComponent>(dae::ResourceManager::GetFont("arcade"), *livesDisplayObject);
+    auto character1HealthComponent = characterObject->GetComponent<dae::HealthComponent>();
+    livesDisplayComponent->AttachToHealthComponent(character1HealthComponent);
+    livesDisplayObject->AddComponent(std::move(livesDisplayComponent));
+    livesDisplayObject->SetLocalPosition(glm::vec3(100, 450, 0.f));
+
+    auto pointsDisplayObject = std::make_unique<dae::GameObject>();
+    auto pointsDisplayComponent = std::make_unique<dae::PointsDisplayComponent>(dae::ResourceManager::GetFont("arcade"), *pointsDisplayObject); // Assuming a font for displaying points
+    auto characterPointComponent = characterObject->GetComponent<dae::PointComponent>();
+    pointsDisplayComponent->AttachToPointComponent(characterPointComponent);
+    pointsDisplayObject->AddComponent(std::move(pointsDisplayComponent));
+    pointsDisplayObject->SetLocalPosition(glm::vec3(100, 470, 0.f));
+
+    scene->Add(std::move(pointsDisplayObject));
+    scene->Add(std::move(livesDisplayObject));
+    scene->Add(std::move(characterObject));
 
     // Create GameObject for Title
     auto TitleObject = std::make_unique<dae::GameObject>();
@@ -256,7 +297,7 @@ void Scene2(dae::Scene* scene)
     scene->Add(std::move(Infocharacter2Txt02));
 }
 
-void Scene3(const dae::InputManager& inputManager, dae::Scene* scene)
+void Scene3(const dae::InputManager& /*inputManager*/, dae::Scene* scene)
 {
     // Create GameObject for background
     auto backgroundObject03 = std::make_unique<dae::GameObject>();
@@ -302,7 +343,7 @@ void Scene3(const dae::InputManager& inputManager, dae::Scene* scene)
     CharacterObject1->AddComponent(std::move(PlayerComponent));
 
 
-    HandlePlayerInput(inputManager, CharacterObject1.get());
+    //HandlePlayerInput(inputManager, CharacterObject1.get());
 
 
 	auto livesDisplayObject2 = std::make_unique<dae::GameObject>();
@@ -332,7 +373,7 @@ void Scene3(const dae::InputManager& inputManager, dae::Scene* scene)
     eggObject->AddComponent(std::move(eggspriterenderComponent));
 
     auto egganimationComponent = std::make_unique<dae::AnimationComponent>(eggObject.get(), eggObject->GetComponent<dae::SpriteRenderer>(), "eggIdle");
-    egganimationComponent->Play("eggstunned", true);
+    egganimationComponent->Play("eggStunned", true);
 	eggObject->AddComponent(std::move(egganimationComponent));
 
     eggObject->SetLocalPosition(glm::vec3(221.0f, 81.0f, 0.0f));

@@ -1,18 +1,12 @@
 #include "PlayerState.h"
-
-#include <iostream>
-
-#include "Player.h" // Include the Player header file if necessary
+#include "EnventQueue.h"
+#include "Player.h"
+#include "sound_system.h"
 
 namespace game
 {
     //walking state
-    void PlayerWalkingState::OnEnterState(Player& /*player*/)
-    {
-        std::cout << "in PlayerWalkingState";
-    }
-
-    void PlayerWalkingState::Update(Player& player)
+    void MovingState::Update(Player& player)
     {
 
         if (player.m_deltaX > 0) {
@@ -32,63 +26,66 @@ namespace game
         }
     }
 
-    void PlayerWalkingState::OnExitState(Player& player)
+    void MovingState::OnExitState(Player& player)
     {
         player.m_animationComponent->Stop();
     }
    
 
     //atacking state
-    void PlayerAttackingState::OnEnterState(Player& player)
+    void AttackingState::OnEnterState(Player& player)
     {
-        std::cout << "in PlayerAttackingState";
         player.m_animationComponent->Play("Attacking", false);
 
+        const int newScore = player.m_pointComponent->GetScore() + 100;
+        player.m_pointComponent->SetScore(newScore);
     }
 
-    void PlayerAttackingState::Update(Player& /*player*/)
-    {
-    }
-
-    void PlayerAttackingState::OnExitState(Player& player)
+    void AttackingState::OnExitState(Player& player)
     {
         player.m_animationComponent->Stop();
     }
 
 
     //dyingstate
-    void PlayerDyingState::OnEnterState(Player& player)
+    void DyingState::OnEnterState(Player& player)
     {
-        std::cout << "in PlayerDyingState";
         player.m_animationComponent->Play("Dying", false);
+
+        dae::Message message;
+
+        message.type = dae::PlaySoundMessageType::deathSound;
+
+        message.arguments.emplace_back(static_cast<sound_id>(1));
+        message.arguments.emplace_back(50.f);
+
+        dae::EventQueue::Broadcast(message);
+
+        const int newHealth = player.m_healthComponent->GetHealth() - 100;
+        player.m_healthComponent->SetHealth(newHealth);
     }
 
-    void PlayerDyingState::Update(Player& player)
+    void DyingState::Update(Player& player)
     {
 	    if (player.m_healthComponent->GetLives() < 0)
 	    {
-            player.respawn();
+            player.Respawn();
 	    }
     }
 
-    void PlayerDyingState::OnExitState(Player& player)
+    void DyingState::OnExitState(Player& player)
     {
         player.m_animationComponent->Stop();
     }
 
 
     //idlestate
-    void PlayerIdleState::OnEnterState(Player& player)
+    void IdleState::OnEnterState(Player& player)
     {
-        std::cout << "in idle";
         player.m_animationComponent->Play("Idle", true);
     }
 
-    void PlayerIdleState::Update(Player& /*player*/)
-    {
-    }
-
-    void PlayerIdleState::OnExitState(Player& player)
+    void IdleState::OnExitState(Player& player)
     {
         player.m_animationComponent->Stop();
     }
