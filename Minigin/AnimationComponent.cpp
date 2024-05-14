@@ -4,7 +4,7 @@
 
 namespace dae
 {
-    AnimationComponent::AnimationComponent(GameObject* gameObject, SpriteRenderer* spriteRenderer, const std::string& defaultAnimation)
+    AnimationComponent::AnimationComponent(GameObject* gameObject, SpriteRendererComponent* spriteRenderer, const std::string& defaultAnimation)
         : m_gameObject(gameObject), m_spriteRenderer(spriteRenderer), m_activeAnimation(nullptr),
         m_activeAnimationName(defaultAnimation), m_playingAnimation(false), m_LoopingAnimation(false),
         m_frameTime(0.0f), m_renderScaleX(1.0f), m_renderScaleY(1.0f)
@@ -51,7 +51,7 @@ namespace dae
     {
         if (!m_spriteRenderer)
         {
-            std::cerr << "SpriteRenderer is null" << std::endl;
+            std::cerr << "SpriteRendererComponent is null" << std::endl;
             return;
         }
 

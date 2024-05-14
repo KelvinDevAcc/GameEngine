@@ -7,6 +7,7 @@
 #include <functional>
 #include <queue>
 #include <unordered_map>
+#include <variant>
 
 namespace dae {
 
@@ -14,9 +15,14 @@ namespace dae {
         deathSound,
     };
 
+    enum class PointsMessageType {
+        addScore,
+        damage
+    };
+
     struct Message
     {
-        PlaySoundMessageType type;
+        std::variant<PlaySoundMessageType, PointsMessageType> type;
         std::vector<std::any> arguments;
     };
 
@@ -28,7 +34,7 @@ namespace dae {
         }
 
         template<typename T>
-        static void AddListener(PlaySoundMessageType eventType, T* object,
+        static void AddListener(auto eventType, T* object,
             void (T::* memberFunction)(const Message&))
         {
             listeners.insert({
@@ -71,7 +77,7 @@ namespace dae {
 
     private:
         using Listener = std::pair<void*, std::function<void(const Message&)>>;
-        static inline std::unordered_multimap<PlaySoundMessageType, Listener> listeners{};
+        static inline std::unordered_multimap<std::variant<PlaySoundMessageType, PointsMessageType>, Listener> listeners{};
         static inline std::queue<Message> messages{};
     };
 

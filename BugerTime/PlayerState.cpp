@@ -16,7 +16,6 @@ namespace game
         else if (player.m_deltaX < 0) {
             player.m_animationComponent->Play("Walk_Left", true, 0);
             player.m_animationComponent->FlipSprite(false, false);
-
         }
         else if (player.m_deltaY > 0) {
             player.m_animationComponent->Play("Walk_Down", true, 0);
@@ -37,8 +36,12 @@ namespace game
     {
         player.m_animationComponent->Play("Attacking", false);
 
-        const int newScore = player.m_pointComponent->GetScore() + 100;
-        player.m_pointComponent->SetScore(newScore);
+       // const int newScore = player.m_pointComponent->GetScore() + 100;
+
+        dae::Message scoreMessage;
+        scoreMessage.type = dae::PointsMessageType::addScore;
+        scoreMessage.arguments.emplace_back(100);
+        dae::EventQueue::Broadcast(scoreMessage);
     }
 
     void AttackingState::OnExitState(Player& player)

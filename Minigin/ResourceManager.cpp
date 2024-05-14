@@ -20,9 +20,9 @@ void dae::ResourceManager::Init(const std::string& dataPath)
 
 dae::Font* dae::ResourceManager::LoadFont(const std::string& name, const std::string& file, unsigned int size)
 {
-	auto fullPath = m_dataPath + file;
+	auto fullPath = m_dataPath + "Font/" + file;
 	auto font = std::make_unique<Font>(fullPath, size);
-	auto [it, success] = g_FontUPtrMap.emplace(name, std::move(font));
+	auto [it, success] = m_FontMap.emplace(name, std::move(font));
 	if (!success)
 	{
 		std::cerr << "Error: Font '" << name << "' already loaded.\n";
@@ -40,18 +40,18 @@ dae::Texture2D* dae::ResourceManager::LoadTexture(const std::string& fileName)
 		std::cerr << "Error: Failed to load texture '" << fileName << "': " << IMG_GetError() << '\n';
 
 
-	return g_LoadedTextureUPtrs.emplace_back(std::make_unique<Texture2D>(texture)).get();
+	return m_LoadedTextures.emplace_back(std::make_unique<Texture2D>(texture)).get();
 }
 
 dae::Sprite* dae::ResourceManager::LoadSprite(const std::string& name, const std::string& fileName, int rowCount, int colCount, const std::map<std::string, SpriteAnimation>& animations)
 {
-	return g_SpriteUPtrMap.emplace(name,std::make_unique<Sprite>(LoadTexture(m_dataPath + fileName), rowCount, colCount, animations)).first->second.get();
+	return m_SpriteMap.emplace(name,std::make_unique<Sprite>(LoadTexture(m_dataPath + fileName), rowCount, colCount, animations)).first->second.get();
 }
 
 dae::Sprite* dae::ResourceManager::GetSprite(const std::string& name)
 {
-	if (g_SpriteUPtrMap.contains(name))
-		return g_SpriteUPtrMap.at(name).get();
+	if (m_SpriteMap.contains(name))
+		return m_SpriteMap.at(name).get();
 
 	std::cerr << "Error: Sprite '" << name << "' not found.\n";
 	return nullptr;
@@ -59,8 +59,8 @@ dae::Sprite* dae::ResourceManager::GetSprite(const std::string& name)
 
 dae::Font* dae::ResourceManager::GetFont(const std::string& name)
 {
-	if (g_FontUPtrMap.contains(name))
-		return g_FontUPtrMap.at(name).get();
+	if (m_FontMap.contains(name))
+		return m_FontMap.at(name).get();
 
 	std::cerr << "Error: Font '" << name << "' not found.\n";
 	return nullptr;

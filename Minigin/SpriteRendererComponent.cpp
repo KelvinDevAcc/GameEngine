@@ -1,21 +1,24 @@
-#include "SpriteRenderer.h"
+#include "SpriteRendererComponent.h"
 #include "Sprite.h"
 #include "GameObject.h"
 #include "Renderer.h"
 
-dae::SpriteRenderer::SpriteRenderer(dae::GameObject* gameObject, const Sprite* sprite, glm::ivec2 drawCell) :
+dae::SpriteRendererComponent::SpriteRendererComponent(dae::GameObject* gameObject, const Sprite* sprite, glm::ivec2 drawCell) :
     m_gameObject(gameObject),m_drawCell(drawCell)
 {
     SetSprite(sprite);
 }
 
-void dae::SpriteRenderer::SetDrawCell(glm::ivec2 drawCell)
+void dae::SpriteRendererComponent::SetDrawCell(glm::ivec2 drawCell)
 {
     m_drawCell = drawCell;
 }
 
-void dae::SpriteRenderer::SetSprite(const Sprite* spritePtr)
+void dae::SpriteRendererComponent::SetSprite(const Sprite* spritePtr)
 {
+    if (m_spritePtr == spritePtr)
+        return;
+
 	m_spritePtr = spritePtr;
 
     if (m_spritePtr)
@@ -27,28 +30,28 @@ void dae::SpriteRenderer::SetSprite(const Sprite* spritePtr)
     }
 }
 
-void dae::SpriteRenderer::Update()
+void dae::SpriteRendererComponent::Update()
 {
 }
 
-const dae::Sprite* dae::SpriteRenderer::GetSprite() const
+const dae::Sprite* dae::SpriteRendererComponent::GetSprite() const
 {
 	return m_spritePtr;
 }
 
-void dae::SpriteRenderer::SetDimensions(float width, float height)
+void dae::SpriteRendererComponent::SetDimensions(float width, float height)
 {
     m_width = width;
     m_height = height;
 }
 
-void dae::SpriteRenderer::Setflip(bool flipx, bool flipy) 
+void dae::SpriteRendererComponent::Setflip(bool flipx, bool flipy) 
 {
     m_flipX = flipx;
     m_flipY = flipy;
 }
 
-void dae::SpriteRenderer::Render() const
+void dae::SpriteRendererComponent::Render() const
 {
     if (m_spritePtr == nullptr)
         return;

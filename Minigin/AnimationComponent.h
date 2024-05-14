@@ -1,6 +1,6 @@
 #pragma once
 #include "GameObject.h"
-#include "SpriteRenderer.h"
+#include "SpriteRendererComponent.h"
 
 
 namespace dae
@@ -8,7 +8,7 @@ namespace dae
     class AnimationComponent : public Component
     {
     public:
-        AnimationComponent(GameObject* gameObject, SpriteRenderer* spriteRenderer, const std::string& defaultAnimation);
+        AnimationComponent(GameObject* gameObject, SpriteRendererComponent* spriteRenderer, const std::string& defaultAnimation);
 
         void Update() override;
         void Play(const std::string& name, bool looping = false, float startFrameTime = 0.0f);
@@ -20,7 +20,7 @@ namespace dae
 
     private:
         GameObject* m_gameObject;
-        SpriteRenderer* m_spriteRenderer;
+        SpriteRendererComponent* m_spriteRenderer;
         const SpriteAnimation* m_activeAnimation;
         std::string m_activeAnimationName;
         bool m_playingAnimation;

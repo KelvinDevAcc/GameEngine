@@ -66,28 +66,16 @@ namespace game
         }
     }
 
-    void Player::Attack()
-    {
-        if (m_CurrentState)
-        {
-            SetState(m_attackignState.get());
-        }
+    void Player::Attack() {
+        SetState(m_attackignState.get());
     }
 
-    void Player::Die()
-    {
-        if (m_CurrentState)
-        {
-            SetState(m_dyingState.get());
-        }
+    void Player::Die() {
+        SetState(m_dyingState.get());
     }
 
-    void Player::Idle()
-    {
-        if (m_CurrentState)
-        {
-            SetState(m_idleState.get());
-        }
+    void Player::Idle() {
+        SetState(m_idleState.get());
     }
 
     void Player::Respawn()

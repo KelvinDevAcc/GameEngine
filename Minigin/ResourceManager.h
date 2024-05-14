@@ -28,8 +28,8 @@ namespace dae
 		ResourceManager() = default;
 		static std::string m_dataPath;
 
-		inline static std::map<std::string, std::unique_ptr<Font>> g_FontUPtrMap{};
-		inline static std::map<std::string, std::unique_ptr<Sprite>> g_SpriteUPtrMap{};
-		inline static std::vector<std::unique_ptr<Texture2D>> g_LoadedTextureUPtrs{};
+		inline static std::map<std::string, std::unique_ptr<Font>> m_FontMap{};
+		inline static std::map<std::string, std::unique_ptr<Sprite>> m_SpriteMap{};
+		inline static std::vector<std::unique_ptr<Texture2D>> m_LoadedTextures{};
 	};
 }
