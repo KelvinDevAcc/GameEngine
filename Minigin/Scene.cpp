@@ -1,9 +1,15 @@
 #include "Scene.h"
+
+#include <iostream>
 #include <string>
+
+#include "HitBox.h"
 
 namespace dae
 {
     Scene::Scene(std::string name) : m_name(std::move(name)) {}
+
+   
 
     void Scene::Add(std::unique_ptr<GameObject> object)
     {
@@ -41,4 +47,5 @@ namespace dae
     {
         return m_objects;
     }
+
 }

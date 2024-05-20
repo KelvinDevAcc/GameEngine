@@ -159,6 +159,12 @@
     <ClInclude Include="SceneHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HitBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ResourceManager.cpp">
@@ -291,6 +297,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SceneHelpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -210,6 +210,7 @@
     <ClInclude Include="GameObjectBenchmark.h" />
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="HealthComponent.h" />
+    <ClInclude Include="HitBox.h" />
     <ClInclude Include="imguiExerciseComponent.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="LivesDisplayComponent.h" />
@@ -224,6 +225,7 @@
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="RotatorComponent.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="SceneData.h" />
     <ClInclude Include="SceneHelpers.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="sdl_sound_system.h" />
@@ -271,6 +273,7 @@
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="RotatorComponent.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SceneData.cpp" />
     <ClCompile Include="SceneHelpers.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="sdl_sound_system.cpp" />

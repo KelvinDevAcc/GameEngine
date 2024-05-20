@@ -17,7 +17,7 @@ namespace dae
         virtual void Render() const {} // Render component if needed
         virtual const std::type_info& GetComponentType() const = 0; // Pure virtual function for component type identification
 
-
+        void SetGameObject(GameObject* pGameObject) { m_pGameObject = pGameObject; }
         GameObject* GetGameObject() const { return m_pGameObject; }
 
     private:

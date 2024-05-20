@@ -2,6 +2,7 @@
 #include "AnimationComponent.h"
 #include "GameObject.h"
 #include "HealthComponent.h"
+#include "LoadMap.h"
 #include "PlayerState.h" 
 #include "PointComponent.h"
 
@@ -17,6 +18,7 @@ namespace game
 
     public:
         Player(dae::GameObject* gameObject);
+
 
         ~Player() override = default;
 
@@ -35,6 +37,10 @@ namespace game
         void Idle();
 
         void Respawn();
+
+        void SetMap(const LoadMap& map);
+
+        dae::GameObject* GetParentObject() const { return m_GameObject; }
 
         std::type_info const& GetComponentType() const override { return typeid(Player); }
 
@@ -64,7 +70,9 @@ namespace game
         float m_timeSinceLastAction;
         float m_inactivityThreshold;
         
+        const LoadMap* m_gameMap; // Reference to the map
 
+        void CheckAndMove(float deltaX, float deltaY);
     };
 } // namespace 
 
