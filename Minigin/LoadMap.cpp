@@ -1,10 +1,7 @@
 #include "LoadMap.h"
 #include <iostream>
 #include <fstream>
-#include <glm/vec2.hpp>
-
 #include "SceneHelpers.h"
-#include "../BugerTime/Player.h"
 
 LoadMap::LoadMap(const std::string& mapFilePath, const std::string& ingFilePath) {
     loadFromFile(mapFilePath, ingFilePath);

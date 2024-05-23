@@ -73,6 +73,9 @@ namespace game
         const LoadMap* m_gameMap; // Reference to the map
 
         void CheckAndMove(float deltaX, float deltaY);
+
+        void MoveHorizontally(float deltaX);
+        void MoveVertically(float deltaY, bool isOnLadder, bool isOnSolidLadder);
     };
 } // namespace 
 

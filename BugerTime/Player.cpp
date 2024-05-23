@@ -106,57 +106,52 @@ namespace game
     {
         const auto& sceneData = dae::SceneData::GetInstance();
 
-        bool canMoveX = false;
-        bool canMoveY = false;
+        bool canMove = sceneData.CanEntityMove(deltaX, deltaY, *m_GameObject);
 
-        bool isOnLadder = sceneData.IsOnLadder(*m_GameObject);
-        bool isOnSolidLadder = sceneData.IsOnSolidLadder(*m_GameObject);
-        bool isOnFloor = sceneData.IsOnFloor(*m_GameObject);
+        const bool isOnLadder = sceneData.IsOnLadder(*m_GameObject);
+        const bool isOnSolidLadder = sceneData.IsOnSolidLadder(*m_GameObject);
+        const bool isOnFloor = sceneData.IsOnFloor(*m_GameObject);
 
-        // Allow horizontal movement if the player is on a regular ladder or not on any ladder
-        if (isOnFloor) {
-            if (sceneData.CanEntityMove(deltaX, 0, *m_GameObject)) {
-                canMoveX = true;
-            }
+        // Allow horizontal movement if the player is on the floor or ladder
+        if (isOnFloor && canMove) {
+            MoveHorizontally(deltaX);
         }
 
         // Allow vertical movement if the player is on a ladder or solid ladder
-        if (isOnSolidLadder) {
-            if (sceneData.CanEntityMove(0, deltaY, *m_GameObject)) {
-                canMoveY = true;
-            }
+        if ((isOnLadder || isOnSolidLadder) && canMove) {
+            MoveVertically(deltaY, isOnLadder, isOnSolidLadder);
         }
 
-        if (isOnLadder) {
-            if (sceneData.CanEntityMove(deltaX, deltaY, *m_GameObject)) {
-                canMoveY = true;
-            }
+        // Allow horizontal movement if the player is on a ladder
+        if (isOnLadder && canMove) {
+            MoveHorizontally(deltaX);
         }
 
-        if (canMoveX || canMoveY) {
-            glm::vec3 currentPosition = m_GameObject->GetWorldPosition();
-            if (canMoveX) {
-                currentPosition.x += deltaX;
-            }
-            if (canMoveY) {
-                currentPosition.y += deltaY;
-
-                // If moving vertically on a ladder, clip to the center of the ladder
-                if (isOnLadder) {
-                    // Assuming you have a function to get the center X position of the ladder
-                    float ladderCenterX = sceneData.GetLadderCenterX(*m_GameObject);
-                    currentPosition.x = ladderCenterX;
-                }
-            }
-            m_GameObject->SetLocalPosition(currentPosition);
-
-            if (m_CurrentState) {
-                SetState(m_walkingState.get());
-            }
-        }
-        else {
+        // If neither horizontal nor vertical movement is allowed, set player to idle
+        if (!canMove) {
             Idle();
         }
     }
 
+    void Player::MoveHorizontally(float deltaX)
+    {
+        glm::vec3 currentPosition = m_GameObject->GetWorldPosition();
+        currentPosition.x += deltaX;
+        m_GameObject->SetLocalPosition(currentPosition);
+        SetState(m_walkingState.get());
+    }
+
+    void Player::MoveVertically(float deltaY, bool isOnLadder, bool isOnSolidLadder)
+    {
+        glm::vec3 currentPosition = m_GameObject->GetWorldPosition();
+        currentPosition.y += deltaY;
+
+        if (isOnLadder || isOnSolidLadder) {
+	        const float ladderCenterX = dae::SceneData::GetInstance().GetLadderCenterX(*m_GameObject);
+            currentPosition.x = ladderCenterX;
+        }
+
+        m_GameObject->SetLocalPosition(currentPosition);
+        SetState(m_walkingState.get());
+    }
 }

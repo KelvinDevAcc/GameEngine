@@ -201,6 +201,7 @@
     <ClInclude Include="..\3rdParty\imgui-1.90.4\imstb_truetype.h" />
     <ClInclude Include="..\3rdParty\imgui-plot-master\include\imgui_plot.h" />
     <ClInclude Include="AnimationComponent.h" />
+    <ClInclude Include="BurgerComponent.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Font.h" />
@@ -250,6 +251,7 @@
     <ClCompile Include="..\3rdParty\imgui-1.90.4\imgui_widgets.cpp" />
     <ClCompile Include="..\3rdParty\imgui-plot-master\src\imgui_plot.cpp" />
     <ClCompile Include="AnimationComponent.cpp" />
+    <ClCompile Include="BurgerComponent.cpp" />
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Font.cpp" />

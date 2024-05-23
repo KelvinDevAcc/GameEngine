@@ -59,8 +59,6 @@ void LoadResources()
 
 	dae::ResourceManager::LoadSprite("Stage01", "Stage01.png");
 
-    dae::ResourceManager::LoadSprite("sausage", "sausage.png");
-
     dae::ResourceManager::LoadSprite("floor", "floor.png");
     dae::ResourceManager::LoadSprite("ladder_down", "go_down.png");
     dae::ResourceManager::LoadSprite("ladder_up", "go_up.png");
@@ -69,6 +67,14 @@ void LoadResources()
     dae::ResourceManager::LoadSprite("mid_basket", "mid_basket.png");
     dae::ResourceManager::LoadSprite("left_basket", "left_basket.png");
     dae::ResourceManager::LoadSprite("combined_basket", "combined_basket.png");
+
+
+    dae::ResourceManager::LoadSprite("Bugertop", "Bugertop.png");
+    dae::ResourceManager::LoadSprite("cheese", "cheese.png");
+    dae::ResourceManager::LoadSprite("Meat", "Meat.png");
+    dae::ResourceManager::LoadSprite("tomato", "tomato.png");
+    dae::ResourceManager::LoadSprite("lettuce", "lettuce.png");
+    dae::ResourceManager::LoadSprite("Buger_bottom", "Buger_bottom.png");
 
 
     dae::ResourceManager::LoadSprite("chef",
@@ -82,20 +88,48 @@ void LoadResources()
             { "Walk_Up", { { { 6, 0 }, { 7, 0 }, { 8, 0 } }, 4 } },
             { "Walk_Down", { { { 0, 0 }, { 1, 0 }, { 2, 0 } }, 4 } },
             { "Dying", { { { 3, 1 }, { 4, 1 }, { 5, 1 }, { 6, 1 }, { 7, 1 }, { 8, 1 } }, 2 } },
-            { "Attacking", { { { 1, 1 } }, 1 } }
+            { "Attacking", { { { 1, 1 } }, 1 } },
+            { "Victory", { { { 3, 1 }, { 1, 0 }}, 3 } }
+
         });
     dae::ResourceManager::LoadSprite("egg",
         "Arcade - Burger Time - Characters & Objects-white.png",
         11,  // rowCount
         15,  // colCount
         {
-            { "eggIdle", { { { 1, 6 }}, 1 } },
-            { "eggWalk_Right", { { { 2, 6 }, { 3, 6 } }, 1 } },
-            { "eggWalk_Left", { { { 2, 6 }, { 3, 6 } }, 1 } },
-            { "eggWalk_Up", { { { 4, 6 }, { 4, 6 } }, 1 } },
-            { "eggWalk_Down", { { { 0, 6 }, { 1, 6 } }, 1 } },
-            { "eggDying", { { { 0, 7 }, { 1, 7 }, { 2, 7 }, { 3, 7 } }, 2 } },
-            { "eggStunned", { { { 4, 7 }, { 5, 7 } }, 1 } }
+            { "Idle", { { { 1, 6 },{ 1, 6 }}, 1 } },
+            { "Walk_Right", { { { 2, 6 }, { 3, 6 } }, 2 } },
+            { "Walk_Left", { { { 2, 6 }, { 3, 6 } }, 2 } },
+            { "Walk_Up", { { { 4, 6 }, { 5, 6 } }, 2 } },
+            { "Walk_Down", { { { 0, 6 }, { 1, 6 } }, 2 } },
+            { "Dying", { { { 0, 7 }, { 1, 7 }, { 2, 7 }, { 3, 7 } }, 1 } },
+            { "Stunned", { { { 4, 7 }, { 5, 7 } }, 1 } }
+        });
+    dae::ResourceManager::LoadSprite("sausage",
+        "Arcade - Burger Time - Characters & Objects-white.png",
+        11,  // rowCount
+        15,  // colCount
+        {
+            { "Idle", { { { 1, 2 }}, 1 } },
+            { "Walk_Right", { { { 2, 2 }, { 3, 2 } }, 2 } },
+            { "Walk_Left", { { { 2, 2 }, { 3, 2 } }, 2 } },
+            { "Walk_Up", { { { 4, 2 }, { 5, 2 } }, 2 } },
+            { "Walk_Down", { { { 0, 2 }, { 1, 2 } }, 2 } },
+            { "Dying", { { { 0, 3 }, { 1, 3 }, { 2, 3 }, { 3, 3 } }, 1 } },
+            { "Stunned", { { { 4, 3 }, { 5, 3 } }, 1 } }
+        });
+    dae::ResourceManager::LoadSprite("Pickle",
+        "Arcade - Burger Time - Characters & Objects-white.png",
+        11,  // rowCount
+        15,  // colCount
+        {
+            { "PickleIdle", { { { 1, 4 }}, 1 } },
+            { "PickleWalk_Right", { { { 2, 4 }, { 3, 4 } }, 2 } },
+            { "PickleWalk_Left", { { { 2, 4 }, { 3, 4 } }, 2 } },
+            { "PickleWalk_Up", { { { 4, 4 }, { 5, 4 } }, 2 } },
+            { "PickleWalk_Down", { { { 0, 4 }, { 1, 4 } }, 2 } },
+            { "PickleDying", { { { 0, 5 }, { 1, 5 }, { 2, 5 }, { 3, 5 } }, 1 } },
+            { "PickleStunned", { { { 4, 5 }, { 5, 5 } }, 1 } }
         });
 
 }
@@ -409,16 +443,18 @@ void Scene4(dae::Scene* scene, const dae::InputManager& inputManager)
     //scene->Add(std::move(backgroundObject03));
     // Load the map
     constexpr glm::vec3 startPos(335, 20, 0.0f);
-    constexpr glm::vec2 scale(40, 29.5f);
+    constexpr glm::vec2 Mapscale(40, 29.5f);
 
     const LoadMap loadMap("../Data/maps/map1.map", "../Data/maps/map1.ingmap");
-    SceneHelpers::LoadMapIntoScene(loadMap, scene, startPos, scale);
+    SceneHelpers::LoadMapIntoScene(loadMap, scene, startPos, Mapscale);
+
+    SceneHelpers::LoadIngMapIntoScene(loadMap, scene, startPos, Mapscale);
 
 
     //Create GameObject for Character 1
-	auto CharacterObject1 = std::make_unique<dae::GameObject>();
+    auto CharacterObject1 = std::make_unique<dae::GameObject>();
 
-    auto hitBox = std::make_unique<HitBox>(glm::vec2(40, 40));
+    auto hitBox = std::make_unique<HitBox>(glm::vec2(20, 40));
     hitBox->SetGameObject(CharacterObject1.get());
     CharacterObject1->AddComponent(std::move(hitBox));
 
@@ -446,6 +482,7 @@ void Scene4(dae::Scene* scene, const dae::InputManager& inputManager)
 
     HandlePlayerInput(inputManager, CharacterObject1.get());
 
+    dae::SceneData::GetInstance().AddGameObject(CharacterObject1.get(), dae::GameObjectType::Player);
 
     auto livesDisplayObject2 = std::make_unique<dae::GameObject>();
     auto livesDisplayComponent2 = std::make_unique<dae::LivesDisplayComponent>(dae::ResourceManager::GetFont("arcade"), *livesDisplayObject2);
@@ -465,13 +502,31 @@ void Scene4(dae::Scene* scene, const dae::InputManager& inputManager)
     scene->Add(std::move(livesDisplayObject2));
     scene->Add(std::move(CharacterObject1));
 
-    auto obstacleHitBoxobject = std::make_unique<dae::GameObject>();
-    obstacleHitBoxobject->SetLocalPosition(glm::vec3(100, 250, 0.f));
-    auto obstacleHitBox = std::make_unique<HitBox>(glm::vec2(40, 29.5f));
-    obstacleHitBox->SetGameObject(obstacleHitBoxobject.get());
-    obstacleHitBoxobject->AddComponent(std::move(obstacleHitBox));
-    
-    scene->Add(std::move(obstacleHitBoxobject));
+
+
+}
+
+void Scene5(dae::Scene* scene)
+{
+    constexpr glm::vec3 startPos(335, 50, 0.0f);
+    constexpr glm::vec2 Mapscale(35, 25.5f);
+
+    const LoadMap loadMap("../Data/maps/map2.map", "../Data/maps/map2.ingmap");
+    SceneHelpers::LoadMapIntoScene(loadMap, scene, startPos, Mapscale);
+
+    SceneHelpers::LoadIngMapIntoScene(loadMap, scene, startPos, Mapscale);
+	
+}
+
+void Scene6(dae::Scene* scene)
+{
+    constexpr glm::vec3 startPos(335, 50, 0.0f);
+    constexpr glm::vec2 Mapscale(35, 25.5f);
+
+    const LoadMap loadMap("../Data/maps/map3.map", "../Data/maps/map3.ingmap");
+    SceneHelpers::LoadMapIntoScene(loadMap, scene, startPos, Mapscale);
+
+    SceneHelpers::LoadIngMapIntoScene(loadMap, scene, startPos, Mapscale);
 
 }
 
@@ -486,12 +541,16 @@ void load()
     //const auto& scene2 = sceneManager.CreateScene("Scene2");
     //const auto& scene3 = sceneManager.CreateScene("Scene3");
     const auto& scene4 = sceneManager.CreateScene("Scene4");
+    const auto& scene5 = sceneManager.CreateScene("Scene5");
+    const auto& scene6 = sceneManager.CreateScene("Scene6");
 
 
     //Scene1(inputManager, scene);
     //Scene2(scene2);
     //Scene3(inputManager, scene3);
     Scene4(scene4, inputManager);
+    Scene5(scene5);
+    Scene6(scene6);
 
     sceneManager.SetActiveScene("Scene4");
 

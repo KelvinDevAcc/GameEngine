@@ -6,18 +6,12 @@
 #include <SDL_ttf.h>
 #include "Minigin.h"
 
-#include <iomanip>
-#include <iostream>
-#include <sstream>
 #include <thread>
 
-#include "FPSCounterComponent.h"
 #include "InputManager.h"
 #include "SceneManager.h"
 #include "Renderer.h"
 #include "ResourceManager.h"
-#include "Scene.h"
-#include "TextComponent.h"
 #include "GameObject.h"
 #include "GameTime.h"
 #include "EnventQueue.h"

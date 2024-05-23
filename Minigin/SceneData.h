@@ -9,14 +9,12 @@ namespace dae {
         Floor,
         Ladder,
         SolidLadder,
-        PlatformLeft,
-        PlatformMiddle,
-        PlatformRight,
-        PlatformCombined,
-        Player
+        BurgerPart,
+        Player,
+        Basket
     };
 
-    class SceneData : Singleton<SceneData> {
+    class SceneData : public Singleton<SceneData> {
     public:
         static SceneData& GetInstance();
         SceneData(const SceneData&) = delete;
@@ -25,35 +23,34 @@ namespace dae {
         void AddGameObject(GameObject* gameObject, GameObjectType type);
         void Update();
 
-        bool CanEntityMove(float move_x, float move_y,GameObject& entity) const;
-
+        GameObject* GetPlayer() const;
+        const std::vector<GameObject*>& GetBurgerParts() const;
+        bool IsOnFloor(GameObject& player) const;
         bool IsOnLadder(GameObject& player) const;
         bool IsOnSolidLadder(GameObject& player) const;
-        float GetLadderCenterX(GameObject& player) const;
-        bool IsOnFloor(GameObject& player) const;
+        bool IsInBasket(GameObject& burger) const;
+
+        float GetLadderCenterX(GameObject& gameObject) const;
+        bool CanEntityMove(float moveX, float moveY, GameObject& entity) const;
+
+        bool IsWithinBounds(float x, float y) const;
+
+        bool IsNextObject(float x, float y) const;
+
+        bool IsOnSpecificObjectType(GameObject& player, const std::vector<GameObject*>& objects) const;
 
     private:
         SceneData() = default;
 
-        std::vector<GameObject*> m_players;
         std::vector<GameObject*> m_floors;
         std::vector<GameObject*> m_ladders;
         std::vector<GameObject*> m_solidLadders;
-        std::vector<GameObject*> m_platformsLeft;
-        std::vector<GameObject*> m_platformsMiddle;
-        std::vector<GameObject*> m_platformsRight;
-        std::vector<GameObject*> m_platformsCombined;
+        std::vector<GameObject*> m_players;
+        std::vector<GameObject*> m_burgerParts;
+        std::vector<GameObject*> m_baskets;
 
         void CheckPlayerCollisions();
-        void CheckCollisionsWithPlayer(GameObject* player);
         void OnCollision(GameObject* a, GameObject* b, GameObjectType type);
-
-
-       
-        bool IsObstacle(float x, float y) const;
-        bool IsWithinBounds(float x, float y) const;
-
-
 
     };
 }
