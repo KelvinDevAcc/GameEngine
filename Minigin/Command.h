@@ -1,7 +1,10 @@
 #pragma once
+
 #include "GameObject.h"
 #include "HealthComponent.h"
+#include "MenuComponent.h"
 #include "PointComponent.h"
+#include "sound_system.h"
 #include "../BugerTime/Player.h"
 
 
@@ -66,9 +69,71 @@ public:
 };
 
 
+
+//sound Commands
 class PlaySoundCommand : public Command {
 public:
     PlaySoundCommand();
     void Execute() override;
 
+};
+
+
+class MuteCommand : public Command {
+public:
+    explicit MuteCommand(sound_system* soundSystem);
+    void Execute() override;
+
+private:
+    sound_system* m_soundSystem;
+};
+
+class IncreaseVolumeCommand : public Command {
+public:
+    explicit IncreaseVolumeCommand(sound_system* soundSystem);
+    void Execute() override;
+
+private:
+    sound_system* m_soundSystem;
+};
+
+class DecreaseVolumeCommand : public Command {
+public:
+    explicit DecreaseVolumeCommand(sound_system* soundSystem);
+    void Execute() override;
+
+private:
+    sound_system* m_soundSystem;
+};
+
+
+//Menu Commands 
+class NavigateUpCommand : public Command
+{
+public:
+    explicit NavigateUpCommand(dae::MenuComponent* menu);
+        void Execute() override;
+
+private:
+    dae::MenuComponent* m_Menu;
+};
+
+class NavigateDownCommand : public Command
+{
+public:
+    explicit NavigateDownCommand(dae::MenuComponent* menu);
+    void Execute() override;
+
+private:
+    dae::MenuComponent* m_Menu;
+};
+
+class SelectOptionCommand : public Command
+{
+public:
+    explicit SelectOptionCommand(dae::MenuComponent* menu);
+    void Execute() override;
+
+private:
+    dae::MenuComponent* m_Menu;
 };

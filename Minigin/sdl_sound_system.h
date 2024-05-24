@@ -22,7 +22,10 @@ public:
     sdl_sound_system& operator=(sdl_sound_system&&) = delete;
     sdl_sound_system& operator=(const sdl_sound_system&) = delete;
 
-    void play(const sound_id id, const float volume) override;
+    void play(const sound_id id) override;
+    void mute() override;
+    float getVolume() override;
+    void setVolume(float volume) override;
     void process_events();
     void stop();
     void register_sound_file(const std::string& file_path) override;
@@ -44,7 +47,9 @@ private:
     std::condition_variable m_sound_requests_cv;
     std::unique_ptr<std::jthread> m_thread;
     bool m_running;
-
+    bool m_muted;
+    int m_volume;
+    int m_previousVolume;
     std::map<std::string, sound_id> m_file_path_to_id_map;
     std::map<sound_id, Mix_Music*> m_id_to_music_map;
 };
@@ -82,9 +87,25 @@ public:
     {
         _real_ss->unload_sound(id);
     }
-    void play(const sound_id id, const float volume) override
+    void play(const sound_id id) override
     {
-        _real_ss->play(id, volume);
+        _real_ss->play(id);
+    }
+
+    void mute() override
+    {
+        _real_ss->mute();
+    }
+
+    void setVolume(float volume) override {
+        _real_ss->setVolume(volume);
+        std::cout << "Setting volume to: " << volume << std::endl;
+    }
+
+    float getVolume() override {
+        float volume = _real_ss->getVolume();
+        std::cout << "Current volume: " << volume << std::endl;
+        return volume;
     }
 
 private:

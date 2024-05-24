@@ -62,7 +62,67 @@ void PlaySoundCommand::Execute() {
     message.type = dae::PlaySoundMessageType::deathSound;
 
     message.arguments.emplace_back(static_cast<sound_id>(1)); // sound ID
-    message.arguments.emplace_back(50.f); // volume
 
     dae::EventQueue::Broadcast(message);
+}
+
+MuteCommand::MuteCommand(sound_system* soundSystem)
+    : m_soundSystem(soundSystem) {}
+
+void MuteCommand::Execute() {
+    if (m_soundSystem) {
+        m_soundSystem->mute();
+    }
+}
+
+IncreaseVolumeCommand::IncreaseVolumeCommand(sound_system* soundSystem)
+    : m_soundSystem(soundSystem) {}
+
+void IncreaseVolumeCommand::Execute() {
+    if (m_soundSystem) {
+        const float currentVolume = m_soundSystem->getVolume();
+        m_soundSystem->setVolume(std::min(currentVolume + 10.0f, 128.0f));
+    }
+}
+
+DecreaseVolumeCommand::DecreaseVolumeCommand(sound_system* soundSystem)
+    : m_soundSystem(soundSystem) {}
+
+void DecreaseVolumeCommand::Execute() {
+    if (m_soundSystem) {
+        const float currentVolume = m_soundSystem->getVolume();
+        m_soundSystem->setVolume(std::max(currentVolume - 10.0f, 0.0f));
+    }
+}
+
+
+
+NavigateUpCommand::NavigateUpCommand(dae::MenuComponent* menu) : m_Menu(menu) {}
+
+void NavigateUpCommand::Execute()
+{
+    if (m_Menu)
+    {
+        m_Menu->NavigateUp();
+    }
+}
+
+NavigateDownCommand::NavigateDownCommand(dae::MenuComponent* menu) : m_Menu(menu) {}
+
+void NavigateDownCommand::Execute()
+{
+    if (m_Menu)
+    {
+        m_Menu->NavigateDown();
+    }
+}
+
+SelectOptionCommand::SelectOptionCommand(dae::MenuComponent* menu) : m_Menu(menu) {}
+
+void SelectOptionCommand::Execute()
+{
+    if (m_Menu)
+    {
+        m_Menu->SelectOption();
+    }
 }

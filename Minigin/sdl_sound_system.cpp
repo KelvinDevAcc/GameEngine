@@ -1,7 +1,7 @@
 #include "sdl_sound_system.h"
 
 
-sdl_sound_system::sdl_sound_system() : m_running(true) {
+sdl_sound_system::sdl_sound_system() : m_running(true),m_muted(false), m_volume(0), m_previousVolume(0) {
     // Initialize SDL mixer
     if (Mix_Init(MIX_INIT_MP3 | MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_OGG) < 0) {
         std::cerr << "SDL mixer initialization failed: " << Mix_GetError() << std::endl;
@@ -27,28 +27,25 @@ sdl_sound_system::~sdl_sound_system() {
 
 void sdl_sound_system::onPlaySoundMessage(const dae::Message& message) {
     try {
-        if (message.arguments.size() != 2) {
+        if (message.arguments.size() != 1) {
             std::cerr << "Invalid number of arguments for PlaySound message" << std::endl;
             return;
         }
 
         const sound_id soundID = std::any_cast<decltype(soundID)>(message.arguments[0]);
-        const float volume = std::any_cast<decltype(volume)>(message.arguments[1]);
 
-        play(soundID, volume);
+        play(soundID);
     }
     catch (const std::bad_any_cast& e) {
         std::cerr << "Error extracting arguments from PlaySound message: " << e.what() << std::endl;
     }
 }
 
-void sdl_sound_system::play(const sound_id id, const float volume) {
-    // Lock the mutex before modifying the sound requests queue
+void sdl_sound_system::play(const sound_id id) {
     std::unique_lock<std::mutex> lock(m_sound_requests_mutex);
-    m_sound_requests.push({ id, volume }); // Push the sound request to the queue
-    lock.unlock(); // Unlock the mutex
-    m_sound_requests_cv.notify_one(); // Notify the sound system thread about the new sound request
-
+    m_sound_requests.push({ id, static_cast<float>(m_volume) }); // Use the stored volume
+    lock.unlock();
+    m_sound_requests_cv.notify_one();
 }
 
 void sdl_sound_system::process_events() {
@@ -142,24 +139,60 @@ void sdl_sound_system::unload_sound(sound_id id) {
     }
 }
 
+void sdl_sound_system::mute() {
+    // Lock the mutex before modifying the mute state and volume
+    std::lock_guard<std::mutex> lock(m_sound_requests_mutex);
+    if (m_muted) {
+        // Unmute: Restore previous volume
+        m_muted = false;
+        m_volume = m_previousVolume;
+        Mix_VolumeMusic(m_volume); // Set the volume back to the previous level
+    }
+    else {
+        // Mute: Store current volume and set volume to 0
+        m_muted = true;
+        m_previousVolume = m_volume; // Store the current volume
+        m_volume = 0;
+        Mix_VolumeMusic(0); // Mute the music
+    }
+}
 
 
-void logging_sound_system::onPlaySoundMessage(const dae::Message& message)
-{
+void sdl_sound_system::setVolume(float volume) {
+    std::lock_guard<std::mutex> lock(m_sound_requests_mutex);
+    m_volume = static_cast<int>(volume * MIX_MAX_VOLUME);
+    if (!m_muted) {
+        Mix_VolumeMusic(m_volume);
+    }
+    else {
+        // If sound is muted, don't set volume directly, just store it for when it's unmuted
+        m_previousVolume = m_volume; // Store the current volume
+        std::cout << "Sound is muted. Volume change will take effect when sound is unmuted." << std::endl;
+    }
+}
+
+float sdl_sound_system::getVolume() {
+    std::lock_guard<std::mutex> lock(m_sound_requests_mutex);
+    return static_cast<float>(m_volume) / MIX_MAX_VOLUME;
+}
+
+
+void logging_sound_system::onPlaySoundMessage(const dae::Message& message) {
     try {
-        // Check if the message has the correct number of arguments
-        if (message.arguments.size() != 2) {
+        if (message.arguments.size() != 1) {
             std::cerr << "Invalid number of arguments for PlaySound message" << std::endl;
             return;
         }
 
         const sound_id soundID = std::any_cast<decltype(soundID)>(message.arguments[0]);
-        const float volume = std::any_cast<decltype(volume)>(message.arguments[1]);
 
-        play(soundID, volume);
-        std::cout << "playing " << soundID << " at volume " << volume << std::endl;
+        const float currentVolume = _real_ss->getVolume();
+        play(soundID);
+        std::cout << "Playing sound ID " << soundID << " at volume " << currentVolume << std::endl;
     }
     catch (const std::bad_any_cast& e) {
         std::cerr << "Error extracting arguments from PlaySound message: " << e.what() << std::endl;
     }
 }
+
+

@@ -60,7 +60,6 @@ namespace game
         message.type = dae::PlaySoundMessageType::deathSound;
 
         message.arguments.emplace_back(static_cast<sound_id>(1));
-        message.arguments.emplace_back(50.f);
 
         dae::EventQueue::Broadcast(message);
 

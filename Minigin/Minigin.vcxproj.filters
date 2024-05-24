@@ -168,6 +168,9 @@
     <ClInclude Include="BurgerComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
+    <ClInclude Include="MenuComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ResourceManager.cpp">
@@ -307,6 +310,9 @@
     </ClCompile>
     <ClCompile Include="BurgerComponent.cpp">
       <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuComponent.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

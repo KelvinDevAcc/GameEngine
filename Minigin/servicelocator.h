@@ -18,21 +18,23 @@ public:
     null_sound_system& operator=(null_sound_system&&) = delete;
     null_sound_system& operator=(const null_sound_system&) = delete;
 
-
-    void play(const sound_id id, const float volume) override
+    void play(const sound_id id) override
     {
-        std::cout << "null_sound_system is not playing" << "id:" << id << "volume: " << volume << std::endl;
+        std::cout << "null_sound_system is not playing id: " << id << std::endl;
     }
 
     void onPlaySoundMessage(const dae::Message& /*message*/) override
     {
-        play(0, 0);
+        play(0);
     }
 
     void register_sound_file(const std::string& /*file_path*/) override {}
     sound_id get_sound_id_for_file_path(const std::string& /*file_path*/) override { return 0; }
     void load_sound(sound_id /*id*/, const std::string& /*file_path*/) override {}
     void unload_sound(sound_id /*id*/) override {}
+    void mute() override{}
+    void setVolume(float /*volume*/) override {}
+    float getVolume() override { return 0.0f; }
 };
 class servicelocator final
 {
@@ -43,5 +45,6 @@ public:
 	{
 		_ss_instance = ss == nullptr ? std::make_unique<null_sound_system>() : std::move(ss);
 	}
+
 };
 

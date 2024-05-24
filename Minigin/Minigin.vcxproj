@@ -217,6 +217,7 @@
     <ClInclude Include="LivesDisplayComponent.h" />
     <ClInclude Include="EnventQueue.h" />
     <ClInclude Include="LoadMap.h" />
+    <ClInclude Include="MenuComponent.h" />
     <ClInclude Include="Minigin.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="PointComponent.h" />
@@ -266,6 +267,7 @@
     <ClCompile Include="LivesDisplayComponent.cpp" />
     <ClCompile Include="EnventQueue.cpp" />
     <ClCompile Include="LoadMap.cpp" />
+    <ClCompile Include="MenuComponent.cpp" />
     <ClCompile Include="Minigin.cpp" />
     <ClCompile Include="Observer.cpp" />
     <ClCompile Include="PointComponent.cpp" />
