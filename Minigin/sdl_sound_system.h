@@ -99,13 +99,10 @@ public:
 
     void setVolume(float volume) override {
         _real_ss->setVolume(volume);
-        std::cout << "Setting volume to: " << volume << std::endl;
     }
 
     float getVolume() override {
-        float volume = _real_ss->getVolume();
-        std::cout << "Current volume: " << volume << std::endl;
-        return volume;
+        return _real_ss->getVolume();
     }
 
 private:

@@ -17,6 +17,7 @@
 #include "Command.h"
 #include "InputManager.h"
 #include "HealthComponent.h"
+#include "HighScores.h"
 #include "HitBox.h"
 #include "LivesDisplayComponent.h"
 #include "LoadMap.h"
@@ -135,7 +136,6 @@ void LoadResources()
 
 }
 
-
 void HandlePlayerInput(const dae::InputManager& inputManager, dae::GameObject* player)
 {
 
@@ -153,12 +153,12 @@ void HandlePlayerInput(const dae::InputManager& inputManager, dae::GameObject* p
 
 }
 
-void BindMenuCommands(dae::MenuComponent* menu, const dae::InputManager& inputManager)
+void BindMenuCommands(const dae::InputManager& inputManager)
 {
     // Assuming SDL_SCANCODE_W is for moving up, SDL_SCANCODE_S for moving down, and SDL_SCANCODE_RETURN for selecting
-    inputManager.BindCommand(SDL_SCANCODE_I, KeyState::Up, std::make_unique<NavigateUpCommand>(menu), InputType::Keyboard);
-    inputManager.BindCommand(SDL_SCANCODE_K, KeyState::Up, std::make_unique<NavigateDownCommand>(menu), InputType::Keyboard);
-    inputManager.BindCommand(SDL_SCANCODE_L, KeyState::Up, std::make_unique<SelectOptionCommand>(menu), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_I, KeyState::Up, std::make_unique<NavigateUpCommand>(), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_K, KeyState::Up, std::make_unique<NavigateDownCommand>(), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_L, KeyState::Up, std::make_unique<SelectOptionCommand>(), InputType::Keyboard);
     inputManager.BindCommand(SDL_SCANCODE_M, KeyState::Up, std::make_unique<GoToNextSceneCommand>(), InputType::Keyboard);
 
 	inputManager.BindCommand(SDL_SCANCODE_G, KeyState::Up, std::make_unique<MuteCommand>(&servicelocator::get_sound_system()), InputType::Keyboard);
@@ -168,6 +168,8 @@ void BindMenuCommands(dae::MenuComponent* menu, const dae::InputManager& inputMa
 
     // Add similar bindings for controller if needed
 }
+
+
 void UnBindMenuCommands(const dae::InputManager& inputManager)
 {
     // Assuming SDL_SCANCODE_W is for moving up, SDL_SCANCODE_S for moving down, and SDL_SCANCODE_RETURN for selecting
@@ -180,26 +182,25 @@ void UnBindMenuCommands(const dae::InputManager& inputManager)
     // Add similar bindings for controller if needed
 }
 
-void LoadStartMenu()
+void LoadStartMenu(dae::Scene* startMenuScene)
 {
-    auto& sceneManager = dae::SceneManager::GetInstance();
     const auto& inputManager = dae::InputManager::GetInstance();
-    const auto startMenuScene = sceneManager.CreateScene("StartMenu");
 
-    std::vector<std::string> options = { "single player", "multiplayer", "versus Mode" };
+    std::vector<std::string> options = { "single player", "multiplayer", "versus Mode", "scoreBoard" };
     std::vector<std::function<void()>> callbacks =
     {
         [inputManagerPtr = &inputManager]() { dae::SceneManager::GetInstance().SetActiveScene("Scene4"); UnBindMenuCommands(*inputManagerPtr); },  // Example: Load single player scene
         []() { dae::SceneManager::GetInstance().SetActiveScene("Scene5"); },  // Example: Load multiplayer scene
-        []() { dae::SceneManager::GetInstance().SetActiveScene("Scene6"); }   // Example: Load versus mode scene
+        []() { dae::SceneManager::GetInstance().SetActiveScene("Scene6"); },   // Example: Load versus mode scene
+        []() { dae::SceneManager::GetInstance().SetActiveScene("ScoreboardScene");}   // Example: Load versus mode scene
     };
 
     // Create the GameObject for the menu
     auto menuObject = std::make_unique<dae::GameObject>();
     menuObject->SetLocalPosition(glm::vec3(635, 300, 0.f));
     auto menuComponent = std::make_unique<dae::MenuComponent>(menuObject.get(), options, callbacks, dae::ResourceManager::GetFont("arcadeBig"), 70.0f);
-    menuComponent->SetTextColor(SDL_Color{ 220,100,100,255 });
-    BindMenuCommands(menuComponent.get(), inputManager);
+    menuComponent->SetTextColor(SDL_Color{ 220,200,100,255 });
+    BindMenuCommands(inputManager);
     menuObject->AddComponent(std::move(menuComponent));
 
     // Add the menu GameObject to the scene
@@ -227,42 +228,60 @@ void LoadStartMenu()
 }
 
 
-void Scene2(dae::Scene* scene)
+void LoadScoreboard(dae::Scene* ScoreBoardScene)
 {
 
-    //// Create GameObject for FPS counter
-    //auto fpsCounterObject1 = std::make_unique<dae::GameObject>();
-    //auto fpsTextComponent1 = std::make_unique<dae::TextComponent>("FPS: ", dae::ResourceManager::GetFont("Lingua"), SDL_Color{ 252, 157, 3, 255 }, *fpsCounterObject1); // Specify color here
-    //auto fpsCounterComponent1 = std::make_unique<dae::FPSCounterComponent>(fpsTextComponent1.get());
-    //fpsCounterObject1->SetLocalPosition(glm::vec3(100.f, 20.f, 0.0f));
-    //fpsCounterObject1->AddComponent(std::move(fpsTextComponent1));
-    //fpsCounterObject1->AddComponent(std::move(fpsCounterComponent1));
-    //scene->Add(std::move(fpsCounterObject1));
+    HighScores highScores;
+    highScores.loadScores();
+
+
+    // Get the loaded scores
+    const auto& scores = highScores.getHighScores();
+
+    // Create GameObjects with TextComponents to display scores
+    for (size_t i = 0; i < scores.size(); ++i) {
+        const auto& playerName = scores[i].first;
+        const auto score = scores[i].second;
+
+        // Create GameObject
+        auto gameObject = std::make_unique<dae::GameObject>();
+
+        // Create TextComponent to display player name and score
+        std::string text = playerName.data() + std::string(": ") + std::to_string(score);
+        auto textComponent = std::make_unique<dae::TextComponent>(text, dae::ResourceManager::GetFont("arcadeBig"), SDL_Color{ 255, 0, 0, 255 }, *gameObject);
+
+        // Adjust position based on index to avoid overlapping
+        gameObject->SetLocalPosition(glm::vec3(635, 190 + i * 50, 0.f));
+
+        // Add TextComponent to GameObject
+        gameObject->AddComponent(std::move(textComponent));
+
+        // Add GameObject to the active scene
+        ScoreBoardScene->Add(std::move(gameObject));
+    }
 
 
     // Create GameObject for Title
     auto TitleObject02 = std::make_unique<dae::GameObject>();
-    auto titleTextComponent02 = std::make_unique<dae::TextComponent>("BURGERTIME", dae::ResourceManager::GetFont("Lingua"), SDL_Color{ 255, 0, 0, 255 }, *TitleObject02); // Pass the GameObject reference here
+    auto titleTextComponent02 = std::make_unique<dae::TextComponent>("BURGERTIME", dae::ResourceManager::GetFont("arcadeBig"), SDL_Color{ 255, 0, 0, 255 }, *TitleObject02); // Pass the GameObject reference here
     TitleObject02->SetLocalPosition(glm::vec3(635, 70, 0.f));
     TitleObject02->AddComponent(std::move(titleTextComponent02));
-    scene->Add(std::move(TitleObject02));
-
-    // Create GameObject for text shef
-    auto Infocharacter1Txt02 = std::make_unique<dae::GameObject>();
-    auto character1textcomponent02 = std::make_unique<dae::TextComponent>("@ CORP 1982 DATA EAST INC", dae::ResourceManager::GetFont("Lingua"), SDL_Color{ 255, 0, 0, 255 }, *Infocharacter1Txt02); // Specify color here
-    Infocharacter1Txt02->AddComponent(std::move(character1textcomponent02));
-    Infocharacter1Txt02->SetLocalPosition(glm::vec3(635, 140, 0.f));
-    scene->Add(std::move(Infocharacter1Txt02));
-
-    // Create GameObject for text sausage
-    auto Infocharacter2Txt02 = std::make_unique<dae::GameObject>();
-    auto character2textcomponent02 = std::make_unique<dae::TextComponent>("MFGD BY BALLY MIDWAY MFG, CO,", dae::ResourceManager::GetFont("Lingua"), SDL_Color{ 255, 0, 0, 255 }, *Infocharacter2Txt02); // Specify color here
-    Infocharacter2Txt02->AddComponent(std::move(character2textcomponent02));
-    Infocharacter2Txt02->SetLocalPosition(glm::vec3(635, 170, 0.f));
-    scene->Add(std::move(Infocharacter2Txt02));
+    ScoreBoardScene->Add(std::move(TitleObject02));
 
 
+    std::vector<std::string> options2 = { "back to menu"};
+    std::vector<std::function<void()>> callbacks2 =
+    {
+        []() { dae::SceneManager::GetInstance().SetActiveScene("StartMenu"); },  // Example: Load multiplayer scene
+    };
 
+    // Create the GameObject for the menu
+    auto menuObject = std::make_unique<dae::GameObject>();
+    menuObject->SetLocalPosition(glm::vec3(635, 600, 0.f));
+    auto menuComponent = std::make_unique<dae::MenuComponent>(menuObject.get(), options2, callbacks2, dae::ResourceManager::GetFont("arcadeBig"), 70.0f);
+    menuComponent->SetTextColor(SDL_Color{ 220,200,100,255 });
+    menuObject->AddComponent(std::move(menuComponent));
+    ScoreBoardScene->Add(std::move(menuObject));
 }
 
 
@@ -367,20 +386,20 @@ void Scene6(dae::Scene* scene)
 void load()
 {
     LoadResources();
-    LoadStartMenu();
+
 
     auto& sceneManager = dae::SceneManager::GetInstance();
     const auto& inputManager = dae::InputManager::GetInstance();
 
-    const auto& scene2 = sceneManager.CreateScene("Scene2");
+    const auto& startMenuScene = sceneManager.CreateScene("StartMenu");
+    const auto& ScoreBoardScene = sceneManager.CreateScene("ScoreboardScene");
     const auto& scene4 = sceneManager.CreateScene("Scene4");
     const auto& scene5 = sceneManager.CreateScene("Scene5");
     const auto& scene6 = sceneManager.CreateScene("Scene6");
 
 
-    //Scene1(inputManager, scene);
-    Scene2(scene2);
-    //Scene3(inputManager, scene3);
+    LoadStartMenu(startMenuScene);
+    LoadScoreboard(ScoreBoardScene);
     Scene4(scene4, inputManager);
     Scene5(scene5);
     Scene6(scene6);

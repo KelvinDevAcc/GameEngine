@@ -4,6 +4,7 @@
 #include "HealthComponent.h"
 #include "MenuComponent.h"
 #include "PointComponent.h"
+#include "SceneManager.h"
 #include "sound_system.h"
 #include "../BugerTime/Player.h"
 
@@ -111,29 +112,26 @@ private:
 class NavigateUpCommand : public Command
 {
 public:
-    explicit NavigateUpCommand(dae::MenuComponent* menu);
-        void Execute() override;
+    void Execute() override;
 
 private:
-    dae::MenuComponent* m_Menu;
+    static dae::MenuComponent* FindMenuComponent();
 };
 
 class NavigateDownCommand : public Command
 {
 public:
-    explicit NavigateDownCommand(dae::MenuComponent* menu);
     void Execute() override;
 
 private:
-    dae::MenuComponent* m_Menu;
+    static dae::MenuComponent* FindMenuComponent();
 };
 
 class SelectOptionCommand : public Command
 {
 public:
-    explicit SelectOptionCommand(dae::MenuComponent* menu);
     void Execute() override;
 
 private:
-    dae::MenuComponent* m_Menu;
+    static dae::MenuComponent* FindMenuComponent();
 };

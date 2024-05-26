@@ -41,8 +41,8 @@ public:
 
     void Render() const override
     {
-	    //const SDL_Rect rect = GetRect(); // Assuming GetRect() returns the SDL_Rect for your object
-        //dae::Renderer::GetInstance().RenderRect(rect, { 255, 0, 0, 255 }, false); // Render the rectangle in red
+	    const SDL_Rect rect = GetRect(); 
+        dae::Renderer::GetInstance().RenderRect(rect, { 255, 0, 0, 255 }, false);
     }
 
     const std::type_info& GetComponentType() const override {

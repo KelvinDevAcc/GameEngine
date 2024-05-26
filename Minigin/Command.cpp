@@ -97,32 +97,56 @@ void DecreaseVolumeCommand::Execute() {
 
 
 
-NavigateUpCommand::NavigateUpCommand(dae::MenuComponent* menu) : m_Menu(menu) {}
-
-void NavigateUpCommand::Execute()
-{
-    if (m_Menu)
-    {
-        m_Menu->NavigateUp();
+void NavigateUpCommand::Execute() {
+	if (const auto menu = FindMenuComponent()) {
+        menu->NavigateUp();
     }
 }
 
-NavigateDownCommand::NavigateDownCommand(dae::MenuComponent* menu) : m_Menu(menu) {}
+dae::MenuComponent* NavigateUpCommand::FindMenuComponent() {
+	const auto& sceneManager = dae::SceneManager::GetInstance();
+    const auto& currentScene = sceneManager.GetActiveScene();
+    const auto& objects = currentScene->GetObjects();
+    for (const auto& obj : objects) {
+	    if (const auto menuComponent = obj->GetComponent<dae::MenuComponent>()) {
+            return menuComponent;
+        }
+    }
+    return nullptr;
+}
 
-void NavigateDownCommand::Execute()
-{
-    if (m_Menu)
-    {
-        m_Menu->NavigateDown();
+void NavigateDownCommand::Execute() {
+	if (const auto menu = FindMenuComponent()) {
+        menu->NavigateDown();
     }
 }
 
-SelectOptionCommand::SelectOptionCommand(dae::MenuComponent* menu) : m_Menu(menu) {}
-
-void SelectOptionCommand::Execute()
-{
-    if (m_Menu)
-    {
-        m_Menu->SelectOption();
+dae::MenuComponent* NavigateDownCommand::FindMenuComponent() {
+	const auto& sceneManager = dae::SceneManager::GetInstance();
+    const auto& currentScene = sceneManager.GetActiveScene();
+    const auto& objects = currentScene->GetObjects();
+    for (const auto& obj : objects) {
+	    if (const auto menuComponent = obj->GetComponent<dae::MenuComponent>()) {
+            return menuComponent;
+        }
     }
+    return nullptr;
+}
+
+void SelectOptionCommand::Execute() {
+	if (const auto menu = FindMenuComponent()) {
+        menu->SelectOption();
+    }
+}
+
+dae::MenuComponent* SelectOptionCommand::FindMenuComponent() {
+	const auto& sceneManager = dae::SceneManager::GetInstance();
+    const auto& currentScene = sceneManager.GetActiveScene();
+    const auto& objects = currentScene->GetObjects();
+    for (const auto& obj : objects) {
+	    if (const auto menuComponent = obj->GetComponent<dae::MenuComponent>()) {
+            return menuComponent;
+        }
+    }
+    return nullptr;
 }

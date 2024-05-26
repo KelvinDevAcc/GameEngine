@@ -171,6 +171,9 @@
     <ClInclude Include="MenuComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HighScores.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ResourceManager.cpp">
@@ -312,6 +315,9 @@
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="MenuComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HighScores.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
