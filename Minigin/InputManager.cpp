@@ -30,10 +30,10 @@ bool InputManager::ProcessInput()
         case SDL_QUIT:
             return false;
         case SDL_KEYDOWN:
-            handleKeyinput(e.key.keysym.scancode, KeyState::Down);
+            HandleKeyInput(e.key.keysym.scancode, KeyState::Down);
             break;
         case SDL_KEYUP:
-            handleKeyinput(e.key.keysym.scancode, KeyState::Up);
+            HandleKeyInput(e.key.keysym.scancode, KeyState::Up);
             break;
         default:
             break;
@@ -42,9 +42,9 @@ bool InputManager::ProcessInput()
     }
 
     
-    handleKeyinput();
+    HandleKeyInput();
     
-    handlecontrollerinput();
+    HandleControllerInput();
 
     return true; 
 }
@@ -79,7 +79,7 @@ void InputManager::UnbindCommand(unsigned int button, KeyState state, InputType 
 }
 
 
-void InputManager::handleKeyinput()
+void InputManager::HandleKeyInput()
 {
     // Process keyboard bindings
     for (const auto& binding : m_keyboardBindings)
@@ -94,7 +94,8 @@ void InputManager::handleKeyinput()
 }
 
 
-void InputManager::handleKeyinput(SDL_Scancode keyCode, KeyState state)
+
+void InputManager::HandleKeyInput(SDL_Scancode keyCode, KeyState state)
 {
     for (const auto& binding : m_keyboardBindings)
     {
@@ -106,7 +107,7 @@ void InputManager::handleKeyinput(SDL_Scancode keyCode, KeyState state)
     }
 }
 
-void InputManager::handlecontrollerinput()
+void InputManager::HandleControllerInput()
 {
     for (const auto& binding : m_controllerBindings)
     {

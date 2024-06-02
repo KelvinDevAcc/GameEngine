@@ -168,12 +168,12 @@ void dae::Renderer::RenderTexture(const dae::Texture2D& texture, glm::vec2 drawL
 
 void dae::Renderer::RenderRect(const SDL_Rect& rect, SDL_Color color, bool filled) const
 {
-	int centeredX = rect.x - (rect.w / 2);
-	int centeredY = rect.y - (rect.h / 2);
+	//int centeredX = rect.x - (rect.w / 2);
+	//int centeredY = rect.y - (rect.h / 2);
 
 	SDL_Rect centeredRect = rect;
-	centeredRect.x = centeredX;
-	centeredRect.y = centeredY;
+	//centeredRect.x = centeredX;
+	//centeredRect.y = centeredY;
 
 	SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
 	if (filled) {

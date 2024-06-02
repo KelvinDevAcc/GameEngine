@@ -58,18 +58,18 @@ namespace game
 
     void Player::Move(float deltaX, float deltaY)
     {
-        //m_deltaY = deltaY;
-        //m_deltaX = deltaX;
+       /* m_deltaY = deltaY;
+        m_deltaX = deltaX;
 
-        //glm::vec3 currentPosition = m_GameObject->GetWorldPosition();
-        //currentPosition.x += deltaX;
-        //currentPosition.y += deltaY;
-        //m_GameObject->SetLocalPosition(currentPosition);
+        glm::vec3 currentPosition = m_GameObject->GetWorldPosition();
+        currentPosition.x += deltaX;
+        currentPosition.y += deltaY;
+        m_GameObject->SetLocalPosition(currentPosition);
 
-        //if (m_CurrentState)
-        //{
-        //    SetState(m_walkingState.get());
-        //}
+        if (m_CurrentState)
+        {
+            SetState(m_walkingState.get());
+        }*/
 
 
         m_deltaY = deltaY;
@@ -106,7 +106,7 @@ namespace game
     {
         const auto& sceneData = dae::SceneData::GetInstance();
 
-        bool canMove = sceneData.CanEntityMove(deltaX, deltaY, *m_GameObject);
+        const bool canMove = sceneData.CanEntityMove(deltaX, deltaY, *m_GameObject);
 
         const bool isOnLadder = sceneData.IsOnLadder(*m_GameObject);
         const bool isOnSolidLadder = sceneData.IsOnSolidLadder(*m_GameObject);
@@ -119,7 +119,7 @@ namespace game
 
         // Allow vertical movement if the player is on a ladder or solid ladder
         if ((isOnLadder || isOnSolidLadder) && canMove) {
-            MoveVertically(deltaY, isOnLadder, isOnSolidLadder);
+            MoveVertically(deltaY);
         }
 
         // Allow horizontal movement if the player is on a ladder
@@ -141,15 +141,10 @@ namespace game
         SetState(m_walkingState.get());
     }
 
-    void Player::MoveVertically(float deltaY, bool isOnLadder, bool isOnSolidLadder)
+    void Player::MoveVertically(float deltaY)
     {
         glm::vec3 currentPosition = m_GameObject->GetWorldPosition();
         currentPosition.y += deltaY;
-
-        if (isOnLadder || isOnSolidLadder) {
-	        const float ladderCenterX = dae::SceneData::GetInstance().GetLadderCenterX(*m_GameObject);
-            currentPosition.x = ladderCenterX;
-        }
 
         m_GameObject->SetLocalPosition(currentPosition);
         SetState(m_walkingState.get());

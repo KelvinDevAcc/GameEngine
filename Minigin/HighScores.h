@@ -29,7 +29,7 @@ private:
     static constexpr std::array<std::pair<const char*, uint32_t>, NUM_HIGH_SCORES> DEFAULT_SCORES = {
         std::make_pair("Player1", 0),
         std::make_pair("Player2", 0),
-        std::make_pair("Player3", 0),
+        std::make_pair("Player3", 200),
         std::make_pair("Player4", 0),
         std::make_pair("Player5", 100)
     };

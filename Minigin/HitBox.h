@@ -10,15 +10,20 @@ public:
     HitBox(const glm::vec2& size)
 	    : m_position(0,0), m_size(size)
     {
+        if (const auto parent = GetGameObject()) {
+            const glm::vec3 parentPosition = parent->GetWorldPosition();
+            m_position = parentPosition;
+        }
     }
 
     SDL_Rect GetRect() const {
-	    const glm::vec2 position = m_position;
+        // Fetch the parent position to ensure up-to-date position
+       
         return SDL_Rect{
-            static_cast<int>(position.x),
-            static_cast<int>(position.y),
-            static_cast<int>(m_size.x),
-            static_cast<int>(m_size.y)
+             static_cast<int>(m_position.x - m_size.x / 2),
+             static_cast<int>(m_position.y - m_size.y / 2),
+             static_cast<int>(m_size.x),
+             static_cast<int>(m_size.y)
         };
     }
 
@@ -32,8 +37,8 @@ public:
         m_position = position;
     }
 
-    void Update() override {
-
+    void Update() override
+	{
         if (const auto parent = GetGameObject()) {
             m_position = parent->GetWorldPosition();
         }
@@ -41,8 +46,8 @@ public:
 
     void Render() const override
     {
-	    const SDL_Rect rect = GetRect(); 
-        dae::Renderer::GetInstance().RenderRect(rect, { 255, 0, 0, 255 }, false);
+	   // const SDL_Rect rect = GetRect(); 
+       // dae::Renderer::GetInstance().RenderRect(rect, { 255, 0, 0, 255 }, false);
     }
 
     const std::type_info& GetComponentType() const override {
@@ -50,6 +55,6 @@ public:
     }
 
 private:
-    glm::vec2 m_position = glm::vec2(0.0f, 0.0f);
+    glm::vec2 m_position;
     glm::vec2 m_size;
 };

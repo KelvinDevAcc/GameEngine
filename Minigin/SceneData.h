@@ -30,7 +30,6 @@ namespace dae {
         bool IsOnSolidLadder(GameObject& player) const;
         bool IsInBasket(GameObject& burger) const;
 
-        float GetLadderCenterX(GameObject& gameObject) const;
         bool CanEntityMove(float moveX, float moveY, GameObject& entity) const;
 
         bool IsWithinBounds(float x, float y) const;

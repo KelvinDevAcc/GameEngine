@@ -21,17 +21,26 @@ namespace dae {
     }
 
     void SceneData::Update() {
-        //CheckPlayerCollisions();
+       // CheckPlayerCollisions();
     }
 
     void SceneData::CheckPlayerCollisions() {
         for (const auto player : m_players) {
-            const auto playerHitBox = player->GetComponent<HitBox>();
-            for (const auto& objects : { m_floors, m_ladders, m_solidLadders }) {
-                for (const auto gameObject : objects) {
-                    const auto hitBox = gameObject->GetComponent<HitBox>();
-                    if (hitBox && playerHitBox->IsColliding(*hitBox)) {
-                        OnCollision(player, gameObject, GameObjectType::Floor); // Adjust GameObjectType as needed
+            if (const auto playerHitBox = player->GetComponent<HitBox>()) {
+                for (const auto& objects : { m_floors, m_ladders, m_solidLadders }) {
+                    for (const auto gameObject : objects) {
+                        if (const auto hitBox = gameObject->GetComponent<HitBox>()) {
+                            if (playerHitBox->IsColliding(*hitBox)) {
+                                // Determine the type based on the current object list
+                                GameObjectType type;
+                                if (objects == m_floors) type = GameObjectType::Floor;
+                                else if (objects == m_ladders) type = GameObjectType::Ladder;
+                                else if (objects == m_solidLadders) type = GameObjectType::SolidLadder;
+                                else continue; // If none match, skip to the next
+
+                                OnCollision(player, gameObject, type);
+                            }
+                        }
                     }
                 }
             }
@@ -39,15 +48,44 @@ namespace dae {
     }
 
     void SceneData::OnCollision(GameObject* a, GameObject* b, GameObjectType type) {
+        // Retrieve positions
+        const glm::vec3 posA = a->GetWorldPosition();
+        const glm::vec3 posB = b->GetWorldPosition();
+
+        // Retrieve hitbox dimensions
+        const auto hitBoxA = a->GetComponent<HitBox>();
+        const auto hitBoxB = b->GetComponent<HitBox>();
+
+        if (!hitBoxA || !hitBoxB) return;
+
+        const SDL_Rect rectA = hitBoxA->GetRect();
+        const SDL_Rect rectB = hitBoxB->GetRect();
+
         switch (type) {
         case GameObjectType::Floor:
-            std::cout << "Collision detected between player " << a << " and floor " << b << std::endl;
+            std::cout << "Collision detected between player " << a << " and floor " << b
+                << " at positions (" << posA.x << ", " << posA.y << ") and ("
+                << posB.x << ", " << posB.y << ")\n"
+                << "Hitbox A: (" << rectA.x << ", " << rectA.y << ", " << rectA.w << ", " << rectA.h << ")\n"
+                << "Hitbox B: (" << rectB.x << ", " << rectB.y << ", " << rectB.w << ", " << rectB.h << ")\n";
             break;
         case GameObjectType::Ladder:
-            std::cout << "Collision detected between player " << a << " and ladder " << b << std::endl;
+            std::cout << "Collision detected between player " << a << " and ladder " << b
+                << " at positions (" << posA.x << ", " << posA.y << ") and ("
+                << posB.x << ", " << posB.y << ")\n"
+                << "Hitbox A: (" << rectA.x << ", " << rectA.y << ", " << rectA.w << ", " << rectA.h << ")\n"
+                << "Hitbox B: (" << rectB.x << ", " << rectB.y << ", " << rectB.w << ", " << rectB.h << ")\n";
+            break;
+        case GameObjectType::SolidLadder:
+            std::cout << "Collision detected between player " << a << " and solid ladder " << b
+                << " at positions (" << posA.x << ", " << posA.y << ") and ("
+                << posB.x << ", " << posB.y << ")\n"
+                << "Hitbox A: (" << rectA.x << ", " << rectA.y << ", " << rectA.w << ", " << rectA.h << ")\n"
+                << "Hitbox B: (" << rectB.x << ", " << rectB.y << ", " << rectB.w << ", " << rectB.h << ")\n";
             break;
         }
     }
+
 
     bool SceneData::IsOnSpecificObjectType(GameObject& player, const std::vector<GameObject*>& objects) const {
         const auto playerHitBox = player.GetComponent<HitBox>();
@@ -59,6 +97,7 @@ namespace dae {
         }
         return false;
     }
+
     bool SceneData::IsWithinBounds(float x, float y) const {
         // Define the boundaries of the game world
         const float minX = SceneHelpers::GetMinCoordinates().x;
@@ -88,18 +127,6 @@ namespace dae {
         return  IsNextObject(newPosition.x, newPosition.y);
     }
 
-
-    float SceneData::GetLadderCenterX(GameObject& gameObject) const {
-        // Placeholder implementation: Return the center position of the ladder
-        // You might need to adjust this based on how your ladder GameObject is structured
-        const auto hitBox = gameObject.GetComponent<HitBox>();
-        if (hitBox) {
-            const SDL_Rect rect = hitBox->GetRect();
-            const float centerX =static_cast<float>(rect.x);
-            return centerX;
-        }
-        return 0.f; // Default to (0, 0) if no ladder center is found
-    }
 
     bool SceneData::IsNextObject(float x, float y) const {
         auto checkCollisionsWithObjects = [&](const std::vector<GameObject*>& objects) {

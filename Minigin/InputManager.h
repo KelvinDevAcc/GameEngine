@@ -35,9 +35,9 @@ namespace dae
         static void UnbindCommand(unsigned int button, KeyState state, InputType type);
 
     private:
-        static void handleKeyinput();
-        static void handleKeyinput(SDL_Scancode keyCode, KeyState state);
-        static void handlecontrollerinput();
+        static void HandleKeyInput();
+        static void HandleKeyInput(SDL_Scancode keyCode, KeyState state);
+        static void HandleControllerInput();
 
         static GameController m_gameController;
         static std::unordered_map<std::pair<unsigned int, KeyState>, std::unique_ptr<Command>> m_controllerBindings;

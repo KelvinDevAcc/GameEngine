@@ -355,9 +355,11 @@ void SceneHelpers::SpawnPlayer(dae::Scene* scene, float x, float y, glm::vec2 sc
 void SceneHelpers::LoadMapIntoScene(const LoadMap& loadMap, dae::Scene* scene, const glm::vec3& startPos, glm::vec2 scale) {
     const auto& map = loadMap.getMap();
 
-    // Initialize variables to store the maximum X and Y coordinates
+    // Initialize variables to store the minimum and maximum X and Y coordinates
     s_MinCoordinates.x = startPos.x;
     s_MinCoordinates.y = startPos.y;
+    s_MaxCoordinates.x = startPos.x;
+    s_MaxCoordinates.y = startPos.y;
 
     for (int y = 0; y < map.size(); ++y) {
         for (int x = 0; x < map[y].size(); ++x) {
@@ -365,9 +367,9 @@ void SceneHelpers::LoadMapIntoScene(const LoadMap& loadMap, dae::Scene* scene, c
             const float posX = startPos.x + x * scale.x;
             const float posY = startPos.y + y * scale.y;
 
-            s_MaxCoordinates.x += posX;
-            s_MaxCoordinates.y += posY;
-
+            // Update maximum coordinates
+            if (posX > s_MaxCoordinates.x) s_MaxCoordinates.x = posX;
+            if (posY > s_MaxCoordinates.y) s_MaxCoordinates.y = posY;
 
             switch (tile) {
             case 'v':
@@ -378,7 +380,7 @@ void SceneHelpers::LoadMapIntoScene(const LoadMap& loadMap, dae::Scene* scene, c
                 break;
             case '^':
             case '|':
-                CreateLadderUp(scene, posX, posY,scale);
+                CreateLadderUp(scene, posX, posY, scale);
                 break;
             case '_':
                 CreateFloor(scene, posX, posY, scale);
@@ -401,6 +403,7 @@ void SceneHelpers::LoadMapIntoScene(const LoadMap& loadMap, dae::Scene* scene, c
         }
     }
 }
+
 
 void SceneHelpers::LoadIngMapIntoScene(const LoadMap& loadMap, dae::Scene* scene, const glm::vec3& startPos,glm::vec2 scale)
 {

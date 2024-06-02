@@ -75,7 +75,7 @@ namespace game
         void CheckAndMove(float deltaX, float deltaY);
 
         void MoveHorizontally(float deltaX);
-        void MoveVertically(float deltaY, bool isOnLadder, bool isOnSolidLadder);
+        void MoveVertically(float deltaY);
     };
 } // namespace 
 

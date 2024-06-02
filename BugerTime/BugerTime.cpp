@@ -23,7 +23,6 @@
 #include "LoadMap.h"
 #include "Player.h"
 #include "PointsDisplayComponent.h"
-#include "RotatorComponent.h"
 #include "SceneData.h"
 #include "SceneHelpers.h"
 #include "sdl_sound_system.h"
@@ -139,11 +138,10 @@ void LoadResources()
 void HandlePlayerInput(const dae::InputManager& inputManager, dae::GameObject* player)
 {
 
-
-    inputManager.BindCommand(SDL_SCANCODE_W, KeyState::Pressed, std::make_unique<MoveCommand>(player, 0.0f, -3.0f), InputType::Keyboard);
-    inputManager.BindCommand(SDL_SCANCODE_S, KeyState::Pressed, std::make_unique<MoveCommand>(player, 0.0f, 3.0f), InputType::Keyboard);
-    inputManager.BindCommand(SDL_SCANCODE_A, KeyState::Pressed, std::make_unique<MoveCommand>(player, -3.0f, 0.0f), InputType::Keyboard);
-    inputManager.BindCommand(SDL_SCANCODE_D, KeyState::Pressed, std::make_unique<MoveCommand>(player, 3.0f, 0.0f), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_W, KeyState::Pressed, std::make_unique<MoveCommand>(player, 0.0f, -1.5f), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_S, KeyState::Pressed, std::make_unique<MoveCommand>(player, 0.0f, 1.5f), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_A, KeyState::Pressed, std::make_unique<MoveCommand>(player, -1.5f, 0.0f), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_D, KeyState::Pressed, std::make_unique<MoveCommand>(player, 1.5f, 0.0f), InputType::Keyboard);
 
     inputManager.BindCommand(SDL_SCANCODE_X, KeyState::Up, std::make_unique<ScorePointCommand>(player), InputType::Keyboard);
     inputManager.BindCommand(SDL_SCANCODE_Z, KeyState::Up, std::make_unique<ScorePointCommand>(player), InputType::Keyboard);
@@ -166,7 +164,6 @@ void BindMenuCommands(const dae::InputManager& inputManager)
     inputManager.BindCommand(SDL_SCANCODE_MINUS, KeyState::Up, std::make_unique<DecreaseVolumeCommand>(&servicelocator::get_sound_system()), InputType::Keyboard);
     inputManager.BindCommand(SDL_SCANCODE_EQUALS, KeyState::Up, std::make_unique<IncreaseVolumeCommand>(&servicelocator::get_sound_system()), InputType::Keyboard);
 
-    // Add similar bindings for controller if needed
 }
 
 
@@ -190,9 +187,9 @@ void LoadStartMenu(dae::Scene* startMenuScene)
     std::vector<std::function<void()>> callbacks =
     {
         [inputManagerPtr = &inputManager]() { dae::SceneManager::GetInstance().SetActiveScene("Scene4"); UnBindMenuCommands(*inputManagerPtr); },  // Example: Load single player scene
-        []() { dae::SceneManager::GetInstance().SetActiveScene("Scene5"); },  // Example: Load multiplayer scene
-        []() { dae::SceneManager::GetInstance().SetActiveScene("Scene6"); },   // Example: Load versus mode scene
-        []() { dae::SceneManager::GetInstance().SetActiveScene("ScoreboardScene");}   // Example: Load versus mode scene
+        []() { dae::SceneManager::GetInstance().SetActiveScene("Scene5"); }, 
+        []() { dae::SceneManager::GetInstance().SetActiveScene("Scene6"); },   
+        []() { dae::SceneManager::GetInstance().SetActiveScene("ScoreboardScene");} 
     };
 
     // Create the GameObject for the menu
@@ -295,8 +292,8 @@ void Scene4(dae::Scene* scene, const dae::InputManager& inputManager)
     //backgroundObject03->AddComponent(std::move(backgroundRenderComponent03));
     //scene->Add(std::move(backgroundObject03));
     // Load the map
-    constexpr glm::vec3 startPos(335, 20, 0.0f);
-    constexpr glm::vec2 Mapscale(40, 29.5f);
+    constexpr glm::vec3 startPos(335, 70, 0.0f);
+    constexpr glm::vec2 Mapscale(40, 26.f);
 
     const LoadMap loadMap("../Data/maps/map1.map", "../Data/maps/map1.ingmap");
     SceneHelpers::LoadMapIntoScene(loadMap, scene, startPos, Mapscale);
@@ -307,7 +304,7 @@ void Scene4(dae::Scene* scene, const dae::InputManager& inputManager)
     //Create GameObject for Character 1
     auto CharacterObject1 = std::make_unique<dae::GameObject>();
 
-    auto hitBox = std::make_unique<HitBox>(glm::vec2(20, 40));
+    auto hitBox = std::make_unique<HitBox>(glm::vec2(30, 40));
     hitBox->SetGameObject(CharacterObject1.get());
     CharacterObject1->AddComponent(std::move(hitBox));
 
@@ -355,6 +352,64 @@ void Scene4(dae::Scene* scene, const dae::InputManager& inputManager)
     scene->Add(std::move(livesDisplayObject2));
     scene->Add(std::move(CharacterObject1));
 
+    // Assuming you have an instance of HighScores
+    HighScores highScoresInstance;
+
+    auto HighScoretextObject = std::make_unique<dae::GameObject>();
+
+    // Create the "HIGHSCORE:" text component
+    auto titleTextComponent02 = std::make_unique<dae::TextComponent>(
+        "HI-SCORE",
+        dae::ResourceManager::GetFont("arcade"),
+        SDL_Color{ 255, 0, 0, 255 },
+        * HighScoretextObject
+    );
+    HighScoretextObject->SetLocalPosition(glm::vec3(530, 5, 0.f));
+    HighScoretextObject->AddComponent(std::move(titleTextComponent02));
+
+    scene->Add(std::move(HighScoretextObject));
+
+    auto HighScoreObject = std::make_unique<dae::GameObject>();
+    // Retrieve the top score and convert it to a string
+    uint32_t topScore = highScoresInstance.getTopScore();
+    std::string topScoreStr = std::to_string(topScore);
+
+    // Create the high score value text component using the string
+    auto scoreTextComponent = std::make_unique<dae::TextComponent>(topScoreStr,dae::ResourceManager::GetFont("arcade"),SDL_Color{ 255, 255, 255, 255 },*HighScoreObject);
+    HighScoreObject->SetLocalPosition(glm::vec3(540, 33, 0.f));
+	HighScoreObject->AddComponent(std::move(scoreTextComponent));
+
+    // Add HighScoreObject to the scene (assuming 'this' is a scene class)
+    scene->Add(std::move(HighScoreObject));
+
+
+
+    auto PepertextObject = std::make_unique<dae::GameObject>();
+
+    auto PeperComponent = std::make_unique<dae::TextComponent>(
+        "PEPPER",
+        dae::ResourceManager::GetFont("arcade"),
+        SDL_Color{ 0, 255, 0, 255 },
+        * PepertextObject
+    );
+    PepertextObject->SetLocalPosition(glm::vec3(930, 5, 0.f));
+    PepertextObject->AddComponent(std::move(PeperComponent));
+
+    scene->Add(std::move(PepertextObject));
+
+    auto PeperscoretextObject = std::make_unique<dae::GameObject>();
+
+    auto PeperscoreComponent = std::make_unique<dae::TextComponent>(
+        "4",
+        dae::ResourceManager::GetFont("arcade"),
+        SDL_Color{ 255, 255, 255, 255 },
+        * PeperscoretextObject
+    );
+    PeperscoretextObject->SetLocalPosition(glm::vec3(975, 30, 0.f));
+    PeperscoretextObject->AddComponent(std::move(PeperscoreComponent));
+
+    scene->Add(std::move(PeperscoretextObject));
+
 
 
 }
@@ -386,7 +441,6 @@ void Scene6(dae::Scene* scene)
 void load()
 {
     LoadResources();
-
 
     auto& sceneManager = dae::SceneManager::GetInstance();
     const auto& inputManager = dae::InputManager::GetInstance();
