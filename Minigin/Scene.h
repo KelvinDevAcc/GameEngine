@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "GameObject.h"
+#include "sound_system.h"
 
 namespace dae
 {
@@ -27,9 +28,16 @@ namespace dae
         Scene& operator=(const Scene& other) = delete;
         Scene& operator=(Scene&& other) = delete;
 
+        void SetBackgroundMusic(const std::string& musicFilePath);
+        void SetBackgroundMusic(int musicid);
+        void PlayBackgroundMusic();
+        void StopBackgroundMusic();
+        sound_id GetBackgroundMusicID() const { return  m_backgroundMusicID; }
+
     private:
 
         std::string m_name;
         std::vector<std::unique_ptr<GameObject>> m_objects{};
+        sound_id m_backgroundMusicID{ 0 };
     };
 }

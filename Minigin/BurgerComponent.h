@@ -8,10 +8,11 @@ public:
 
     std::type_info const& GetComponentType() const override { return typeid(BurgerComponent); }
 private:
-    bool IsPlayerOverComponent();
-    float GetPlayerMovementOverComponent();
+    bool IsPlayerOverComponent() const;
+    float GetPlayerMovementOverComponent() const;
     void DropToNextFloor();
 
+    bool m_IsDropping;
     float m_Length;
     float m_DropDistance;
     float m_PlayerWalkedDistance;

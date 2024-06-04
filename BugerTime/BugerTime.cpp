@@ -39,14 +39,54 @@ void LoadResources()
 
     auto& ss = servicelocator::get_sound_system();
 
-    // Register the sound file with its corresponding ID
-    ss.register_sound_file("../Data/Sounds/2.mp3");
-    ss.register_sound_file("../Data/Sounds/04 Lose Life.mp3");
+    ss.setVolume(10.f);
 
-    // Get the ID for the sound file path
-    const sound_id soundId = ss.get_sound_id_for_file_path("../Data/Sounds/04 Lose Life.mp3");
-    ss.setVolume(50.f);
-    ss.load_sound(soundId, "../Data/Sounds/04 Lose Life.mp3");
+    // Register the sound files with their corresponding IDs
+    ss.register_sound_file("../Data/Sounds/0_burger_going_down.mp3");
+    ss.register_sound_file("../Data/Sounds/1_burger_touching_floor.mp3");
+    ss.register_sound_file("../Data/Sounds/2_die.mp3");
+    ss.register_sound_file("../Data/Sounds/3_high_scores.mp3");
+    ss.register_sound_file("../Data/Sounds/4_entry_selected.mp3");
+    ss.register_sound_file("../Data/Sounds/5_coin_inserted.mp3");
+    ss.register_sound_file("../Data/Sounds/6_one_up.mp3");
+    ss.register_sound_file("../Data/Sounds/7_enemy_crushed.mp3");
+    ss.register_sound_file("../Data/Sounds/8_enemy_fall.mp3");
+    ss.register_sound_file("../Data/Sounds/9_pepper_up.mp3");
+    ss.register_sound_file("../Data/Sounds/10_level_intro.mp3");
+    ss.register_sound_file("../Data/Sounds/11_main.mp3");
+    ss.register_sound_file("../Data/Sounds/12_main_bip.mp3");
+    ss.register_sound_file("../Data/Sounds/13_new_ingredient.mp3");
+    ss.register_sound_file("../Data/Sounds/14_pepper.mp3");
+    ss.register_sound_file("../Data/Sounds/15_peppered.mp3");
+    ss.register_sound_file("../Data/Sounds/16_stepping_on_burger.mp3");
+    ss.register_sound_file("../Data/Sounds/17_win.mp3");
+    ss.register_sound_file("../Data/Sounds/18_menu_select.mp3");
+    ss.register_sound_file("../Data/Sounds/19_burgermenu.mp3");
+    ss.register_sound_file("../Data/Sounds/20_menu_move.mp3");
+
+    // Load each sound file once
+    ss.load_sound(0, "../Data/Sounds/0_burger_going_down.mp3");
+    ss.load_sound(1, "../Data/Sounds/1_burger_touching_floor.mp3");
+    ss.load_sound(2, "../Data/Sounds/2_die.mp3");
+    ss.load_sound(3, "../Data/Sounds/3_high_scores.mp3");
+    ss.load_sound(4, "../Data/Sounds/4_entry_selected.mp3");
+    ss.load_sound(5, "../Data/Sounds/5_coin_inserted.mp3");
+    ss.load_sound(6, "../Data/Sounds/6_one_up.mp3");
+    ss.load_sound(7, "../Data/Sounds/7_enemy_crushed.mp3");
+    ss.load_sound(8, "../Data/Sounds/8_enemy_fall.mp3");
+    ss.load_sound(9, "../Data/Sounds/9_pepper_up.mp3");
+    ss.load_sound(10, "../Data/Sounds/10_level_intro.mp3");
+    ss.load_sound(11, "../Data/Sounds/11_main.mp3", true);
+    ss.load_sound(12, "../Data/Sounds/12_main_bip.mp3");
+    ss.load_sound(13, "../Data/Sounds/13_new_ingredient.mp3");
+    ss.load_sound(14, "../Data/Sounds/14_pepper.mp3");
+    ss.load_sound(15, "../Data/Sounds/15_peppered.mp3");
+    ss.load_sound(16, "../Data/Sounds/16_stepping_on_burger.mp3");
+    ss.load_sound(17, "../Data/Sounds/17_win.mp3");
+    ss.load_sound(18, "../Data/Sounds/18_menu_select.mp3");
+    ss.load_sound(19, "../Data/Sounds/19_burgermenu.mp3", true);
+    ss.load_sound(20, "../Data/Sounds/20_menu_move.mp3");
+
 
 
 	dae::ResourceManager::LoadFont("Lingua", "Lingua.otf", 36);
@@ -222,6 +262,8 @@ void LoadStartMenu(dae::Scene* startMenuScene)
     Infocharacter2Txt02->AddComponent(std::move(character2textcomponent02));
     Infocharacter2Txt02->SetLocalPosition(glm::vec3(635, 170, 0.f));
     startMenuScene->Add(std::move(Infocharacter2Txt02));
+
+    startMenuScene->SetBackgroundMusic(11);
 }
 
 
@@ -284,6 +326,8 @@ void LoadScoreboard(dae::Scene* ScoreBoardScene)
 
 void Scene4(dae::Scene* scene, const dae::InputManager& inputManager)
 {
+
+  
     //// Create GameObject for background
     //auto backgroundObject03 = std::make_unique<dae::GameObject>();
     //auto backgroundRenderComponent03 = std::make_unique<dae::SpriteRendererComponent>(backgroundObject03.get(), dae::ResourceManager::GetSprite("Stage01"));
@@ -410,7 +454,7 @@ void Scene4(dae::Scene* scene, const dae::InputManager& inputManager)
 
     scene->Add(std::move(PeperscoretextObject));
 
-
+    scene->SetBackgroundMusic(19);
 
 }
 

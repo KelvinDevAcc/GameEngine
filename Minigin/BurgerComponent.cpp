@@ -6,16 +6,15 @@
 #include "HitBox.h"
 
 BurgerComponent::BurgerComponent(float length, float dropDistance)
-    : m_Length(length), m_DropDistance(dropDistance), m_PlayerWalkedDistance(0.0f), m_HasDropped(false) {}
+    : m_IsDropping(false), m_Length(length), m_DropDistance(dropDistance), m_PlayerWalkedDistance(0.0f), m_HasDropped(false) {}
 
 void BurgerComponent::Update() {
-    if (!m_HasDropped) {
+    if (m_IsDropping) {
+        DropToNextFloor();
+    }
+    else if (!m_HasDropped) {
         if (IsPlayerOverComponent()) {
-            m_PlayerWalkedDistance += GetPlayerMovementOverComponent();
-            if (m_PlayerWalkedDistance >= m_Length) {
-                DropToNextFloor();
-                m_HasDropped = true;
-            }
+            m_IsDropping = true; // Start dropping
         }
         else {
             m_PlayerWalkedDistance = 0.0f; // Reset if player steps off
@@ -23,8 +22,9 @@ void BurgerComponent::Update() {
     }
 }
 
-bool BurgerComponent::IsPlayerOverComponent() {
-    auto& sceneData = dae::SceneData::GetInstance();
+bool BurgerComponent::IsPlayerOverComponent() const
+{
+	const auto& sceneData = dae::SceneData::GetInstance();
     const auto player = sceneData.GetPlayer();
     if (!player) return false;
 
@@ -34,7 +34,8 @@ bool BurgerComponent::IsPlayerOverComponent() {
     return playerHitBox && burgerHitBox && playerHitBox->IsColliding(*burgerHitBox);
 }
 
-float BurgerComponent::GetPlayerMovementOverComponent() {
+float BurgerComponent::GetPlayerMovementOverComponent() const
+{
     auto& sceneData = dae::SceneData::GetInstance();
     const auto player = sceneData.GetPlayer();
     if (!player) {
@@ -69,14 +70,44 @@ float BurgerComponent::GetPlayerMovementOverComponent() {
 }
 
 void BurgerComponent::DropToNextFloor() {
-    auto& sceneData = dae::SceneData::GetInstance();
+    const auto& sceneData = dae::SceneData::GetInstance();
     auto* burger = GetGameObject();
 
-    glm::vec3 dropVector(0.0f, m_DropDistance, 0.0f);
-    while (!sceneData.IsOnFloor(*burger) &&
-        !sceneData.IsOnSpecificObjectType(*burger, sceneData.GetBurgerParts()) &&
-        !sceneData.IsInBasket(*burger)) {
-        glm::vec3 currentPosition = burger->GetWorldPosition();
-        burger->SetLocalPosition(currentPosition + dropVector);
+    // Retrieve the burger's hitbox
+    const auto burgerHitBox = burger->GetComponent<HitBox>();
+    if (!burgerHitBox) {
+        std::cout << "Error: Burger HitBox is nullptr\n";
+        m_IsDropping = false;
+        return;
     }
+
+    const glm::vec3 dropVector(0.0f, 80.0f, 0.0f); // Drop step by step by 50 units
+    glm::vec3 currentPosition = burger->GetWorldPosition();
+    const glm::vec3 newPosition = currentPosition + dropVector;
+    burger->SetLocalPosition(newPosition);
+
+    // Debug statements
+    std::cout << "Dropping burger. Current Position: (" << currentPosition.x << ", " << currentPosition.y << "), New Position: (" << newPosition.x << ", " << newPosition.y << ")\n";
+
+    // Re-check conditions after moving
+    bool isOnFloor = sceneData.IsOnFloor(*burger);
+    bool isInBasket = sceneData.IsInBasket(*burger);
+    bool isOnBurgerParts = sceneData.IsOnSpecificObjectType(*burger, sceneData.GetBurgerParts());
+
+    std::cout << "Checking conditions: IsOnFloor = " << isOnFloor
+        << ", IsOnBurgerParts = " << isOnBurgerParts
+        << ", IsInBasket = " << isInBasket << "\n";
+
+    // Check conditions
+    if (isOnFloor || isInBasket || isOnBurgerParts) {
+        // If any condition is met, stop dropping
+        m_IsDropping = false;
+        std::cout << "Stopping drop. Condition met: ";
+        if (isOnFloor) std::cout << "IsOnFloor\n";
+        else if (isInBasket) std::cout << "IsInBasket\n";
+        else if (isOnBurgerParts) std::cout << "IsOnBurgerParts\n";
+    }
+
+    // Final debug statement
+    std::cout << "Burger final position: (" << burger->GetWorldPosition().x << ", " << burger->GetWorldPosition().y << ")\n";
 }

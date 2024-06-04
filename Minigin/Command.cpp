@@ -61,7 +61,7 @@ void PlaySoundCommand::Execute() {
 
     message.type = dae::PlaySoundMessageType::deathSound;
 
-    message.arguments.emplace_back(static_cast<sound_id>(1)); // sound ID
+    message.arguments.emplace_back(static_cast<sound_id>(4)); // sound ID
 
     dae::EventQueue::Broadcast(message);
 }
@@ -99,6 +99,13 @@ void DecreaseVolumeCommand::Execute() {
 
 void NavigateUpCommand::Execute() {
 	if (const auto menu = FindMenuComponent()) {
+        dae::Message message;
+
+        message.type = dae::PlaySoundMessageType::deathSound;
+
+        message.arguments.emplace_back(static_cast<sound_id>(20)); // sound ID
+
+        dae::EventQueue::Broadcast(message);
         menu->NavigateUp();
     }
 }
@@ -117,6 +124,13 @@ dae::MenuComponent* NavigateUpCommand::FindMenuComponent() {
 
 void NavigateDownCommand::Execute() {
 	if (const auto menu = FindMenuComponent()) {
+        dae::Message message;
+
+        message.type = dae::PlaySoundMessageType::deathSound;
+
+        message.arguments.emplace_back(static_cast<sound_id>(20)); // sound ID
+
+        dae::EventQueue::Broadcast(message);
         menu->NavigateDown();
     }
 }
@@ -135,6 +149,13 @@ dae::MenuComponent* NavigateDownCommand::FindMenuComponent() {
 
 void SelectOptionCommand::Execute() {
 	if (const auto menu = FindMenuComponent()) {
+        dae::Message message;
+
+        message.type = dae::PlaySoundMessageType::deathSound;
+
+        message.arguments.emplace_back(static_cast<sound_id>(18)); // sound ID
+
+        dae::EventQueue::Broadcast(message);
         menu->SelectOption();
     }
 }

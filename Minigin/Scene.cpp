@@ -4,6 +4,7 @@
 #include <string>
 
 #include "HitBox.h"
+#include "servicelocator.h"
 
 namespace dae
 {
@@ -18,8 +19,7 @@ namespace dae
 
     void Scene::Remove(GameObject* object)
     {
-        m_objects.erase(std::remove_if(m_objects.begin(), m_objects.end(),
-            [object](const auto& ptr) { return ptr.get() == object; }), m_objects.end());
+        std::erase_if(m_objects,[object](const auto& ptr) { return ptr.get() == object; });
     }
 
     void Scene::RemoveAll()
@@ -48,4 +48,41 @@ namespace dae
         return m_objects;
     }
 
+    void Scene::SetBackgroundMusic(const std::string& musicFilePath)
+    {
+        auto& soundSystem = servicelocator::get_sound_system();
+        m_backgroundMusicID = soundSystem.get_sound_id_for_file_path(musicFilePath);
+        if (m_backgroundMusicID == 0)
+        {
+            std::cerr << "Failed to load background music for scene '" << m_name << "' from file: " << musicFilePath << std::endl;
+        }
+    }
+
+    void Scene::SetBackgroundMusic(int musicid)
+    {
+        m_backgroundMusicID = static_cast<sound_id>(musicid);
+    }
+
+    void Scene::PlayBackgroundMusic()
+    {
+        if (m_backgroundMusicID != 0)
+        {
+            auto& soundSystem = servicelocator::get_sound_system();
+            soundSystem.play(m_backgroundMusicID);
+        }
+        else
+        {
+            std::cerr << "No background music set for scene '" << m_name << "'" << std::endl;
+        }
+    }
+
+    void Scene::StopBackgroundMusic()
+    {
+        if (m_backgroundMusicID)
+        {
+            //auto& soundSystem = servicelocator::get_sound_system();
+            //soundSystem.StopPlaying(m_backgroundMusicID);
+            //m_backgroundMusicID = 0; // Clear the stored background music ID
+        }
+    }
 }

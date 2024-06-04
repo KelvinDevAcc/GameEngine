@@ -30,7 +30,7 @@ public:
     void stop();
     void register_sound_file(const std::string& file_path) override;
     sound_id get_sound_id_for_file_path(const std::string& file_path) override;
-    void load_sound(sound_id id, const std::string& file_path) override;
+    void load_sound(sound_id id, const std::string& file_path, bool isBackgroundMusic = false) override;
     void unload_sound(sound_id id) override;
 
 private:
@@ -52,6 +52,7 @@ private:
     int m_previousVolume;
     std::map<std::string, sound_id> m_file_path_to_id_map;
     std::map<sound_id, Mix_Music*> m_id_to_music_map;
+    std::map<sound_id, Mix_Chunk*> m_id_to_chunk_map;
 };
 
 
@@ -79,9 +80,9 @@ public:
     {
         return _real_ss->get_sound_id_for_file_path(file_path);
     }
-    void load_sound(sound_id id, const std::string& file_path) override
+    void load_sound(sound_id id, const std::string& file_path, bool isBackgroundMusic) override
     {
-        _real_ss->load_sound(id, file_path);
+        _real_ss->load_sound(id, file_path, isBackgroundMusic);
     }
     void unload_sound(sound_id id) override
     {

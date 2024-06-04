@@ -1,6 +1,10 @@
 #include "SceneManager.h"
 
+#include <iostream>
+#include <ostream>
 #include <stdexcept>
+
+#include "servicelocator.h"
 
 
 namespace dae
@@ -29,6 +33,22 @@ namespace dae
             if ((*it)->GetName() == name)
             {
                 m_activeSceneIterator = it;
+                (*m_activeSceneIterator)->StopBackgroundMusic();
+
+                // Play the music of the newly activated scene
+                if (m_activeSceneIterator != m_scenes.end())
+                {
+                    auto& soundSystem = servicelocator::get_sound_system();
+                    const sound_id soundID = (*m_activeSceneIterator)->GetBackgroundMusicID();
+                    if (soundID != 0)
+                    {
+                        soundSystem.play(soundID);
+                    }
+                    else
+                    {
+                        std::cerr << "Failed to load background music for scene: " << name << std::endl;
+                    }
+                }
                 return;
             }
         }

@@ -13,6 +13,14 @@ namespace dae {
 
     enum class PlaySoundMessageType {
         deathSound,
+        LevelIntro,
+        Main,
+        win,
+        pepper,
+        steppingOnBurger,
+        bugerMenu,
+        menuSelect,
+        menuMove
     };
 
     enum class PointsMessageType {

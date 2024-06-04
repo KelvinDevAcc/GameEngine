@@ -31,6 +31,7 @@ namespace dae {
         bool IsInBasket(GameObject& burger) const;
 
         bool CanEntityMove(float moveX, float moveY, GameObject& entity) const;
+        GameObject* GetFloorAt(const glm::vec3& position) const;
 
         bool IsWithinBounds(float x, float y) const;
 

@@ -87,11 +87,16 @@ namespace dae {
     }
 
 
-    bool SceneData::IsOnSpecificObjectType(GameObject& player, const std::vector<GameObject*>& objects) const {
-        const auto playerHitBox = player.GetComponent<HitBox>();
-        for (const auto gameObject : objects) {
-            const auto hitBox = gameObject->GetComponent<HitBox>();
-            if (hitBox && playerHitBox->IsColliding(*hitBox)) {
+    bool SceneData::IsOnSpecificObjectType(GameObject& object, const std::vector<GameObject*>& objects) const {
+        const auto hitBox = object.GetComponent<HitBox>();
+        if (!hitBox) return false;
+
+        for (const auto& gameObject : objects) {
+            // Skip the object itself
+            if (gameObject == &object) continue;
+
+            const auto otherHitBox = gameObject->GetComponent<HitBox>();
+            if (otherHitBox && hitBox->IsColliding(*otherHitBox)) {
                 return true;
             }
         }
@@ -127,6 +132,22 @@ namespace dae {
         return  IsNextObject(newPosition.x, newPosition.y);
     }
 
+    GameObject* SceneData::GetFloorAt(const glm::vec3& position) const
+    {
+        // Iterate through all floor objects
+        for (const auto& floor : m_floors) {
+	        if (const auto hitBox = floor->GetComponent<HitBox>()) {
+                const SDL_Rect rect = hitBox->GetRect();
+                // Check if the position is within the bounds of the current floor
+                if (position.x >= rect.x && position.x < rect.x + rect.w &&
+                    position.y >= rect.y && position.y < rect.y + rect.h) {
+                    return floor;
+                }
+            }
+        }
+        // If no floor is found at the given position, return nullptr
+        return nullptr;
+    }
 
     bool SceneData::IsNextObject(float x, float y) const {
         auto checkCollisionsWithObjects = [&](const std::vector<GameObject*>& objects) {

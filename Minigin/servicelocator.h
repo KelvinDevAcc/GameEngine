@@ -30,7 +30,7 @@ public:
 
     void register_sound_file(const std::string& /*file_path*/) override {}
     sound_id get_sound_id_for_file_path(const std::string& /*file_path*/) override { return 0; }
-    void load_sound(sound_id /*id*/, const std::string& /*file_path*/) override {}
+    void load_sound(sound_id /*id*/, const std::string& /*file_path*/, bool /*isBackgroundMusic*/) override {}
     void unload_sound(sound_id /*id*/) override {}
     void mute() override{}
     void setVolume(float /*volume*/) override {}

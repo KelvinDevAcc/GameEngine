@@ -61,24 +61,34 @@ void sdl_sound_system::process_events() {
 
         // Process the first sound request in the queue
         SoundRequest request = m_sound_requests.front();
-        m_sound_requests.pop(); 
-        lock.unlock(); 
+        m_sound_requests.pop();
+        lock.unlock();
 
-        // Find the music associated with the sound ID
-        auto it = m_id_to_music_map.find(request.id);
-        if (it == m_id_to_music_map.end()) {
-            std::cerr << "Failed to find music for sound ID: " << request.id << std::endl;
-            continue; 
+        // Find the music or sound effect associated with the sound ID
+        Mix_Chunk* chunk = nullptr;
+        Mix_Music* music = nullptr;
+        auto chunkIt = m_id_to_chunk_map.find(request.id);
+        auto musicIt = m_id_to_music_map.find(request.id);
+
+        if (chunkIt != m_id_to_chunk_map.end()) {
+            chunk = chunkIt->second;
         }
-
-        Mix_Music* music = it->second;
-        if (!music) {
-            std::cerr << "Failed to load music for sounds ID: " << request.id << std::endl;
+        else if (musicIt != m_id_to_music_map.end()) {
+            music = musicIt->second;
+        }
+        else {
+            std::cerr << "Failed to find audio for sound ID: " << request.id << std::endl;
             continue;
         }
 
-        Mix_VolumeMusic(static_cast<int>(request.volume));
-        Mix_PlayMusic(music, 1);
+        if (chunk) {
+            Mix_PlayChannel(-1, chunk, 0); // Play the chunk on any available channel
+            Mix_VolumeChunk(chunk, static_cast<int>(request.volume));
+        }
+        else if (music) {
+            Mix_PlayMusic(music, -1);
+            Mix_VolumeMusic(static_cast<int>(request.volume));
+        }
     }
 
     Mix_CloseAudio();
@@ -108,26 +118,36 @@ sound_id sdl_sound_system::get_sound_id_for_file_path(const std::string& file_pa
     std::lock_guard<std::mutex> lock(m_sound_requests_mutex);
 
     // Check if the file path exists in the map
-    auto it = m_file_path_to_id_map.find(file_path);
-    if (it != m_file_path_to_id_map.end()) {
+    if (const auto it = m_file_path_to_id_map.find(file_path); it != m_file_path_to_id_map.end()) {
         return it->second; // Return the corresponding ID
     }
+
+    return 0;
+}
+
+void sdl_sound_system::load_sound(sound_id id, const std::string& file_path, bool isBackgroundMusic) {
+    if (isBackgroundMusic) {
+        // Background music, load it and store it in the background music map
+        if (Mix_Music* music = Mix_LoadMUS(file_path.c_str())) {
+            std::lock_guard<std::mutex> lock(m_sound_requests_mutex);
+            m_id_to_music_map[id] = music;
+        }
+        else {
+            std::cerr << "Failed to load background music for sound ID: " << id << ". SDL Mixer Error: " << Mix_GetError() << std::endl;
+        }
+    }
     else {
-        return 0;
+        // Normal sound effect, load it as usual
+        if (Mix_Chunk* chunk = Mix_LoadWAV(file_path.c_str())) {
+            std::lock_guard<std::mutex> lock(m_sound_requests_mutex);
+            m_id_to_chunk_map[id] = chunk;
+        }
+        else {
+            std::cerr << "Failed to load sound effect for sound ID: " << id << ". SDL Mixer Error: " << Mix_GetError() << std::endl;
+        }
     }
 }
 
-void sdl_sound_system::load_sound(sound_id id, const std::string& file_path) {
-    // Load the music from the file path using SDL mixer
-    if (Mix_Music* music = Mix_LoadMUS(file_path.c_str())) {
-        // Lock the mutex before modifying the ID to music map
-        std::lock_guard<std::mutex> lock(m_sound_requests_mutex);
-        m_id_to_music_map[id] = music; // Store the loaded music with the provided ID
-    }
-    else {
-        std::cerr << "Failed to load music for sound ID: " << id << ". SDL Mixer Error: " << Mix_GetError() << std::endl;
-    }
-}
 
 void sdl_sound_system::unload_sound(sound_id id) {
     // Lock the mutex before modifying the ID to music map

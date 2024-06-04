@@ -158,7 +158,12 @@ void SceneHelpers::CreateBurgerTop(dae::Scene* scene, float x, float y, glm::vec
     BurgerTopObject->AddComponent(std::move(spriteRenderer));
     BurgerTopObject->SetLocalPosition(glm::vec3(x, y, 0.0f));
 
-    auto hitBox = std::make_unique<HitBox>(scale);
+    // Create and set up the BurgerComponent
+    auto burgerComponent = std::make_unique<BurgerComponent>(scale.x, 50.f);
+    burgerComponent->SetGameObject(BurgerTopObject.get());
+    BurgerTopObject->AddComponent(std::move(burgerComponent));
+
+    auto hitBox = std::make_unique<HitBox>(glm::vec2(scale.x - 10, scale.y));
     hitBox->SetGameObject(BurgerTopObject.get());
     BurgerTopObject->AddComponent(std::move(hitBox));
 
@@ -175,7 +180,12 @@ void SceneHelpers::CreateCheese(dae::Scene* scene, float x, float y, glm::vec2 s
     CheeseObject->AddComponent(std::move(spriteRenderer));
     CheeseObject->SetLocalPosition(glm::vec3(x, y, 0.0f));
 
-    auto hitBox = std::make_unique<HitBox>(scale);
+    // Create and set up the BurgerComponent
+    auto burgerComponent = std::make_unique<BurgerComponent>(scale.x, 50.f);
+    burgerComponent->SetGameObject(CheeseObject.get());
+    CheeseObject->AddComponent(std::move(burgerComponent));
+
+    auto hitBox = std::make_unique<HitBox>(glm::vec2(scale.x - 10, scale.y));
     hitBox->SetGameObject(CheeseObject.get());
     CheeseObject->AddComponent(std::move(hitBox));
 
@@ -192,7 +202,14 @@ void SceneHelpers::CreateMeat(dae::Scene* scene, float x, float y, glm::vec2 sca
     MeatObject->AddComponent(std::move(spriteRenderer));
     MeatObject->SetLocalPosition(glm::vec3(x, y, 0.0f));
 
-    auto hitBox = std::make_unique<HitBox>(scale);
+
+    // Create and set up the BurgerComponent
+    auto burgerComponent = std::make_unique<BurgerComponent>(scale.x, 50.f);
+    burgerComponent->SetGameObject(MeatObject.get());
+    MeatObject->AddComponent(std::move(burgerComponent));
+
+
+    auto hitBox = std::make_unique<HitBox>(glm::vec2(scale.x - 10, scale.y));
     hitBox->SetGameObject(MeatObject.get());
     MeatObject->AddComponent(std::move(hitBox));
 
@@ -209,7 +226,12 @@ void SceneHelpers::CreateTomato(dae::Scene* scene, float x, float y, glm::vec2 s
     TomatoObject->AddComponent(std::move(spriteRenderer));
     TomatoObject->SetLocalPosition(glm::vec3(x, y, 0.0f));
 
-    auto hitBox = std::make_unique<HitBox>(scale);
+    // Create and set up the BurgerComponent
+    auto burgerComponent = std::make_unique<BurgerComponent>(scale.x, 50.f);
+    burgerComponent->SetGameObject(TomatoObject.get());
+    TomatoObject->AddComponent(std::move(burgerComponent));
+
+    auto hitBox = std::make_unique<HitBox>(glm::vec2(scale.x - 10, scale.y));
     hitBox->SetGameObject(TomatoObject.get());
     TomatoObject->AddComponent(std::move(hitBox));
 
@@ -226,7 +248,12 @@ void SceneHelpers::CreateLettuce(dae::Scene* scene, float x, float y, glm::vec2 
     LettuceObject->AddComponent(std::move(spriteRenderer));
     LettuceObject->SetLocalPosition(glm::vec3(x, y, 0.0f));
 
-    auto hitBox = std::make_unique<HitBox>(scale);
+    // Create and set up the BurgerComponent
+    auto burgerComponent = std::make_unique<BurgerComponent>(scale.x, 50.f);
+    burgerComponent->SetGameObject(LettuceObject.get());
+    LettuceObject->AddComponent(std::move(burgerComponent));
+
+    auto hitBox = std::make_unique<HitBox>(glm::vec2(scale.x - 10, scale.y));
     hitBox->SetGameObject(LettuceObject.get());
     LettuceObject->AddComponent(std::move(hitBox));
 
@@ -245,16 +272,17 @@ void SceneHelpers::CreateBurgerBottom(dae::Scene* scene, float x, float y, glm::
     spriteRenderer->SetDimensions(scale.x, scale.y);
     BurgerBottomObject->AddComponent(std::move(spriteRenderer));
 
-    // Create and set up the BurgerComponent
-     auto burgerComponent = std::make_unique<BurgerComponent>(scale.x, 10.f);
-     burgerComponent->SetGameObject(BurgerBottomObject.get());
-     BurgerBottomObject->AddComponent(std::move(burgerComponent));
-
     // Set the local position of the GameObject
     BurgerBottomObject->SetLocalPosition(glm::vec3(x, y, 0.0f));
 
+    // Create and set up the BurgerComponent
+     auto burgerComponent = std::make_unique<BurgerComponent>(scale.x, 50.f);
+     burgerComponent->SetGameObject(BurgerBottomObject.get());
+     BurgerBottomObject->AddComponent(std::move(burgerComponent));
+
+
     // Create and set up the HitBox
-    auto hitBox = std::make_unique<HitBox>(scale);
+    auto hitBox = std::make_unique<HitBox>(glm::vec2(scale.x - 10, scale.y));
     hitBox->SetGameObject(BurgerBottomObject.get());
     BurgerBottomObject->AddComponent(std::move(hitBox));
 

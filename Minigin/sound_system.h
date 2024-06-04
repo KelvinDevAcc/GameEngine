@@ -21,7 +21,7 @@ public:
 	virtual void register_sound_file(const std::string& file_path) = 0;
 	virtual sound_id get_sound_id_for_file_path(const std::string& file_path) = 0;
 	virtual float getVolume() = 0;
-	virtual void load_sound(sound_id id, const std::string& file_path) = 0;
+	virtual void load_sound(sound_id id, const std::string& file_path, bool isBackgroundMusic = false) = 0;
 	virtual void unload_sound(sound_id id) = 0;
 	virtual void setVolume(float volume) = 0;
 };
