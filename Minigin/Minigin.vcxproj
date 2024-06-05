@@ -204,11 +204,13 @@
     <ClInclude Include="BurgerComponent.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="EnemyAIComponent.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="FPSCounterComponent.h" />
     <ClInclude Include="GameController.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameObjectBenchmark.h" />
+    <ClInclude Include="GameStateManager.h" />
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="HealthComponent.h" />
     <ClInclude Include="HighScores.h" />
@@ -261,6 +263,7 @@
     <ClCompile Include="GameController.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameObjectBenchmark.cpp" />
+    <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="GameTime.cpp" />
     <ClCompile Include="HealthComponent.cpp" />
     <ClCompile Include="HighScores.cpp" />

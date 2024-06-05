@@ -21,17 +21,22 @@ namespace dae {
         void operator=(const SceneData&) = delete;
 
         void AddGameObject(GameObject* gameObject, GameObjectType type);
+        void RemoveAllGameObjects();
+
         void Update();
 
         GameObject* GetPlayer() const;
+        std::vector<GameObject*> GetPlayers() const {return m_players;}
         const std::vector<GameObject*>& GetBurgerParts() const;
+        GameObject* GetFloorAt(const glm::vec3& position) const;
+
         bool IsOnFloor(GameObject& player) const;
         bool IsOnLadder(GameObject& player) const;
         bool IsOnSolidLadder(GameObject& player) const;
         bool IsInBasket(GameObject& burger) const;
+        bool IsBurgerPartColliding(GameObject& burgerPart) const;
 
         bool CanEntityMove(float moveX, float moveY, GameObject& entity) const;
-        GameObject* GetFloorAt(const glm::vec3& position) const;
 
         bool IsWithinBounds(float x, float y) const;
 

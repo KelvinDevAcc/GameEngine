@@ -182,10 +182,12 @@ xcopy "$(SolutionDir)3rdParty\SDL2_mixer\lib\$(PlatformTarget)\*.dll" "$(OutputP
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BugerTime.cpp" />
+    <ClCompile Include="MrHotDogAIComponent.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerState.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MrHotDogAIComponent.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerState.h" />
   </ItemGroup>

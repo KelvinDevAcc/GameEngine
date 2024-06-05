@@ -28,6 +28,7 @@ namespace dae
     	const Sprite* GetSprite() const;
 
         void SetDimensions(float width, float height);
+        glm::vec2 GetDimensions() const;
         void Setflip(bool flipx, bool flipy);
 
         std::type_info const& GetComponentType() const override { return typeid(SpriteRendererComponent); }

@@ -20,6 +20,16 @@ namespace dae {
         }
     }
 
+    void SceneData::RemoveAllGameObjects()
+    {
+        m_floors.clear();
+        m_ladders.clear();
+        m_solidLadders.clear();
+        m_players.clear();
+        m_burgerParts.clear();
+        m_baskets.clear();
+    }
+
     void SceneData::Update() {
        // CheckPlayerCollisions();
     }
@@ -97,6 +107,7 @@ namespace dae {
 
             const auto otherHitBox = gameObject->GetComponent<HitBox>();
             if (otherHitBox && hitBox->IsColliding(*otherHitBox)) {
+
                 return true;
             }
         }
@@ -108,7 +119,7 @@ namespace dae {
         const float minX = SceneHelpers::GetMinCoordinates().x;
         const float minY = SceneHelpers::GetMinCoordinates().y;
         const float maxX = SceneHelpers::GetMaxCoordinates().x;
-        const float maxY = SceneHelpers::GetMaxCoordinates().y;
+        const float maxY = SceneHelpers::GetMaxCoordinates().y - (SceneHelpers::GetCellSize().y*3);
 
         // Check if the given position is within the defined bounds
         return x >= minX && x < maxX && y >= minY && y < maxY;
@@ -193,5 +204,9 @@ namespace dae {
     }
     bool SceneData::IsInBasket(GameObject& burger) const {
         return IsOnSpecificObjectType(burger, m_baskets);
+    }
+
+    bool SceneData::IsBurgerPartColliding(GameObject& burgerPart) const {
+        return IsOnSpecificObjectType(burgerPart, m_burgerParts);
     }
 }

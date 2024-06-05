@@ -65,10 +65,9 @@ namespace dae
     void MenuComponent::SetTextColor(const SDL_Color& color)
     {
         // Set the text color of the menu objects
-        for (auto& optionObject : m_OptionObjects)
+        for (const auto& optionObject : m_OptionObjects)
         {
-            auto textComponent = optionObject->GetComponent<TextComponent>();
-            if (textComponent)
+	        if (const auto textComponent = optionObject->GetComponent<TextComponent>())
             {
                 textComponent->SetColor(color);
                 m_NormalColor = color;
@@ -109,6 +108,7 @@ namespace dae
         if (m_SelectedOption < m_Callbacks.size())
         {
             m_Callbacks[m_SelectedOption]();
+            m_SelectedOption = 0;
         }
     }
 }

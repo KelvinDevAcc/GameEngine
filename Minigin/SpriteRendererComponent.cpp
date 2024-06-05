@@ -45,6 +45,11 @@ void dae::SpriteRendererComponent::SetDimensions(float width, float height)
     m_height = height;
 }
 
+glm::vec2 dae::SpriteRendererComponent::GetDimensions() const
+{
+    return {m_width, m_height};
+}
+
 void dae::SpriteRendererComponent::Setflip(bool flipx, bool flipy) 
 {
     m_flipX = flipx;

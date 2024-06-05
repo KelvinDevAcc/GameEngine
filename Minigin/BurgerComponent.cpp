@@ -4,6 +4,7 @@
 
 #include "SceneData.h"
 #include "HitBox.h"
+#include "SpriteRendererComponent.h"
 
 BurgerComponent::BurgerComponent(float length, float dropDistance)
     : m_IsDropping(false), m_Length(length), m_DropDistance(dropDistance), m_PlayerWalkedDistance(0.0f), m_HasDropped(false) {}
@@ -81,8 +82,8 @@ void BurgerComponent::DropToNextFloor() {
         return;
     }
 
-    const glm::vec3 dropVector(0.0f, 80.0f, 0.0f); // Drop step by step by 50 units
-    glm::vec3 currentPosition = burger->GetWorldPosition();
+    constexpr glm::vec3 dropVector(0.0f, 20.0f, 0.0f); // Drop step by step by 50 units
+    const glm::vec3 currentPosition = burger->GetWorldPosition();
     const glm::vec3 newPosition = currentPosition + dropVector;
     burger->SetLocalPosition(newPosition);
 
@@ -90,23 +91,34 @@ void BurgerComponent::DropToNextFloor() {
     std::cout << "Dropping burger. Current Position: (" << currentPosition.x << ", " << currentPosition.y << "), New Position: (" << newPosition.x << ", " << newPosition.y << ")\n";
 
     // Re-check conditions after moving
-    bool isOnFloor = sceneData.IsOnFloor(*burger);
-    bool isInBasket = sceneData.IsInBasket(*burger);
-    bool isOnBurgerParts = sceneData.IsOnSpecificObjectType(*burger, sceneData.GetBurgerParts());
+    const bool isOnFloor = sceneData.IsOnFloor(*burger);
+    const bool isInBasket = sceneData.IsInBasket(*burger);
+    const bool isOnBurgerParts = sceneData.IsBurgerPartColliding(*burger);
 
     std::cout << "Checking conditions: IsOnFloor = " << isOnFloor
         << ", IsOnBurgerParts = " << isOnBurgerParts
         << ", IsInBasket = " << isInBasket << "\n";
 
     // Check conditions
-    if (isOnFloor || isInBasket || isOnBurgerParts) {
+    if (isOnFloor) 
+    {
         // If any condition is met, stop dropping
         m_IsDropping = false;
-        std::cout << "Stopping drop. Condition met: ";
-        if (isOnFloor) std::cout << "IsOnFloor\n";
-        else if (isInBasket) std::cout << "IsInBasket\n";
-        else if (isOnBurgerParts) std::cout << "IsOnBurgerParts\n";
     }
+    else if (isInBasket)
+    {
+        m_IsDropping = false;
+    }
+    else if (isOnBurgerParts)
+    {
+	    if (m_IsDropping)
+	    {
+		    const auto position = GetGameObject()->GetWorldPosition();
+            GetGameObject()->SetLocalPosition(glm::vec3(position.x, position.y + GetGameObject()->GetComponent<dae::SpriteRendererComponent>()->GetDimensions().y, position.z));
+	    	m_IsDropping = false;
+	    }
+    }
+
 
     // Final debug statement
     std::cout << "Burger final position: (" << burger->GetWorldPosition().x << ", " << burger->GetWorldPosition().y << ")\n";

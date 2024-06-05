@@ -195,10 +195,14 @@ void BindMenuCommands(const dae::InputManager& inputManager)
 {
     // Assuming SDL_SCANCODE_W is for moving up, SDL_SCANCODE_S for moving down, and SDL_SCANCODE_RETURN for selecting
     inputManager.BindCommand(SDL_SCANCODE_I, KeyState::Up, std::make_unique<NavigateUpCommand>(), InputType::Keyboard);
-    inputManager.BindCommand(SDL_SCANCODE_K, KeyState::Up, std::make_unique<NavigateDownCommand>(), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_W, KeyState::Up, std::make_unique<NavigateUpCommand>(), InputType::Keyboard);
+   // inputManager.BindCommand(SDL_SCANCODE_K, KeyState::Up, std::make_unique<NavigateDownCommand>(), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_S, KeyState::Up, std::make_unique<NavigateDownCommand>(), InputType::Keyboard);
     inputManager.BindCommand(SDL_SCANCODE_L, KeyState::Up, std::make_unique<SelectOptionCommand>(), InputType::Keyboard);
-    inputManager.BindCommand(SDL_SCANCODE_M, KeyState::Up, std::make_unique<GoToNextSceneCommand>(), InputType::Keyboard);
 
+
+
+	inputManager.BindCommand(SDL_SCANCODE_F1, KeyState::Up, std::make_unique<GoToNextSceneCommand>(), InputType::Keyboard);
 	inputManager.BindCommand(SDL_SCANCODE_G, KeyState::Up, std::make_unique<MuteCommand>(&servicelocator::get_sound_system()), InputType::Keyboard);
 	inputManager.BindCommand(SDL_SCANCODE_P, KeyState::Up, std::make_unique<PlaySoundCommand>(), InputType::Keyboard);
     inputManager.BindCommand(SDL_SCANCODE_MINUS, KeyState::Up, std::make_unique<DecreaseVolumeCommand>(&servicelocator::get_sound_system()), InputType::Keyboard);
@@ -219,14 +223,32 @@ void UnBindMenuCommands(const dae::InputManager& inputManager)
     // Add similar bindings for controller if needed
 }
 
+void UnBindPlayerCommands(const dae::InputManager& inputManager)
+{
+    // Assuming SDL_SCANCODE_W is for moving up, SDL_SCANCODE_S for moving down, and SDL_SCANCODE_RETURN for selecting
+    inputManager.UnbindCommand(SDL_SCANCODE_W, KeyState::Pressed, InputType::Keyboard);
+    inputManager.UnbindCommand(SDL_SCANCODE_S, KeyState::Pressed, InputType::Keyboard);
+    inputManager.UnbindCommand(SDL_SCANCODE_A, KeyState::Pressed, InputType::Keyboard);
+    inputManager.UnbindCommand(SDL_SCANCODE_D, KeyState::Pressed, InputType::Keyboard);
+    inputManager.UnbindCommand(SDL_SCANCODE_X, KeyState::Up, InputType::Keyboard);
+    inputManager.UnbindCommand(SDL_SCANCODE_Z, KeyState::Up, InputType::Keyboard);
+    inputManager.UnbindCommand(SDL_SCANCODE_C, KeyState::Up, InputType::Keyboard);
+
+    // Add similar bindings for controller if needed
+}
+
 void LoadStartMenu(dae::Scene* startMenuScene)
 {
     const auto& inputManager = dae::InputManager::GetInstance();
-
+    UnBindPlayerCommands(inputManager);
+    BindMenuCommands(inputManager);
     std::vector<std::string> options = { "single player", "multiplayer", "versus Mode", "scoreBoard" };
     std::vector<std::function<void()>> callbacks =
     {
-        [inputManagerPtr = &inputManager]() { dae::SceneManager::GetInstance().SetActiveScene("Scene4"); UnBindMenuCommands(*inputManagerPtr); },  // Example: Load single player scene
+        [inputManagerPtr = &inputManager]()
+        {
+	        dae::SceneManager::GetInstance().SetActiveScene("Scene4"); UnBindMenuCommands(*inputManagerPtr);
+        },  // Example: Load single player scene
         []() { dae::SceneManager::GetInstance().SetActiveScene("Scene5"); }, 
         []() { dae::SceneManager::GetInstance().SetActiveScene("Scene6"); },   
         []() { dae::SceneManager::GetInstance().SetActiveScene("ScoreboardScene");} 
@@ -237,7 +259,6 @@ void LoadStartMenu(dae::Scene* startMenuScene)
     menuObject->SetLocalPosition(glm::vec3(635, 300, 0.f));
     auto menuComponent = std::make_unique<dae::MenuComponent>(menuObject.get(), options, callbacks, dae::ResourceManager::GetFont("arcadeBig"), 70.0f);
     menuComponent->SetTextColor(SDL_Color{ 220,200,100,255 });
-    BindMenuCommands(inputManager);
     menuObject->AddComponent(std::move(menuComponent));
 
     // Add the menu GameObject to the scene
@@ -269,7 +290,7 @@ void LoadStartMenu(dae::Scene* startMenuScene)
 
 void LoadScoreboard(dae::Scene* ScoreBoardScene)
 {
-
+    const auto& inputManager = dae::InputManager::GetInstance();
     HighScores highScores;
     highScores.loadScores();
 
@@ -321,6 +342,8 @@ void LoadScoreboard(dae::Scene* ScoreBoardScene)
     menuComponent->SetTextColor(SDL_Color{ 220,200,100,255 });
     menuObject->AddComponent(std::move(menuComponent));
     ScoreBoardScene->Add(std::move(menuObject));
+
+    BindMenuCommands(inputManager);
 }
 
 
@@ -337,12 +360,12 @@ void Scene4(dae::Scene* scene, const dae::InputManager& inputManager)
     //scene->Add(std::move(backgroundObject03));
     // Load the map
     constexpr glm::vec3 startPos(335, 70, 0.0f);
-    constexpr glm::vec2 Mapscale(40, 26.f);
+    constexpr glm::vec2 mapScale(40, 26.f);
 
     const LoadMap loadMap("../Data/maps/map1.map", "../Data/maps/map1.ingmap");
-    SceneHelpers::LoadMapIntoScene(loadMap, scene, startPos, Mapscale);
+    SceneHelpers::LoadMapIntoScene(loadMap, scene, startPos, mapScale);
 
-    SceneHelpers::LoadIngMapIntoScene(loadMap, scene, startPos, Mapscale);
+    SceneHelpers::LoadIngMapIntoScene(loadMap, scene, startPos, mapScale);
 
 
     //Create GameObject for Character 1
@@ -376,7 +399,7 @@ void Scene4(dae::Scene* scene, const dae::InputManager& inputManager)
 
     HandlePlayerInput(inputManager, CharacterObject1.get());
 
-    dae::SceneData::GetInstance().AddGameObject(CharacterObject1.get(), dae::GameObjectType::Player);
+    //dae::SceneData::GetInstance().AddGameObject(CharacterObject1.get(), dae::GameObjectType::Player);
 
     auto livesDisplayObject2 = std::make_unique<dae::GameObject>();
     auto livesDisplayComponent2 = std::make_unique<dae::LivesDisplayComponent>(dae::ResourceManager::GetFont("arcade"), *livesDisplayObject2);
@@ -496,11 +519,13 @@ void load()
     const auto& scene6 = sceneManager.CreateScene("Scene6");
 
 
-    LoadStartMenu(startMenuScene);
-    LoadScoreboard(ScoreBoardScene);
-    Scene4(scene4, inputManager);
-    Scene5(scene5);
-    Scene6(scene6);
+
+    startMenuScene->SetOnActivateCallback([startMenuScene]() { LoadStartMenu(startMenuScene); });
+    
+    ScoreBoardScene->SetOnActivateCallback([ScoreBoardScene]() {LoadScoreboard(ScoreBoardScene); });
+    scene4->SetOnActivateCallback([scene4, &inputManager]() { Scene4(scene4, inputManager); });
+    scene5->SetOnActivateCallback([scene5]() { Scene5(scene5); });
+    scene6->SetOnActivateCallback([scene6]() { Scene6(scene6); });
 
     sceneManager.SetActiveScene("StartMenu");
 

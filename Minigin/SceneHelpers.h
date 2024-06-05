@@ -13,6 +13,15 @@ public:
     static glm::vec2 GetMinCoordinates();
     static glm::vec2 GetMaxCoordinates();
 
+    static glm::vec2 GetCellSize();
+
+    static glm::vec2 GetGridSize()
+	{
+        glm::vec2 maxCoord = GetMaxCoordinates();
+        glm::vec2 minCoord = GetMinCoordinates();
+        return glm::vec2(maxCoord.x - minCoord.x, maxCoord.y - minCoord.y);
+    }
+
 private:
     static void CreatePlatformLeft(dae::Scene* scene, float x, float y, glm::vec2 scale);
     static void CreatePlatformMiddle(dae::Scene* scene, float x, float y, glm::vec2 scale);

@@ -7,9 +7,11 @@
 #include "SceneData.h"
 #include "SpriteRendererComponent.h"
 #include "../BugerTime/Player.h"
+#include "../BugerTime/MrHotDogAIComponent.h"
 
 glm::vec2 s_MinCoordinates;
 glm::vec2 s_MaxCoordinates; 
+glm::vec2 s_CellSize; 
 
 void SceneHelpers::CreateFloor(dae::Scene* scene, float x, float y, glm::vec2 scale) {
     auto floorObject = std::make_unique<dae::GameObject>();
@@ -293,7 +295,7 @@ void SceneHelpers::CreateBurgerBottom(dae::Scene* scene, float x, float y, glm::
     scene->Add(std::move(BurgerBottomObject));
 }
 
-void SceneHelpers::SpawnSauge(dae::Scene* scene, float x, float y, glm::vec2 scale)
+void SceneHelpers::SpawnSauge(dae::Scene* scene, float x, float y, glm::vec2 /*scale*/)
 {
     auto SaugeObject = std::make_unique<dae::GameObject>();
 
@@ -306,10 +308,12 @@ void SceneHelpers::SpawnSauge(dae::Scene* scene, float x, float y, glm::vec2 sca
 	SaugeObject->AddComponent(std::move(animationComponent));
     SaugeObject->SetLocalPosition(glm::vec3(x, y, 0.0f));
 
-    auto hitBox = std::make_unique<HitBox>(scale);
+    /*auto hitBox = std::make_unique<HitBox>(scale);
     hitBox->SetGameObject(SaugeObject.get());
     SaugeObject->AddComponent(std::move(hitBox));
 
+    auto aiComponent = std::make_unique<MrHotDogAIComponent>(SaugeObject.get());
+    SaugeObject->AddComponent(std::move(aiComponent));*/
 
     scene->Add(std::move(SaugeObject));
 }
@@ -357,7 +361,7 @@ void SceneHelpers::SpawnPickle(dae::Scene* scene, float x, float y, glm::vec2 sc
 }
 
 
-void SceneHelpers::SpawnPlayer(dae::Scene* scene, float x, float y, glm::vec2 scale)
+void SceneHelpers::SpawnPlayer(dae::Scene* scene, float x, float y, glm::vec2 /*scale*/)
 {
     auto PlayerObject = std::make_unique<dae::GameObject>();
 
@@ -370,9 +374,9 @@ void SceneHelpers::SpawnPlayer(dae::Scene* scene, float x, float y, glm::vec2 sc
     PlayerObject->AddComponent(std::move(animationComponent));
     PlayerObject->SetLocalPosition(glm::vec3(x, y, 0.0f));
 
-    auto hitBox = std::make_unique<HitBox>(scale);
+    /*auto hitBox = std::make_unique<HitBox>(scale);
     hitBox->SetGameObject(PlayerObject.get());
-    PlayerObject->AddComponent(std::move(hitBox));
+    PlayerObject->AddComponent(std::move(hitBox));*/
 
     //dae::SceneData::GetInstance().AddGameObject(PlayerObject.get(), dae::GameObjectType::Player);
 
@@ -389,14 +393,17 @@ void SceneHelpers::LoadMapIntoScene(const LoadMap& loadMap, dae::Scene* scene, c
     s_MaxCoordinates.x = startPos.x;
     s_MaxCoordinates.y = startPos.y;
 
-    for (int y = 0; y < map.size(); ++y) {
-        for (int x = 0; x < map[y].size(); ++x) {
+    s_CellSize = scale;
+
+    for (int y = 0; y < static_cast<int>(map.size()); ++y) {
+        for (int x = 0; x < static_cast<int>(map[y].size()); ++x) {
             const char tile = map[y][x];
-            const float posX = startPos.x + x * scale.x;
-            const float posY = startPos.y + y * scale.y;
+            const float posX = startPos.x + (x * scale.x);
+            const float posY = startPos.y + (y * scale.y);
 
             // Update maximum coordinates
-            if (posX > s_MaxCoordinates.x) s_MaxCoordinates.x = posX;
+            if (posX > s_MaxCoordinates.x) 
+                s_MaxCoordinates.x = posX;
             if (posY > s_MaxCoordinates.y) s_MaxCoordinates.y = posY;
 
             switch (tile) {
@@ -439,8 +446,8 @@ void SceneHelpers::LoadIngMapIntoScene(const LoadMap& loadMap, dae::Scene* scene
 
     // Initialize variables to store the maximum X and Y coordinates
 
-    for (int y = 0; y < map.size(); ++y) {
-        for (int x = 0; x < map[y].size(); ++x) {
+    for (int y = 0; y < static_cast<int>(map.size()); ++y) {
+        for (int x = 0; x < static_cast<int>(map[y].size()); ++x) {
             const char tile = map[y][x];
             const float posX = startPos.x + x * scale.x;
             const float posY = startPos.y + y * scale.y;
@@ -492,6 +499,11 @@ glm::vec2 SceneHelpers::GetMaxCoordinates()
 glm::vec2 SceneHelpers::GetMinCoordinates()
 {
     return s_MinCoordinates;
+}
+
+glm::vec2 SceneHelpers::GetCellSize()
+{
+    return s_CellSize;
 }
 
 

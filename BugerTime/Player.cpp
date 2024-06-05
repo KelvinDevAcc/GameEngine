@@ -128,10 +128,10 @@ namespace game
             Idle();
         }
     }
-
     void Player::MoveHorizontally(float deltaX)
     {
-        glm::vec3 currentPosition = m_GameObject->GetWorldPosition();
+	    const auto spriteRenderer = m_GameObject->GetComponent<dae::SpriteRendererComponent>();
+        glm::vec3 currentPosition = m_GameObject->GetWorldPosition() + glm::vec3(0, -spriteRenderer->GetDimensions().y / 2, 0);
         currentPosition.x += deltaX;
         m_GameObject->SetLocalPosition(currentPosition);
         SetState(m_walkingState.get());
@@ -139,7 +139,8 @@ namespace game
 
     void Player::MoveVertically(float deltaY)
     {
-        glm::vec3 currentPosition = m_GameObject->GetWorldPosition();
+	    const auto spriteRenderer = m_GameObject->GetComponent<dae::SpriteRendererComponent>();
+        glm::vec3 currentPosition = m_GameObject->GetWorldPosition() + glm::vec3(0, -spriteRenderer->GetDimensions().y / 2, 0);
         currentPosition.y += deltaY;
         m_GameObject->SetLocalPosition(currentPosition);
         SetState(m_walkingState.get());
