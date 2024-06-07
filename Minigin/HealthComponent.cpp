@@ -25,7 +25,6 @@ namespace dae
                 message.type = dae::PlaySoundMessageType::deathSound;
 
                 message.arguments.emplace_back(static_cast<sound_id>(1)); // sound ID
-                message.arguments.emplace_back(50.f); // volume
 
                 dae::EventQueue::Broadcast(message);
             }

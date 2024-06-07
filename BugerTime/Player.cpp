@@ -19,7 +19,6 @@ namespace game
         m_startPosition = m_GameObject->GetWorldPosition();
 
         SetState(m_idleState.get());
-        dae::SceneData::GetInstance().AddGameObject(m_GameObject, dae::GameObjectType::Player);
     }
 
     void Player::SetState(PlayerState* state)
@@ -52,37 +51,27 @@ namespace game
                 Idle();
             }
 
-            dae::SceneData::GetInstance().Update();
         }
     }
 
     void Player::Move(float deltaX, float deltaY)
     {
-       /* m_deltaY = deltaY;
-        m_deltaX = deltaX;
-
-        glm::vec3 currentPosition = m_GameObject->GetWorldPosition();
-        currentPosition.x += deltaX;
-        currentPosition.y += deltaY;
-        m_GameObject->SetLocalPosition(currentPosition);
-
-        if (m_CurrentState)
-        {
-            SetState(m_walkingState.get());
-        }*/
-
-
-        m_deltaY = deltaY;
-        m_deltaX = deltaX;
-
         CheckAndMove(deltaX, deltaY);
     }
 
     void Player::Attack() {
+        if (!m_pointComponent) {
+            return;
+        }
+
         SetState(m_attackignState.get());
     }
 
     void Player::Die() {
+        if (!m_healthComponent) {
+            return;
+        }
+
         SetState(m_dyingState.get());
     }
 
@@ -93,8 +82,6 @@ namespace game
     void Player::Respawn()
     {
         m_GameObject->SetLocalPosition(m_startPosition);
-        m_healthComponent->SetLives(3);
-        m_pointComponent->SetScore(0);
         Idle();
     }
 
@@ -106,42 +93,71 @@ namespace game
     {
         const auto& sceneData = dae::SceneData::GetInstance();
 
-        const bool canMoveHorizontally = sceneData.CanEntityMove(deltaX, 0.0f, *m_GameObject);
-        const bool canMoveVertically = sceneData.CanEntityMove(0.0f, deltaY, *m_GameObject);
-
-        const bool isOnLadder = sceneData.IsOnLadder(*m_GameObject);
+        const bool isOnLadderUp = sceneData.IsOnLadderUp(*m_GameObject);
+        const bool isOnLadderUpDown = sceneData.IsOnLadderUpDown(*m_GameObject);
+        const bool isOnLadderDown = sceneData.IsOnLadderDown(*m_GameObject);
         const bool isOnSolidLadder = sceneData.IsOnSolidLadder(*m_GameObject);
         const bool isOnFloor = sceneData.IsOnFloor(*m_GameObject);
 
-        // Allow horizontal movement if the player is on the floor or ladder
-        if (canMoveHorizontally && (isOnFloor || isOnLadder)) {
-            MoveHorizontally(deltaX);
+
+        m_deltaX = deltaX * 20 * dae::GameTime::GetDeltaTime();
+        m_deltaY = deltaY * 20 * dae::GameTime::GetDeltaTime();
+
+        // On ladder up or up-down
+        if (isOnLadderUp) {
+            // Allow vertical movement only if going up and there's no obstruction
+            if (deltaY < 0 && sceneData.CanEntityMove(m_deltaX, m_deltaY, *m_GameObject)) {
+                MoveVertically(m_deltaY);
+                MoveHorizontally(m_deltaX);
+            }
+        }
+        if (isOnLadderDown) {
+            // Allow horizontal movement only if there's no obstruction
+            if (deltaY > 0 && sceneData.CanEntityMove(m_deltaX, deltaY, *m_GameObject)) {
+                MoveHorizontally(m_deltaX);
+                MoveVertically(deltaY);
+            }
+        }
+        // On ladder down or solid ladder or floor
+        if (isOnFloor) {
+            // Allow horizontal movement only if there's no obstruction
+            if (sceneData.CanEntityMove(m_deltaX, 0.0f, *m_GameObject)) {
+                MoveHorizontally(m_deltaX);
+            }
+        }
+        if (isOnSolidLadder) {
+            // Allow horizontal movement only if there's no obstruction
+            if (sceneData.CanEntityMove(0.0f, m_deltaY, *m_GameObject)) {
+                MoveVertically(m_deltaY);
+            }
+        }
+        if (isOnLadderUpDown) {
+            // Allow horizontal movement only if there's no obstruction
+            if (sceneData.CanEntityMove(m_deltaX, m_deltaY, *m_GameObject)) {
+                MoveHorizontally(m_deltaX);
+                MoveVertically(m_deltaY);
+            }
         }
 
-        // Allow vertical movement if the player is on a ladder or solid ladder
-        if (canMoveVertically && (isOnLadder || isOnSolidLadder)) {
-            MoveVertically(deltaY);
-        }
-
-        // If neither horizontal nor vertical movement is allowed, set player to idle
-        if (!canMoveHorizontally && !canMoveVertically) {
+        // Not on any ladder or floor
+        else {
+            // Set player to idle if neither horizontal nor vertical movement is allowed
             Idle();
         }
     }
+
     void Player::MoveHorizontally(float deltaX)
     {
-	    const auto spriteRenderer = m_GameObject->GetComponent<dae::SpriteRendererComponent>();
-        glm::vec3 currentPosition = m_GameObject->GetWorldPosition() + glm::vec3(0, -spriteRenderer->GetDimensions().y / 2, 0);
-        currentPosition.x += deltaX;
+        glm::vec3 currentPosition = m_GameObject->GetWorldPosition();
+        currentPosition.x += deltaX ; // deltaTime represents the time elapsed since the last frame
         m_GameObject->SetLocalPosition(currentPosition);
         SetState(m_walkingState.get());
     }
 
     void Player::MoveVertically(float deltaY)
     {
-	    const auto spriteRenderer = m_GameObject->GetComponent<dae::SpriteRendererComponent>();
-        glm::vec3 currentPosition = m_GameObject->GetWorldPosition() + glm::vec3(0, -spriteRenderer->GetDimensions().y / 2, 0);
-        currentPosition.y += deltaY;
+        glm::vec3 currentPosition = m_GameObject->GetWorldPosition();
+        currentPosition.y += deltaY; // deltaTime represents the time elapsed since the last frame
         m_GameObject->SetLocalPosition(currentPosition);
         SetState(m_walkingState.get());
     }

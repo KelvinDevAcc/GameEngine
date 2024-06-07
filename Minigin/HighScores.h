@@ -1,13 +1,13 @@
 #pragma once
-#include <iostream>
 #include <fstream>
 #include <vector>
 #include <array>
-#include <algorithm>
-#include <stdexcept>
+#include "Singleton.h"
 
-class HighScores {
+class HighScores final : public dae::Singleton<HighScores>
+{
 public:
+
     static constexpr size_t NUM_HIGH_SCORES = 5;
     static constexpr size_t PLAYER_NAME_SIZE = 20;
 

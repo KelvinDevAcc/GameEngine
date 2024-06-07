@@ -92,7 +92,7 @@ void MrHotDogAIComponent::Update()
             // If the enemy is on a floor, they will continue chasing Peter
             // DisplayPath(path);
         }
-        else if (dae::SceneData::GetInstance().IsOnLadder(*m_gameObject))
+        else if (dae::SceneData::GetInstance().IsOnLadderUpDown(*m_gameObject))
         {
             // If the enemy is on a ladder, they will switch to the CLIMBING state
             m_State = State::CLIMBING;
@@ -102,7 +102,7 @@ void MrHotDogAIComponent::Update()
     case State::CLIMBING:
         // Implement climbing behavior
         // For example, you could make the enemy move up or down a ladder
-        if (!dae::SceneData::GetInstance().IsOnLadder(*m_gameObject))
+        if (!dae::SceneData::GetInstance().IsOnLadderUpDown(*m_gameObject))
         {
             // If the enemy has reached the top or bottom of the ladder,
             // they will switch to the CHASING state and continue moving towards Peter's position

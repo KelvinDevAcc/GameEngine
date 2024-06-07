@@ -15,6 +15,7 @@
 #include "GameObject.h"
 #include "GameTime.h"
 #include "EnventQueue.h"
+#include "SceneData.h"
 
 SDL_Window* g_window{};
 
@@ -100,6 +101,8 @@ void dae::Minigin::Run(const std::function<void()>& load)
 		GameTime::Update();
 
 		sceneManager.Update();
+
+		SceneData::GetInstance().Update();
 
 		renderer.Render();
 

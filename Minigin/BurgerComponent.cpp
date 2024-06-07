@@ -73,7 +73,6 @@ float BurgerComponent::GetPlayerMovementOverComponent() const
 void BurgerComponent::DropToNextFloor() {
     const auto& sceneData = dae::SceneData::GetInstance();
     auto* burger = GetGameObject();
-
     // Retrieve the burger's hitbox
     const auto burgerHitBox = burger->GetComponent<HitBox>();
     if (!burgerHitBox) {

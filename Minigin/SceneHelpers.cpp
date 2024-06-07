@@ -41,10 +41,27 @@ void SceneHelpers::CreateLadderUp(dae::Scene* scene, float x, float y, glm::vec2
     hitBox->SetGameObject(ladderObject.get());
     ladderObject->AddComponent(std::move(hitBox));
 
-    dae::SceneData::GetInstance().AddGameObject(ladderObject.get(), dae::GameObjectType::Ladder);
+    dae::SceneData::GetInstance().AddGameObject(ladderObject.get(), dae::GameObjectType::LadderUp);
 
     scene->Add(std::move(ladderObject));
 }
+
+void SceneHelpers::CreateLadderUpDown(dae::Scene* scene, float x, float y, glm::vec2 scale) {
+    auto ladderObject = std::make_unique<dae::GameObject>();
+    auto spriteRenderer = std::make_unique<dae::SpriteRendererComponent>(ladderObject.get(), dae::ResourceManager::GetSprite("ladder_up"));
+    spriteRenderer->SetDimensions(scale.x, scale.y);
+    ladderObject->AddComponent(std::move(spriteRenderer));
+    ladderObject->SetLocalPosition(glm::vec3(x, y, 0.0f));
+
+    auto hitBox = std::make_unique<HitBox>(scale);
+    hitBox->SetGameObject(ladderObject.get());
+    ladderObject->AddComponent(std::move(hitBox));
+
+    dae::SceneData::GetInstance().AddGameObject(ladderObject.get(), dae::GameObjectType::LadderUpDown);
+
+    scene->Add(std::move(ladderObject));
+}
+
 
 void SceneHelpers::CreateLadderDown(dae::Scene* scene, float x, float y, glm::vec2 scale) {
     auto ladderObject = std::make_unique<dae::GameObject>();
@@ -57,7 +74,7 @@ void SceneHelpers::CreateLadderDown(dae::Scene* scene, float x, float y, glm::ve
     hitBox->SetGameObject(ladderObject.get());
     ladderObject->AddComponent(std::move(hitBox));
 
-    dae::SceneData::GetInstance().AddGameObject(ladderObject.get(), dae::GameObjectType::Ladder);
+    dae::SceneData::GetInstance().AddGameObject(ladderObject.get(), dae::GameObjectType::LadderDown);
 
     scene->Add(std::move(ladderObject));
 }
@@ -295,7 +312,7 @@ void SceneHelpers::CreateBurgerBottom(dae::Scene* scene, float x, float y, glm::
     scene->Add(std::move(BurgerBottomObject));
 }
 
-void SceneHelpers::SpawnSauge(dae::Scene* scene, float x, float y, glm::vec2 /*scale*/)
+void SceneHelpers::SpawnSauge(dae::Scene* scene, float x, float y, glm::vec2 scale)
 {
     auto SaugeObject = std::make_unique<dae::GameObject>();
 
@@ -308,11 +325,14 @@ void SceneHelpers::SpawnSauge(dae::Scene* scene, float x, float y, glm::vec2 /*s
 	SaugeObject->AddComponent(std::move(animationComponent));
     SaugeObject->SetLocalPosition(glm::vec3(x, y, 0.0f));
 
-    /*auto hitBox = std::make_unique<HitBox>(scale);
+    auto hitBox = std::make_unique<HitBox>(scale);
     hitBox->SetGameObject(SaugeObject.get());
     SaugeObject->AddComponent(std::move(hitBox));
 
-    auto aiComponent = std::make_unique<MrHotDogAIComponent>(SaugeObject.get());
+    dae::SceneData::GetInstance().AddGameObject(SaugeObject.get(), dae::GameObjectType::enemy);
+
+
+    /*auto aiComponent = std::make_unique<MrHotDogAIComponent>(SaugeObject.get());
     SaugeObject->AddComponent(std::move(aiComponent));*/
 
     scene->Add(std::move(SaugeObject));
@@ -361,9 +381,15 @@ void SceneHelpers::SpawnPickle(dae::Scene* scene, float x, float y, glm::vec2 sc
 }
 
 
-void SceneHelpers::SpawnPlayer(dae::Scene* scene, float x, float y, glm::vec2 /*scale*/)
+void SceneHelpers::SpawnPlayer(dae::Scene* scene, float x, float y, glm::vec2 scale)
 {
     auto PlayerObject = std::make_unique<dae::GameObject>();
+
+    auto Character1Health = std::make_unique<dae::HealthComponent>(100, 3);
+    PlayerObject->AddComponent(std::move(Character1Health));
+
+    auto Character1points = std::make_unique<dae::PointComponent>(0);
+    PlayerObject->AddComponent(std::move(Character1points));
 
     auto spriterenderComponent = std::make_unique<dae::SpriteRendererComponent>(PlayerObject.get(), dae::ResourceManager::GetSprite("chef"));
     spriterenderComponent->SetDimensions(40, 40);
@@ -374,11 +400,14 @@ void SceneHelpers::SpawnPlayer(dae::Scene* scene, float x, float y, glm::vec2 /*
     PlayerObject->AddComponent(std::move(animationComponent));
     PlayerObject->SetLocalPosition(glm::vec3(x, y, 0.0f));
 
-    /*auto hitBox = std::make_unique<HitBox>(scale);
+    auto hitBox = std::make_unique<HitBox>(scale);
     hitBox->SetGameObject(PlayerObject.get());
-    PlayerObject->AddComponent(std::move(hitBox));*/
+    PlayerObject->AddComponent(std::move(hitBox));
 
-    //dae::SceneData::GetInstance().AddGameObject(PlayerObject.get(), dae::GameObjectType::Player);
+    auto PlayerComponent = std::make_unique<game::Player>(PlayerObject.get());
+    PlayerObject->AddComponent(std::move(PlayerComponent));
+
+    dae::SceneData::GetInstance().AddGameObject(PlayerObject.get(), dae::GameObjectType::Player);
 
     scene->Add(std::move(PlayerObject));
 }
@@ -414,8 +443,9 @@ void SceneHelpers::LoadMapIntoScene(const LoadMap& loadMap, dae::Scene* scene, c
                 CreateSolidLadder(scene, posX, posY, scale);
                 break;
             case '^':
-            case '|':
                 CreateLadderUp(scene, posX, posY, scale);
+            case '|':
+                CreateLadderUpDown(scene, posX, posY, scale);
                 break;
             case '_':
                 CreateFloor(scene, posX, posY, scale);
@@ -481,7 +511,7 @@ void SceneHelpers::LoadIngMapIntoScene(const LoadMap& loadMap, dae::Scene* scene
                 SpawnPickle(scene, posX, posY, scale);
                 break;
             case '0':
-                //SpawnPlayer(scene, posX, posY, scale);
+                SpawnPlayer(scene, posX, posY, scale);
                 break;
             default:
                 break;

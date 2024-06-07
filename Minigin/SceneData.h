@@ -7,10 +7,13 @@
 namespace dae {
     enum class GameObjectType {
         Floor,
-        Ladder,
+        LadderUp,
+        LadderUpDown,
+        LadderDown,
         SolidLadder,
         BurgerPart,
         Player,
+        enemy,
         Basket
     };
 
@@ -31,10 +34,13 @@ namespace dae {
         GameObject* GetFloorAt(const glm::vec3& position) const;
 
         bool IsOnFloor(GameObject& player) const;
-        bool IsOnLadder(GameObject& player) const;
+        bool IsOnLadderUp(GameObject& player) const;
+        bool IsOnLadderUpDown(GameObject& player) const;
+        bool IsOnLadderDown(GameObject& player) const;
         bool IsOnSolidLadder(GameObject& player) const;
         bool IsInBasket(GameObject& burger) const;
         bool IsBurgerPartColliding(GameObject& burgerPart) const;
+        bool isOnEnemy(GameObject& burgerPart) const;
 
         bool CanEntityMove(float moveX, float moveY, GameObject& entity) const;
 
@@ -48,14 +54,17 @@ namespace dae {
         SceneData() = default;
 
         std::vector<GameObject*> m_floors;
-        std::vector<GameObject*> m_ladders;
+        std::vector<GameObject*> m_ladderUp;
+        std::vector<GameObject*> m_ladderUpDown;
+        std::vector<GameObject*> m_ladderDown;
         std::vector<GameObject*> m_solidLadders;
         std::vector<GameObject*> m_players;
+        std::vector<GameObject*> m_enemys;
         std::vector<GameObject*> m_burgerParts;
         std::vector<GameObject*> m_baskets;
 
-        void CheckPlayerCollisions();
-        void OnCollision(GameObject* a, GameObject* b, GameObjectType type);
+        //void CheckPlayerCollisions();
+        //void OnCollision(GameObject* a, GameObject* b, GameObjectType type);
 
     };
 }

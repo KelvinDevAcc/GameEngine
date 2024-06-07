@@ -5,6 +5,7 @@
 #include "MenuComponent.h"
 #include "PointComponent.h"
 #include "SceneManager.h"
+#include "SelectNameComponent.h"
 #include "sound_system.h"
 #include "../BugerTime/Player.h"
 
@@ -29,20 +30,21 @@ enum class MovementDirection
 class MoveCommand : public Command
 {
 public:
-    MoveCommand(dae::GameObject* gameObject, float deltaX, float deltaY); // Include MovementDirection parameter
+    MoveCommand(int playerNumber ,float deltaX, float deltaY); // Include MovementDirection parameter
     void Execute() override;
 
 private:
     dae::GameObject* m_gameObject;
     float m_deltaX;
     float m_deltaY;
+    int m_playernum;
 };
 
 
 
 class DamageCommand final : public Command {
 public:
-    DamageCommand(dae::GameObject* gameObject);
+    DamageCommand(int playerNumber);
 
     virtual void Execute() override;
 
@@ -54,7 +56,7 @@ private:
 
 class ScorePointCommand final : public Command {
 public:
-    ScorePointCommand(dae::GameObject* gameObject);
+    ScorePointCommand(int playerNumber);
 
     virtual void Execute() override;
 
@@ -134,4 +136,46 @@ public:
 
 private:
     static dae::MenuComponent* FindMenuComponent();
+};
+
+
+//select name commands
+
+class NavigateUpLetterCommand : public Command
+{
+public:
+    void Execute() override;
+
+private:
+    static SelectNameComponent* FindSelectNameComponent();
+};
+
+class NavigateDownLetterCommand : public Command
+{
+public:
+    void Execute() override;
+
+private:
+    static SelectNameComponent* FindSelectNameComponent();
+};
+
+class SelectOptionLetterCommand : public Command
+{
+public:
+    void Execute() override;
+
+private:
+    static SelectNameComponent* FindSelectNameComponent();
+};
+
+class saveScoreCommand : public Command
+{
+public:
+    void Execute() override;
+
+private:
+    static SelectNameComponent* FindSelectNameComponent();
+
+    std::string m_currentname;
+
 };

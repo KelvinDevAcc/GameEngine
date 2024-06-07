@@ -1,6 +1,11 @@
 #include "PlayerState.h"
+
+#include <iostream>
+#include <ostream>
+
 #include "EnventQueue.h"
 #include "Player.h"
+#include "SceneData.h"
 #include "sound_system.h"
 
 namespace game
@@ -23,6 +28,7 @@ namespace game
         else if (player.m_deltaY < 0) {
             player.m_animationComponent->Play("Walk_Up", true, 0);
         }
+
     }
 
     void MovingState::OnExitState(Player& player)
@@ -34,6 +40,9 @@ namespace game
     //atacking state
     void AttackingState::OnEnterState(Player& player)
     {
+        if (!player.m_pointComponent) {
+            return;
+        }
         player.m_animationComponent->Play("Attacking", false);
 
 		const int newScore = player.m_pointComponent->GetScore() + 100;
@@ -69,7 +78,7 @@ namespace game
 
     void DyingState::Update(Player& player)
     {
-	    if (player.m_healthComponent->GetLives() < 0)
+	    if (player.m_healthComponent->GetHealth() > -1 )
 	    {
             player.Respawn();
 	    }

@@ -1,17 +1,28 @@
 #include "Command.h"
 #include "EnventQueue.h"
+#include "HighScores.h"
+#include "SceneData.h"
 #include "SceneManager.h"
 #include "servicelocator.h"
 #include "../BugerTime/Player.h"
 
 
-MoveCommand::MoveCommand(dae::GameObject* gameObject, float deltaX, float deltaY)
-	: m_gameObject(gameObject), m_deltaX(deltaX), m_deltaY(deltaY)
+MoveCommand::MoveCommand(int playerNumber, float deltaX, float deltaY)
+	: m_deltaX(deltaX), m_deltaY(deltaY)
 {
+	const std::vector<dae::GameObject*> players = dae::SceneData::GetInstance().GetPlayers();
+
+    if (playerNumber >= 0 && playerNumber < static_cast<int>(players.size()))
+    {
+        m_playernum = playerNumber;
+        // Get the selected player using playerNumber
+        m_gameObject = players[playerNumber];
+    }
 }
 
-void MoveCommand::Execute() {
-    if (m_gameObject) {
+void MoveCommand::Execute()
+{
+	if (m_gameObject) {
         // Execute the move action
         m_gameObject->GetComponent<game::Player>()->Move(m_deltaX, m_deltaY);
     }
@@ -19,9 +30,15 @@ void MoveCommand::Execute() {
 
 
 
-DamageCommand::DamageCommand(dae::GameObject* gameObject)
-    : m_gameObject(gameObject)
+DamageCommand::DamageCommand(int playerNumber)
 {
+    const std::vector<dae::GameObject*> players = dae::SceneData::GetInstance().GetPlayers();
+
+    if (playerNumber >= 0 && playerNumber < static_cast<int>(players.size()))
+    {
+        // Get the selected player using playerNumber
+        m_gameObject = players[playerNumber];
+    }
 }
 
 void DamageCommand::Execute()
@@ -31,9 +48,15 @@ void DamageCommand::Execute()
 }
 
 
-ScorePointCommand::ScorePointCommand(dae::GameObject* gameObject)
-    : m_gameObject(gameObject)
+ScorePointCommand::ScorePointCommand(int playerNumber)
 {
+    const std::vector<dae::GameObject*> players = dae::SceneData::GetInstance().GetPlayers();
+
+    if (playerNumber >= 0 && playerNumber < static_cast<int>(players.size()))
+    {
+        // Get the selected player using playerNumber
+        m_gameObject = players[playerNumber];
+    }
 }
 
 void ScorePointCommand::Execute()
@@ -167,6 +190,105 @@ dae::MenuComponent* SelectOptionCommand::FindMenuComponent() {
     for (const auto& obj : objects) {
 	    if (const auto menuComponent = obj->GetComponent<dae::MenuComponent>()) {
             return menuComponent;
+        }
+    }
+    return nullptr;
+}
+
+
+
+void NavigateUpLetterCommand::Execute() {
+    if (const auto SelectName = FindSelectNameComponent()) {
+        dae::Message message;
+
+        message.type = dae::PlaySoundMessageType::deathSound;
+
+        message.arguments.emplace_back(static_cast<sound_id>(20)); // sound ID
+
+        dae::EventQueue::Broadcast(message);
+        SelectName->AddLetter();
+    }
+}
+
+SelectNameComponent* NavigateUpLetterCommand::FindSelectNameComponent() {
+    const auto& sceneManager = dae::SceneManager::GetInstance();
+    const auto& currentScene = sceneManager.GetActiveScene();
+    const auto& objects = currentScene->GetObjects();
+    for (const auto& obj : objects) {
+        if (const auto selectNameComponent = obj->GetComponent<SelectNameComponent>()) {
+            return selectNameComponent;
+        }
+    }
+    return nullptr;
+}
+
+void NavigateDownLetterCommand::Execute() {
+    if (const auto SelectName = FindSelectNameComponent()) {
+        dae::Message message;
+
+        message.type = dae::PlaySoundMessageType::deathSound;
+
+        message.arguments.emplace_back(static_cast<sound_id>(20)); // sound ID
+
+        dae::EventQueue::Broadcast(message);
+        SelectName->SubtractLetter();
+    }
+}
+
+SelectNameComponent* NavigateDownLetterCommand::FindSelectNameComponent() {
+    const auto& sceneManager = dae::SceneManager::GetInstance();
+    const auto& currentScene = sceneManager.GetActiveScene();
+    const auto& objects = currentScene->GetObjects();
+    for (const auto& obj : objects) {
+        if (const auto selectNameComponent = obj->GetComponent<SelectNameComponent>()) {
+            return selectNameComponent;
+        }
+    }
+    return nullptr;
+}
+
+void SelectOptionLetterCommand::Execute() {
+    if (const auto SelectName = FindSelectNameComponent()) {
+        dae::Message message;
+
+        message.type = dae::PlaySoundMessageType::deathSound;
+
+        message.arguments.emplace_back(static_cast<sound_id>(18)); // sound ID
+
+        dae::EventQueue::Broadcast(message);
+        SelectName->ConfirmLetter();
+    }
+}
+
+SelectNameComponent* SelectOptionLetterCommand::FindSelectNameComponent() {
+    const auto& sceneManager = dae::SceneManager::GetInstance();
+    const auto& currentScene = sceneManager.GetActiveScene();
+    const auto& objects = currentScene->GetObjects();
+    for (const auto& obj : objects) {
+        if (const auto selectNameComponent = obj->GetComponent<SelectNameComponent>()) {
+            return selectNameComponent;
+        }
+    }
+    return nullptr;
+}
+
+
+void saveScoreCommand::Execute() {
+    if (const auto SelectName = FindSelectNameComponent()) {
+        m_currentname = SelectName->GetCurrentName();
+
+        HighScores::GetInstance().saveNewScore(m_currentname, 2000);
+		dae::SceneManager::GetInstance().SetActiveScene("ScoreboardScene");
+    }
+}
+
+SelectNameComponent* saveScoreCommand::FindSelectNameComponent() {
+    const auto& sceneManager = dae::SceneManager::GetInstance();
+    const auto& currentScene = sceneManager.GetActiveScene();
+    const auto& objects = currentScene->GetObjects();
+    for (const auto& obj : objects) {
+        if (const auto selectNameComponent = obj->GetComponent<SelectNameComponent>()) {
+            return selectNameComponent;
         }
     }
     return nullptr;

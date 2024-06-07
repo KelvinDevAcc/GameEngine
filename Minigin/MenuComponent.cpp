@@ -14,7 +14,7 @@ namespace dae
         {
             auto optionObject = std::make_unique<GameObject>();
             auto textComponent = std::make_unique<TextComponent>(option, font, m_NormalColor, *optionObject);
-            textComponent->SetGameObject(optionObject.get());
+           // textComponent->SetGameObject(optionObject.get());
             optionObject->AddComponent(std::move(textComponent));
 
             // Adjust the y-coordinate of the local position based on the parent's position

@@ -6,8 +6,8 @@
 
 using namespace dae;
 
-GameController InputManager::m_gameController;
-std::unordered_map<std::pair<unsigned int, KeyState>, std::unique_ptr<Command>> InputManager::m_controllerBindings;
+std::array<GameController, 4> InputManager::m_gameControllers = { GameController(0), GameController(1), GameController(2), GameController(3) };
+std::array<std::unordered_map<std::pair<unsigned int, KeyState>, std::unique_ptr<Command>>, 4> InputManager::m_controllerBindings;
 std::unordered_map<std::pair<unsigned int, KeyState>, std::unique_ptr<Command>> InputManager::m_keyboardBindings;
 
 const Uint8* InputManager::m_PreviousState = SDL_GetKeyboardState(nullptr);
@@ -15,12 +15,13 @@ const Uint8* InputManager::m_CurrentState = SDL_GetKeyboardState(nullptr);
 
 bool InputManager::ProcessInput()
 {
-    m_gameController.UpdateState();
+    for (auto& controller : m_gameControllers)
+    {
+        controller.UpdateState();
+    }
 
     m_PreviousState = m_CurrentState;
-    // Update the current state
     m_CurrentState = SDL_GetKeyboardState(nullptr);
-
 
     SDL_Event e;
     while (SDL_PollEvent(&e))
@@ -41,12 +42,10 @@ bool InputManager::ProcessInput()
         ImGui_ImplSDL2_ProcessEvent(&e);
     }
 
-    
     HandleKeyInput();
-    
     HandleControllerInput();
 
-    return true; 
+    return true;
 }
 
 
@@ -66,16 +65,34 @@ bool InputManager::IsPressed(SDL_Scancode button)
     return m_CurrentState[button];
 }
 
-void InputManager::BindCommand(unsigned int button, KeyState state, std::unique_ptr<Command> command, InputType type)
+void InputManager::BindCommand(unsigned int button, KeyState state, std::unique_ptr<Command> command, InputType type, int controllerIndex)
 {
-    auto& bindings = (type == InputType::Controller) ? m_controllerBindings : m_keyboardBindings;
-    bindings[{button, state}] = std::move(command);
+    if (type == InputType::Controller)
+    {
+        if (controllerIndex < m_controllerBindings.size())
+        {
+            m_controllerBindings[controllerIndex][{button, state}] = std::move(command);
+        }
+    }
+    else
+    {
+        m_keyboardBindings[{button, state}] = std::move(command);
+    }
 }
 
-void InputManager::UnbindCommand(unsigned int button, KeyState state, InputType type)
+void InputManager::UnbindCommand(unsigned int button, KeyState state, InputType type, int controllerIndex)
 {
-    auto& bindings = (type == InputType::Controller) ? m_controllerBindings : m_keyboardBindings;
-    bindings.erase({ button, state });
+    if (type == InputType::Controller)
+    {
+        if (controllerIndex < m_controllerBindings.size())
+        {
+            m_controllerBindings[controllerIndex].erase({ button, state });
+        }
+    }
+    else
+    {
+        m_keyboardBindings.erase({ button, state });
+    }
 }
 
 
@@ -107,32 +124,36 @@ void InputManager::HandleKeyInput(SDL_Scancode keyCode, KeyState state)
     }
 }
 
-void InputManager::HandleControllerInput()
-{
-    for (const auto& binding : m_controllerBindings)
-    {
-        const auto button = binding.first.first;
+void InputManager::HandleControllerInput() {
+    for (int i = 0; i < m_controllerBindings.size(); ++i) {
+        if (m_controllerBindings[i].empty() || !m_gameControllers[i].IsConnected()) {
+            continue; // Skip this iteration if no bindings or controller not connected
+        }
 
-        switch (const auto state = binding.first.second)
-        {
-        case KeyState::Down:
-            if (m_gameController.IsButtonDown(button))
-            {
-                binding.second->Execute();
+        for (const auto& binding : m_controllerBindings[i]) {
+            const auto button = binding.first.first;
+            const auto state = binding.first.second;
+            const auto& command = binding.second;
+
+            switch (state) {
+            case KeyState::Down:
+                if (m_gameControllers[i].IsButtonDown(button)) {
+                    command->Execute();
+                }
+                break;
+            case KeyState::Up:
+                if (m_gameControllers[i].IsButtonUp(button)) {
+                    command->Execute();
+                }
+                break;
+            case KeyState::Pressed:
+                if (m_gameControllers[i].IsButtonPressed(button)) {
+                    command->Execute();
+                }
+                break;
             }
-            break;
-        case KeyState::Up:
-            if (m_gameController.IsButtonUp(button))
-            {
-                binding.second->Execute();
-            }
-            break;
-        case KeyState::Pressed:
-            if (m_gameController.IsButtonPressed(button))
-            {
-                binding.second->Execute();
-            }
-            break;
         }
     }
 }
+
+

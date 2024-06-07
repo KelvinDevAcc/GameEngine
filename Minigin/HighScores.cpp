@@ -1,5 +1,6 @@
 #include "HighScores.h"
 
+#include <algorithm>
 #include <ranges>
 
 HighScores::HighScores() : fileName("highscores.txt") {
@@ -71,14 +72,21 @@ uint32_t HighScores::getTopScore() const {
 }
 
 void HighScores::saveNewScore(const std::string& playerName, uint32_t newScore) {
+    // Add the new score to the high scores
     highScores.emplace_back(std::array<char, PLAYER_NAME_SIZE>(), newScore);
-    std::copy_n(playerName.begin(), PLAYER_NAME_SIZE, highScores.back().first.begin());
+    std::copy_n(playerName.begin(), std::min(playerName.size(), PLAYER_NAME_SIZE), highScores.back().first.begin());
+
+    // Sort the high scores in descending order
     std::ranges::sort(highScores, [](const auto& left, const auto& right) {
         return left.second > right.second;
         });
 
-    highScores.pop_back(); // Remove the lowest score
+    // Remove the lowest score if the number of high scores exceeds the limit
+    if (highScores.size() > NUM_HIGH_SCORES) {
+        highScores.pop_back();
+    }
 
+    // Write the high scores to the file
     std::ofstream file(fileName, std::ios::binary);
     for (const auto& score : highScores) {
         file.write(score.first.data(), PLAYER_NAME_SIZE);

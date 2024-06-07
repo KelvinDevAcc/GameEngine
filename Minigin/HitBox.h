@@ -52,8 +52,8 @@ public:
 
     void Render() const override
     {
-	   const SDL_Rect rect = GetRect(); 
-       dae::Renderer::GetInstance().RenderRect(rect, { 255, 0, 0, 255 }, false);
+		const SDL_Rect rect = GetRect();
+    	dae::Renderer::GetInstance().RenderRect(rect, { 255, 0, 0, 255 }, false);
     }
 
     const std::type_info& GetComponentType() const override {

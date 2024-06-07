@@ -28,6 +28,7 @@ private:
     static void CreatePlatformRight(dae::Scene* scene, float x, float y, glm::vec2 scale);
     static void CreatePlatformCombined(dae::Scene* scene, float x, float y, glm::vec2 scale);
     static void CreateLadderUp(dae::Scene* scene, float x, float y, glm::vec2 scale);
+    static void CreateLadderUpDown(dae::Scene* scene, float x, float y, glm::vec2 scale);
     static void CreateLadderDown(dae::Scene* scene, float x, float y, glm::vec2 scale);
     static void CreateSolidLadder(dae::Scene* scene, float x, float y, glm::vec2 scale);
     static void CreateFloor(dae::Scene* scene, float x, float y, glm::vec2 scale);
