@@ -4,6 +4,7 @@
 #include "SceneData.h"
 #include "SceneManager.h"
 #include "servicelocator.h"
+#include "../BugerTime/GameData.h"
 #include "../BugerTime/Player.h"
 
 
@@ -11,12 +12,30 @@ MoveCommand::MoveCommand(int playerNumber, float deltaX, float deltaY)
 	: m_deltaX(deltaX), m_deltaY(deltaY)
 {
 	const std::vector<dae::GameObject*> players = dae::SceneData::GetInstance().GetPlayers();
+    const std::vector<dae::GameObject*> playerEnemys = dae::SceneData::GetInstance().GetenemyPlayers();
 
-    if (playerNumber >= 0 && playerNumber < static_cast<int>(players.size()))
+    if (playerNumber >= 0 && playerNumber < static_cast<int>(players.size()) + static_cast<int>(playerEnemys.size()))
     {
-        m_playernum = playerNumber;
-        // Get the selected player using playerNumber
-        m_gameObject = players[playerNumber];
+	    if (playerNumber == 1)
+	    {
+		    if (!dae::SceneData::GetInstance().GetenemyPlayers().empty())
+		    {
+                m_gameObject = playerEnemys[0];
+		    }
+            else
+            {
+                m_playerNum = playerNumber;
+                // Get the selected player using playerNumber
+                m_gameObject = players[playerNumber];
+            }
+	    }
+    	else
+	    {
+            m_playerNum = playerNumber;
+            // Get the selected player using playerNumber
+            m_gameObject = players[playerNumber];
+	    }
+        
     }
 }
 
@@ -197,16 +216,14 @@ dae::MenuComponent* SelectOptionCommand::FindMenuComponent() {
 
 
 
+// NavigateUpLetterCommand.cpp
 void NavigateUpLetterCommand::Execute() {
-    if (const auto SelectName = FindSelectNameComponent()) {
+    if (const auto selectName = FindSelectNameComponent()) {
         dae::Message message;
-
         message.type = dae::PlaySoundMessageType::deathSound;
-
         message.arguments.emplace_back(static_cast<sound_id>(20)); // sound ID
-
         dae::EventQueue::Broadcast(message);
-        SelectName->AddLetter();
+        selectName->AddLetter();
     }
 }
 
@@ -216,22 +233,22 @@ SelectNameComponent* NavigateUpLetterCommand::FindSelectNameComponent() {
     const auto& objects = currentScene->GetObjects();
     for (const auto& obj : objects) {
         if (const auto selectNameComponent = obj->GetComponent<SelectNameComponent>()) {
-            return selectNameComponent;
+            if (selectNameComponent->GetPlayerId() == m_PlayerId) {
+                return selectNameComponent;
+            }
         }
     }
     return nullptr;
 }
 
+// NavigateDownLetterCommand.cpp
 void NavigateDownLetterCommand::Execute() {
-    if (const auto SelectName = FindSelectNameComponent()) {
+    if (const auto selectName = FindSelectNameComponent()) {
         dae::Message message;
-
         message.type = dae::PlaySoundMessageType::deathSound;
-
         message.arguments.emplace_back(static_cast<sound_id>(20)); // sound ID
-
         dae::EventQueue::Broadcast(message);
-        SelectName->SubtractLetter();
+        selectName->SubtractLetter();
     }
 }
 
@@ -241,22 +258,22 @@ SelectNameComponent* NavigateDownLetterCommand::FindSelectNameComponent() {
     const auto& objects = currentScene->GetObjects();
     for (const auto& obj : objects) {
         if (const auto selectNameComponent = obj->GetComponent<SelectNameComponent>()) {
-            return selectNameComponent;
+            if (selectNameComponent->GetPlayerId() == m_PlayerId) {
+                return selectNameComponent;
+            }
         }
     }
     return nullptr;
 }
 
+// SelectOptionLetterCommand.cpp
 void SelectOptionLetterCommand::Execute() {
-    if (const auto SelectName = FindSelectNameComponent()) {
+    if (const auto selectName = FindSelectNameComponent()) {
         dae::Message message;
-
         message.type = dae::PlaySoundMessageType::deathSound;
-
         message.arguments.emplace_back(static_cast<sound_id>(18)); // sound ID
-
         dae::EventQueue::Broadcast(message);
-        SelectName->ConfirmLetter();
+        selectName->ConfirmLetter();
     }
 }
 
@@ -266,29 +283,40 @@ SelectNameComponent* SelectOptionLetterCommand::FindSelectNameComponent() {
     const auto& objects = currentScene->GetObjects();
     for (const auto& obj : objects) {
         if (const auto selectNameComponent = obj->GetComponent<SelectNameComponent>()) {
-            return selectNameComponent;
+            if (selectNameComponent->GetPlayerId() == m_PlayerId) {
+                return selectNameComponent;
+            }
         }
     }
     return nullptr;
 }
 
-
+// saveScoreCommand.cpp
 void saveScoreCommand::Execute() {
-    if (const auto SelectName = FindSelectNameComponent()) {
-        m_currentname = SelectName->GetCurrentName();
+    auto& gameData = GameData::GetInstance();
+    int numberOfPlayers = gameData.GetNumberOfPlayers();
 
-        HighScores::GetInstance().saveNewScore(m_currentname, 2000);
-		dae::SceneManager::GetInstance().SetActiveScene("ScoreboardScene");
+    for (int i = 0; i < numberOfPlayers; ++i) {
+        std::string currentName = "";
+        if (const auto selectName = FindSelectNameComponent(i)) {
+            currentName = selectName->GetCurrentName();
+            HighScores::GetInstance().saveNewScore(currentName, gameData.GetPlayerData(i).score);
+        }
+        gameData.ResetPlayerData(i);
     }
+
+    dae::SceneManager::GetInstance().SetActiveScene("ScoreboardScene");
 }
 
-SelectNameComponent* saveScoreCommand::FindSelectNameComponent() {
+SelectNameComponent* saveScoreCommand::FindSelectNameComponent(int playerId) {
     const auto& sceneManager = dae::SceneManager::GetInstance();
     const auto& currentScene = sceneManager.GetActiveScene();
     const auto& objects = currentScene->GetObjects();
     for (const auto& obj : objects) {
         if (const auto selectNameComponent = obj->GetComponent<SelectNameComponent>()) {
-            return selectNameComponent;
+            if (selectNameComponent->GetPlayerId() == playerId) {
+                return selectNameComponent;
+            }
         }
     }
     return nullptr;

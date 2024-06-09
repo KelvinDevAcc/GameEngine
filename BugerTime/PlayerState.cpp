@@ -1,11 +1,9 @@
 #include "PlayerState.h"
-
-#include <iostream>
-#include <ostream>
-
 #include "EnventQueue.h"
+#include "GameData.h"
 #include "Player.h"
 #include "SceneData.h"
+#include "SceneManager.h"
 #include "sound_system.h"
 
 namespace game
@@ -28,6 +26,7 @@ namespace game
         else if (player.m_deltaY < 0) {
             player.m_animationComponent->Play("Walk_Up", true, 0);
         }
+
 
     }
 
@@ -76,17 +75,33 @@ namespace game
         player.m_healthComponent->SetHealth(newHealth);
     }
 
-    void DyingState::Update(Player& player)
+    void DyingState::Update(Player& /*player*/)
     {
-	    if (player.m_healthComponent->GetHealth() > -1 )
-	    {
-            player.Respawn();
-	    }
+	    
     }
 
     void DyingState::OnExitState(Player& player)
     {
         player.m_animationComponent->Stop();
+
+        if (player.m_healthComponent->GetHealth() > -1)
+        {
+            if (dae::SceneData::GetInstance().GetPlayers().size() <= 1)
+            {
+                dae::SceneManager::GetInstance().SetActiveScene("SaveScoreScene");
+            }
+            else
+            {
+                //for (size_t i = 0; i < dae::SceneData::GetInstance().GetPlayers().size(); i++)
+                //{
+                //    //GameData::GetInstance().UpdatePlayerData();
+
+                //}
+                dae::SceneData::GetInstance().RemoveGameObject(player.GetParentObject(), dae::GameObjectType::Player);
+                dae::SceneManager::GetInstance().GetActiveScene()->Remove(player.GetParentObject());
+            }
+            //dae::SceneManager::GetInstance().SetActiveScene("SaveScoreScene");
+        }
     }
 
 

@@ -11,7 +11,7 @@
 class SelectNameComponent : public dae::Component
 {
 public:
-    SelectNameComponent(dae::GameObject* owner, size_t maxLength, dae::Font* font, const SDL_Color& color);
+    SelectNameComponent(dae::GameObject* owner, size_t maxLength, dae::Font* font, const SDL_Color& color, int playerId);
 
     void Update() override;
     void Render() const override;
@@ -20,12 +20,15 @@ public:
     void ConfirmLetter();
     void FinishName();
 
+    int GetPlayerId() const;
+
     std::string GetCurrentName() const;
     char GetCurrentLetter() const;
 
     std::type_info const& GetComponentType() const override { return typeid(SelectNameComponent); }
 
 private:
+    int m_PlayerId;
     size_t m_MaxLength;
     size_t m_CurrentIndex;
     char m_CurrentLetter;

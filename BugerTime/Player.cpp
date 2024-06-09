@@ -1,6 +1,7 @@
 #include "Player.h"
 
 #include "GameTime.h"
+#include "Pepper.h"
 #include "SceneData.h"
 #include "SceneHelpers.h"
 
@@ -15,7 +16,7 @@ namespace game
         m_animationComponent = m_GameObject->GetComponent<dae::AnimationComponent>();
         m_healthComponent = m_GameObject->GetComponent<dae::HealthComponent>();
         m_pointComponent = m_GameObject->GetComponent<dae::PointComponent>();
-
+        m_pepperAttackComponent = m_GameObject->GetComponent<Pepper>();
         m_startPosition = m_GameObject->GetWorldPosition();
 
         SetState(m_idleState.get());
@@ -63,7 +64,7 @@ namespace game
         if (!m_pointComponent) {
             return;
         }
-
+        m_pepperAttackComponent->Activate();
         SetState(m_attackignState.get());
     }
 
@@ -71,7 +72,6 @@ namespace game
         if (!m_healthComponent) {
             return;
         }
-
         SetState(m_dyingState.get());
     }
 
@@ -85,10 +85,6 @@ namespace game
         Idle();
     }
 
-    void Player::SetMap(const LoadMap& map) {
-        m_gameMap = &map;
-    }
-
     void Player::CheckAndMove(float deltaX, float deltaY)
     {
         const auto& sceneData = dae::SceneData::GetInstance();
@@ -99,50 +95,41 @@ namespace game
         const bool isOnSolidLadder = sceneData.IsOnSolidLadder(*m_GameObject);
         const bool isOnFloor = sceneData.IsOnFloor(*m_GameObject);
 
-
         m_deltaX = deltaX * 20 * dae::GameTime::GetDeltaTime();
         m_deltaY = deltaY * 20 * dae::GameTime::GetDeltaTime();
 
+        bool hasMoved = false;
+
         // On ladder up or up-down
-        if (isOnLadderUp) {
-            // Allow vertical movement only if going up and there's no obstruction
-            if (deltaY < 0 && sceneData.CanEntityMove(m_deltaX, m_deltaY, *m_GameObject)) {
-                MoveVertically(m_deltaY);
-                MoveHorizontally(m_deltaX);
-            }
-        }
-        if (isOnLadderDown) {
-            // Allow horizontal movement only if there's no obstruction
-            if (deltaY > 0 && sceneData.CanEntityMove(m_deltaX, deltaY, *m_GameObject)) {
-                MoveHorizontally(m_deltaX);
-                MoveVertically(deltaY);
-            }
-        }
-        // On ladder down or solid ladder or floor
-        if (isOnFloor) {
-            // Allow horizontal movement only if there's no obstruction
-            if (sceneData.CanEntityMove(m_deltaX, 0.0f, *m_GameObject)) {
-                MoveHorizontally(m_deltaX);
-            }
-        }
-        if (isOnSolidLadder) {
-            // Allow horizontal movement only if there's no obstruction
-            if (sceneData.CanEntityMove(0.0f, m_deltaY, *m_GameObject)) {
-                MoveVertically(m_deltaY);
-            }
-        }
-        if (isOnLadderUpDown) {
-            // Allow horizontal movement only if there's no obstruction
-            if (sceneData.CanEntityMove(m_deltaX, m_deltaY, *m_GameObject)) {
-                MoveHorizontally(m_deltaX);
-                MoveVertically(m_deltaY);
-            }
+        if (isOnLadderUp && deltaY < 0 && sceneData.CanEntityMove(m_deltaX, m_deltaY, *m_GameObject)) {
+            MoveVertically(m_deltaY);
+            hasMoved = true;
         }
 
-        // Not on any ladder or floor
-        else {
-            // Set player to idle if neither horizontal nor vertical movement is allowed
-            Idle();
+        else if (isOnLadderDown && deltaY > 0 && sceneData.CanEntityMove(m_deltaX, m_deltaY, *m_GameObject)) {
+            MoveVertically(m_deltaY);
+            hasMoved = true;
+        }
+
+        else if (isOnSolidLadder && sceneData.CanEntityMove(0.0f, m_deltaY, *m_GameObject)) {
+            MoveVertically(m_deltaY);
+            hasMoved = true;
+        }
+
+        else if (isOnLadderUpDown && sceneData.CanEntityMove(0.0f, m_deltaY, *m_GameObject)) {
+            MoveVertically(m_deltaY);
+            hasMoved = true;
+        }
+
+        // On ladder up-down or on floor
+        if ((isOnLadderUp || isOnLadderDown || isOnLadderUpDown || isOnFloor) && sceneData.CanEntityMove(m_deltaX, 0.0f, *m_GameObject)) {
+            MoveHorizontally(m_deltaX);
+            hasMoved = true;
+        }
+
+        // If no movement was performed, set the player to idle
+        if (!hasMoved) {
+            SetState(m_idleState.get());
         }
     }
 

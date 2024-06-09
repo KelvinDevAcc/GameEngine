@@ -19,12 +19,13 @@ namespace dae
 
     void Scene::Remove(GameObject* object)
     {
-        std::erase_if(m_objects,[object](const auto& ptr) { return ptr.get() == object; });
+        std::erase_if(m_objects, [object](const auto& ptr) { return ptr.get() == object; });
     }
 
     void Scene::RemoveAll()
     {
         m_objects.clear();
+
     }
 
     void Scene::Update() const

@@ -15,12 +15,8 @@ public:
 
     static glm::vec2 GetCellSize();
 
-    static glm::vec2 GetGridSize()
-	{
-        glm::vec2 maxCoord = GetMaxCoordinates();
-        glm::vec2 minCoord = GetMinCoordinates();
-        return glm::vec2(maxCoord.x - minCoord.x, maxCoord.y - minCoord.y);
-    }
+    static glm::vec2 GetGridSize();
+    static std::vector<std::vector<char>> GetLoadMap();
 
 private:
     static void CreatePlatformLeft(dae::Scene* scene, float x, float y, glm::vec2 scale);
@@ -45,6 +41,7 @@ private:
     static void SpawnPickle(dae::Scene* scene, float x, float y, glm::vec2 scale);
 
     static void SpawnPlayer(dae::Scene* scene, float x, float y, glm::vec2 scale);
+    static void SpawnPlayerEnemy(dae::Scene* scene, float x, float y, glm::vec2 scale);
 
 
 };

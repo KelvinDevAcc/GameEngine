@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "HealthComponent.h"
 #include "LoadMap.h"
+#include "Pepper.h"
 #include "PlayerState.h" 
 #include "PointComponent.h"
 
@@ -38,7 +39,6 @@ namespace game
 
         void Respawn();
 
-        void SetMap(const LoadMap& map);
 
         dae::GameObject* GetParentObject() const { return m_GameObject; }
 
@@ -62,14 +62,14 @@ namespace game
 
         dae::HealthComponent* m_healthComponent{};
         dae::PointComponent* m_pointComponent{};
-
+        Pepper* m_pepperAttackComponent{};
         dae::AnimationComponent* m_animationComponent{};
 
         glm::vec3 m_startPosition{};
 
         float m_timeSinceLastAction;
         float m_inactivityThreshold;
-        
+
         const LoadMap* m_gameMap; // Reference to the map
 
         void CheckAndMove(float deltaX, float deltaY);

@@ -6,12 +6,18 @@
 #include "ResourceManager.h"
 #include "SceneData.h"
 #include "SpriteRendererComponent.h"
+#include "../BugerTime/EnemyComponent.h"
+#include "../BugerTime/GameData.h"
 #include "../BugerTime/Player.h"
 #include "../BugerTime/MrHotDogAIComponent.h"
+#include "../BugerTime/MrPickleAIComponent.h"
+#include "../BugerTime/Pepper.h"
 
 glm::vec2 s_MinCoordinates;
 glm::vec2 s_MaxCoordinates; 
-glm::vec2 s_CellSize; 
+glm::vec2 s_CellSize;
+int playerCount;
+std::vector<std::vector<char>> s_loadMap;
 
 void SceneHelpers::CreateFloor(dae::Scene* scene, float x, float y, glm::vec2 scale) {
     auto floorObject = std::make_unique<dae::GameObject>();
@@ -332,8 +338,12 @@ void SceneHelpers::SpawnSauge(dae::Scene* scene, float x, float y, glm::vec2 sca
     dae::SceneData::GetInstance().AddGameObject(SaugeObject.get(), dae::GameObjectType::enemy);
 
 
-    /*auto aiComponent = std::make_unique<MrHotDogAIComponent>(SaugeObject.get());
-    SaugeObject->AddComponent(std::move(aiComponent));*/
+   /* auto aiComponent = std::make_unique<MrHotDogAIComponent>(SaugeObject.get(), s_loadMap);
+    SaugeObject->AddComponent(std::move(aiComponent));
+
+    auto enemyComponent = std::make_unique<game::EnemyComponent>(SaugeObject.get(),scene);
+    SaugeObject->AddComponent(std::move(enemyComponent));*/
+
 
     scene->Add(std::move(SaugeObject));
 }
@@ -355,41 +365,68 @@ void SceneHelpers::SpawnEgg(dae::Scene* scene, float x, float y, glm::vec2 scale
     hitBox->SetGameObject(EggObject.get());
     EggObject->AddComponent(std::move(hitBox));
 
+    dae::SceneData::GetInstance().AddGameObject(EggObject.get(), dae::GameObjectType::enemy);
+
+    auto aiComponent = std::make_unique<MrHotDogAIComponent>(EggObject.get(), s_loadMap);
+    EggObject->AddComponent(std::move(aiComponent));
+
+    auto enemyComponent = std::make_unique<game::EnemyComponent>(EggObject.get(), scene);
+    EggObject->AddComponent(std::move(enemyComponent));
+
 
     scene->Add(std::move(EggObject));
 }
 
 void SceneHelpers::SpawnPickle(dae::Scene* scene, float x, float y, glm::vec2 scale)
 {
-    auto EggObject = std::make_unique<dae::GameObject>();
+    auto PickleObject = std::make_unique<dae::GameObject>();
 
-    auto spriterenderComponent = std::make_unique<dae::SpriteRendererComponent>(EggObject.get(), dae::ResourceManager::GetSprite("egg"));
+    auto spriterenderComponent = std::make_unique<dae::SpriteRendererComponent>(PickleObject.get(), dae::ResourceManager::GetSprite("Pickle"));
     spriterenderComponent->SetDimensions(40, 40);
-    EggObject->AddComponent(std::move(spriterenderComponent));
+    PickleObject->AddComponent(std::move(spriterenderComponent));
 
-    auto animationComponent = std::make_unique<dae::AnimationComponent>(EggObject.get(), EggObject->GetComponent<dae::SpriteRendererComponent>(), "Idle");
+    auto animationComponent = std::make_unique<dae::AnimationComponent>(PickleObject.get(), PickleObject->GetComponent<dae::SpriteRendererComponent>(), "Idle");
     animationComponent->Play("Stunned", true);
-    EggObject->AddComponent(std::move(animationComponent));
-    EggObject->SetLocalPosition(glm::vec3(x, y, 0.0f));
+    PickleObject->AddComponent(std::move(animationComponent));
+    PickleObject->SetLocalPosition(glm::vec3(x, y, 0.0f));
 
     auto hitBox = std::make_unique<HitBox>(scale);
-    hitBox->SetGameObject(EggObject.get());
-    EggObject->AddComponent(std::move(hitBox));
+    hitBox->SetGameObject(PickleObject.get());
+    PickleObject->AddComponent(std::move(hitBox));
+
+    dae::SceneData::GetInstance().AddGameObject(PickleObject.get(), dae::GameObjectType::enemy);
+
+    auto aiComponent = std::make_unique<MrPickleAIComponent>(PickleObject.get(), s_loadMap);
+    PickleObject->AddComponent(std::move(aiComponent));
+
+    auto enemyComponent = std::make_unique<game::EnemyComponent>(PickleObject.get(), scene);
+    PickleObject->AddComponent(std::move(enemyComponent));
 
 
-    scene->Add(std::move(EggObject));
+    scene->Add(std::move(PickleObject));
 }
 
 
 void SceneHelpers::SpawnPlayer(dae::Scene* scene, float x, float y, glm::vec2 scale)
 {
+    int score;
+    int lives;
     auto PlayerObject = std::make_unique<dae::GameObject>();
+    if (GameData::GetInstance().GetPlayerData(playerCount).score != 0)
+        score = GameData::GetInstance().GetPlayerData(playerCount).score;
+    else
+        score = 0;
 
-    auto Character1Health = std::make_unique<dae::HealthComponent>(100, 3);
-    PlayerObject->AddComponent(std::move(Character1Health));
-
-    auto Character1points = std::make_unique<dae::PointComponent>(0);
+    auto Character1points = std::make_unique<dae::PointComponent>(score);
     PlayerObject->AddComponent(std::move(Character1points));
+
+    if (GameData::GetInstance().GetPlayerData(playerCount).lives != 3)
+        lives = GameData::GetInstance().GetPlayerData(playerCount).lives;
+    else
+        lives = 3;
+
+    auto Character1Health = std::make_unique<dae::HealthComponent>(100, lives);
+    PlayerObject->AddComponent(std::move(Character1Health));
 
     auto spriterenderComponent = std::make_unique<dae::SpriteRendererComponent>(PlayerObject.get(), dae::ResourceManager::GetSprite("chef"));
     spriterenderComponent->SetDimensions(40, 40);
@@ -407,14 +444,61 @@ void SceneHelpers::SpawnPlayer(dae::Scene* scene, float x, float y, glm::vec2 sc
     auto PlayerComponent = std::make_unique<game::Player>(PlayerObject.get());
     PlayerObject->AddComponent(std::move(PlayerComponent));
 
+    auto Pepercomponent = std::make_unique<Pepper>(PlayerObject.get(), glm::vec3(1.f,0.f,0.f),10.f,12.f);
+    PlayerObject->AddComponent(std::move(Pepercomponent));
+
     dae::SceneData::GetInstance().AddGameObject(PlayerObject.get(), dae::GameObjectType::Player);
 
+    scene->Add(std::move(PlayerObject));
+
+}
+
+void SceneHelpers::SpawnPlayerEnemy(dae::Scene* scene, float x, float y, glm::vec2 scale)
+{
+    auto PlayerObject = std::make_unique<dae::GameObject>();
+
+    auto Character1Health = std::make_unique<dae::HealthComponent>(100, 3);
+    PlayerObject->AddComponent(std::move(Character1Health));
+
+    auto Character1points = std::make_unique<dae::PointComponent>(0);
+    PlayerObject->AddComponent(std::move(Character1points));
+
+    auto spriterenderComponent = std::make_unique<dae::SpriteRendererComponent>(PlayerObject.get(), dae::ResourceManager::GetSprite("sausage"));
+    spriterenderComponent->SetDimensions(40, 40);
+    PlayerObject->AddComponent(std::move(spriterenderComponent));
+
+    auto animationComponent = std::make_unique<dae::AnimationComponent>(PlayerObject.get(), PlayerObject->GetComponent<dae::SpriteRendererComponent>(), "Idle");
+    animationComponent->Play("Idle", true);
+    PlayerObject->AddComponent(std::move(animationComponent));
+    PlayerObject->SetLocalPosition(glm::vec3(x, y, 0.0f));
+
+    auto hitBox = std::make_unique<HitBox>(scale);
+    hitBox->SetGameObject(PlayerObject.get());
+    PlayerObject->AddComponent(std::move(hitBox));
+
+    auto PlayerComponent = std::make_unique<game::Player>(PlayerObject.get());
+    PlayerObject->AddComponent(std::move(PlayerComponent));
+
+    dae::SceneData::GetInstance().AddGameObject(PlayerObject.get(), dae::GameObjectType::enemyPlayers);
+
+
+    auto tempobject = std::make_unique<dae::GameObject>();
+
+    auto tempobjecthitBox = std::make_unique<HitBox>(scale);
+    tempobjecthitBox->SetGameObject(tempobject.get());
+    tempobject->AddComponent(std::move(tempobjecthitBox));
+
+    tempobject->SetParent(PlayerObject.get());
+    dae::SceneData::GetInstance().AddGameObject(tempobject.get(), dae::GameObjectType::enemy);
+
+    scene->Add(std::move(tempobject));
     scene->Add(std::move(PlayerObject));
 }
 
 
 void SceneHelpers::LoadMapIntoScene(const LoadMap& loadMap, dae::Scene* scene, const glm::vec3& startPos, glm::vec2 scale) {
     const auto& map = loadMap.getMap();
+    s_loadMap = map;
 
     // Initialize variables to store the minimum and maximum X and Y coordinates
     s_MinCoordinates.x = startPos.x;
@@ -444,6 +528,7 @@ void SceneHelpers::LoadMapIntoScene(const LoadMap& loadMap, dae::Scene* scene, c
                 break;
             case '^':
                 CreateLadderUp(scene, posX, posY, scale);
+                break;
             case '|':
                 CreateLadderUpDown(scene, posX, posY, scale);
                 break;
@@ -473,8 +558,6 @@ void SceneHelpers::LoadMapIntoScene(const LoadMap& loadMap, dae::Scene* scene, c
 void SceneHelpers::LoadIngMapIntoScene(const LoadMap& loadMap, dae::Scene* scene, const glm::vec3& startPos,glm::vec2 scale)
 {
     const auto& map = loadMap.getIngMap();
-
-    // Initialize variables to store the maximum X and Y coordinates
 
     for (int y = 0; y < static_cast<int>(map.size()); ++y) {
         for (int x = 0; x < static_cast<int>(map[y].size()); ++x) {
@@ -512,12 +595,18 @@ void SceneHelpers::LoadIngMapIntoScene(const LoadMap& loadMap, dae::Scene* scene
                 break;
             case '0':
                 SpawnPlayer(scene, posX, posY, scale);
+                playerCount += 1;
+                break;
+            case '1':
+                SpawnPlayerEnemy(scene, posX, posY, scale);
                 break;
             default:
                 break;
             }
         }
     }
+
+    playerCount = 0;
 
 }
 
@@ -534,6 +623,17 @@ glm::vec2 SceneHelpers::GetMinCoordinates()
 glm::vec2 SceneHelpers::GetCellSize()
 {
     return s_CellSize;
+}
+glm::vec2 SceneHelpers::GetGridSize()
+{
+    glm::vec2 maxCoord = GetMaxCoordinates();
+    glm::vec2 minCoord = GetMinCoordinates();
+    return glm::vec2(maxCoord.x - minCoord.x, maxCoord.y - minCoord.y);
+}
+
+std::vector<std::vector<char>> SceneHelpers::GetLoadMap()
+{
+    return s_loadMap;
 }
 
 

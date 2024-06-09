@@ -1,6 +1,10 @@
 #include "InputManager.h"
 
+#include <chrono>
+#include <iostream>
+#include <ostream>
 #include <SDL.h>
+#include <thread>
 
 #include "backends/imgui_impl_sdl2.h"
 
@@ -69,7 +73,7 @@ void InputManager::BindCommand(unsigned int button, KeyState state, std::unique_
 {
     if (type == InputType::Controller)
     {
-        if (controllerIndex < m_controllerBindings.size())
+        if (controllerIndex < static_cast<int>(m_controllerBindings.size()))
         {
             m_controllerBindings[controllerIndex][{button, state}] = std::move(command);
         }
@@ -80,13 +84,29 @@ void InputManager::BindCommand(unsigned int button, KeyState state, std::unique_
     }
 }
 
-void InputManager::UnbindCommand(unsigned int button, KeyState state, InputType type, int controllerIndex)
+void InputManager::UnbindCommand(unsigned int button, KeyState state, InputType type)
 {
     if (type == InputType::Controller)
     {
-        if (controllerIndex < m_controllerBindings.size())
+        for (auto& bindings : m_controllerBindings)
         {
-            m_controllerBindings[controllerIndex].erase({ button, state });
+            if (bindings.empty()) {
+                continue; // Skip this iteration if no bindings or controller not connected
+            }
+
+            for (auto it = bindings.begin(); it != bindings.end();)
+            {
+                const auto& binding = *it;
+
+                if (binding.first.first == button && binding.first.second == state)
+                {
+                    it = bindings.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
+            }
         }
     }
     else
@@ -124,31 +144,42 @@ void InputManager::HandleKeyInput(SDL_Scancode keyCode, KeyState state)
     }
 }
 
+int InputManager::GetConnectedControllerCount()
+{
+    int connectedCount = 0;
+    for (const auto& controller : m_gameControllers)
+    {
+        if (controller.IsConnected())
+        {
+            connectedCount++;
+        }
+    }
+    return connectedCount;
+}
+
 void InputManager::HandleControllerInput() {
-    for (int i = 0; i < m_controllerBindings.size(); ++i) {
-        if (m_controllerBindings[i].empty() || !m_gameControllers[i].IsConnected()) {
-            continue; // Skip this iteration if no bindings or controller not connected
+    for (int i = 0; i <static_cast<int>(m_gameControllers.size()); ++i) {
+        if (!m_gameControllers[i].IsConnected()) {
+            continue; // Skip disconnected controllers
         }
 
         for (const auto& binding : m_controllerBindings[i]) {
             const auto button = binding.first.first;
-            const auto state = binding.first.second;
-            const auto& command = binding.second;
 
-            switch (state) {
-            case KeyState::Down:
+            switch (const auto state = binding.first.second) {
+            case KeyState::Down: // Added namespace qualifier
                 if (m_gameControllers[i].IsButtonDown(button)) {
-                    command->Execute();
+                    binding.second->Execute();
                 }
                 break;
-            case KeyState::Up:
+            case KeyState::Up: // Added namespace qualifier
                 if (m_gameControllers[i].IsButtonUp(button)) {
-                    command->Execute();
+                    binding.second->Execute();
                 }
                 break;
-            case KeyState::Pressed:
+            case KeyState::Pressed: // Added namespace qualifier
                 if (m_gameControllers[i].IsButtonPressed(button)) {
-                    command->Execute();
+                    binding.second->Execute();
                 }
                 break;
             }

@@ -25,9 +25,10 @@ namespace dae {
         static bool IsDownThisFrame(SDL_Scancode button);
         static bool IsUpThisFrame(SDL_Scancode button);
         static bool IsPressed(SDL_Scancode button);
+        static int  GetConnectedControllerCount();
 
         void BindCommand(unsigned int button, KeyState state, std::unique_ptr<Command> command, InputType type, int controllerIndex = 0);
-        void UnbindCommand(unsigned int button, KeyState state, InputType type, int controllerIndex = 0);
+        void UnbindCommand(unsigned int button, KeyState state, InputType type);
 
     private:
         static void HandleKeyInput();

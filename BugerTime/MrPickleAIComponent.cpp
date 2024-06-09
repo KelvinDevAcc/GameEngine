@@ -1,15 +1,16 @@
-#include "MrHotDogAIComponent.h"
-
-#include <iostream>
-#include <queue>
+#include "MrPickleAIComponent.h"
+#include <random>
 #include <unordered_set>
 
 #include "GameObject.h"
+#include "GameTime.h"
 #include "SceneData.h"
 #include "SceneHelpers.h"
 
-MrHotDogAIComponent::MrHotDogAIComponent(dae::GameObject* owner, std::vector<std::vector<char>>& loadMap)
-    : m_map(loadMap)
+#include <glm/gtx/rotate_vector.hpp>
+
+MrPickleAIComponent::MrPickleAIComponent(dae::GameObject* owner, std::vector<std::vector<char>>& loadMap)
+    : m_flipTimer(0.0f), m_flipDuration(4.0f), m_map(loadMap)
 {
     m_gameObject = owner;
     m_startNode = nullptr;
@@ -50,7 +51,7 @@ MrHotDogAIComponent::MrHotDogAIComponent(dae::GameObject* owner, std::vector<std
 
 }
 
-std::vector<SDL_Rect*> MrHotDogAIComponent::CalculatePathToPeter(const glm::vec3& position)
+std::vector<SDL_Rect*> MrPickleAIComponent::CalculatePathToPeter(const glm::vec3& position)
 {
     m_path.clear();
     const int startX = static_cast<int>((position.x - m_minCoords.x) / m_cellSize.x);
@@ -95,7 +96,7 @@ std::vector<SDL_Rect*> MrHotDogAIComponent::CalculatePathToPeter(const glm::vec3
 
     while (!openSet.empty()) {
         auto currentNode = *std::ranges::min_element(openSet,
-                                                     [&](const auto& a, const auto& b) { return fScore[a] < fScore[b]; });
+            [&](const auto& a, const auto& b) { return fScore[a] < fScore[b]; });
 
         if (currentNode == std::make_pair(goalX, goalY)) {
             path = ReconstructPath(cameFrom, { goalX, goalY });
@@ -125,7 +126,7 @@ std::vector<SDL_Rect*> MrHotDogAIComponent::CalculatePathToPeter(const glm::vec3
     return path;
 }
 
-void MrHotDogAIComponent::Update()
+void MrPickleAIComponent::Update()
 {
     const auto position = m_gameObject->GetWorldPosition();
 
@@ -139,34 +140,57 @@ void MrHotDogAIComponent::Update()
     }
 
     // Move along the path
-   if (!m_path.empty())
-   {
-       // Get the next position in the path
-       SDL_Rect* nextPosition = m_path.front().get();
-       glm::vec3 nextPositionWorld(nextPosition->x + nextPosition->w / 2.0f, nextPosition->y + nextPosition->h / 2.0f, 0.0f); // Center of the next position
+    if (!m_path.empty())
+    {
+        // Get the next position in the path
+        SDL_Rect* nextPosition = m_path.front().get();
+        glm::vec3 nextPositionWorld(nextPosition->x + nextPosition->w / 2.0f, nextPosition->y + nextPosition->h / 2.0f, 0.0f); // Center of the next position
 
-       // Calculate movement direction
-       glm::vec3 direction = glm::normalize(nextPositionWorld - position);
+        // Calculate movement direction
+        glm::vec3 direction = glm::normalize(nextPositionWorld - position);
 
-       // Calculate the movement amount based on the character's speed and frame time
-       float movementAmount = m_movementSpeed * dae::GameTime::GetDeltaTime(); // Adjust m_movementSpeed as needed
+        // Introduce randomness to movement direction
+        if (m_flipTimer <= 0.0f)
+        {
+            // Generate random angle to flip direction along the x-y plane
+            static std::default_random_engine engine(std::random_device{}());
+            static std::uniform_real_distribution<float> distribution(-glm::pi<float>() / 2.0f, glm::pi<float>() / 2.0f); // Adjust the range as needed
+            const float angle = distribution(engine);
 
-       m_moveDirection = direction;
-       // Move the character towards the next position
-       glm::vec3 newPosition = position + direction * movementAmount;
-       m_gameObject->SetLocalPosition(newPosition);
+            // Rotate direction vector in the x-y plane
+            glm::vec2 directionXY(direction.x, direction.y);
+            directionXY = glm::rotate(directionXY, angle);
 
-       // Check if the character has reached the next position
-       if (glm::distance(newPosition, nextPositionWorld) < movementAmount)
-       {
-           // Remove the reached position from the path
-           m_path.erase(m_path.begin());
-       }
-   }
-       
+            // Update direction vector components
+            direction.x = directionXY.x;
+            direction.y = directionXY.y;
+
+            // Reset flip timer
+            m_flipTimer = m_flipDuration;
+        }
+
+        m_moveDirection = direction;
+
+        // Calculate the movement amount based on the character's speed and frame time
+        float movementAmount = m_movementSpeed * dae::GameTime::GetDeltaTime(); // Adjust m_movementSpeed as needed
+
+        // Move the character towards the next position
+        glm::vec3 newPosition = position + direction * movementAmount;
+        m_gameObject->SetLocalPosition(newPosition);
+
+        // Check if the character has reached the next position
+        if (glm::distance(newPosition, nextPositionWorld) < movementAmount)
+        {
+            // Remove the reached position from the path
+            m_path.erase(m_path.begin());
+        }
+
+        // Decrease flip timer
+        m_flipTimer -= dae::GameTime::GetDeltaTime();
+    }
 }
 
-bool MrHotDogAIComponent::IsCellWalkable(int x, int y) const {
+bool MrPickleAIComponent::IsCellWalkable(int x, int y) const {
     if (x < 0 || x >= m_numCellsX || y < 0 || y >= m_numCellsY) {
         return false;
     }
@@ -183,7 +207,7 @@ bool MrHotDogAIComponent::IsCellWalkable(int x, int y) const {
     }
 }
 
-std::vector<std::pair<int, int>> MrHotDogAIComponent::GetNeighbors(const std::pair<int, int>& node) const {
+std::vector<std::pair<int, int>> MrPickleAIComponent::GetNeighbors(const std::pair<int, int>& node) const {
     std::vector<std::pair<int, int>> neighbors;
 
     // Define possible movements: up, down, left, right
@@ -205,7 +229,7 @@ std::vector<std::pair<int, int>> MrHotDogAIComponent::GetNeighbors(const std::pa
     return neighbors;
 }
 
-std::vector<SDL_Rect*> MrHotDogAIComponent::ReconstructPath(const std::unordered_map<std::pair<int, int>, std::pair<int, int>, PairHash>& cameFrom, const std::pair<int, int>& current)
+std::vector<SDL_Rect*> MrPickleAIComponent::ReconstructPath(const std::unordered_map<std::pair<int, int>, std::pair<int, int>, PairHash>& cameFrom, const std::pair<int, int>& current)
 {
     std::vector<SDL_Rect*> path;
     std::pair<int, int> currentPair = current;
@@ -221,7 +245,7 @@ std::vector<SDL_Rect*> MrHotDogAIComponent::ReconstructPath(const std::unordered
 }
 
 
-float MrHotDogAIComponent::GetCost(const std::pair<int, int>& next) const {
+float MrPickleAIComponent::GetCost(const std::pair<int, int>& next) const {
     int x = next.first;
     int y = next.second;
 
@@ -240,7 +264,7 @@ float MrHotDogAIComponent::GetCost(const std::pair<int, int>& next) const {
     return baseCost;
 }
 
-float MrHotDogAIComponent::GetHeuristicCost(const std::pair<int, int>& pNodeA, const std::pair<int, int>& pNodeB)
+float MrPickleAIComponent::GetHeuristicCost(const std::pair<int, int>& pNodeA, const std::pair<int, int>& pNodeB)
 {
     int dx = abs(pNodeA.first - pNodeB.first);
     int dy = abs(pNodeA.second - pNodeB.second);

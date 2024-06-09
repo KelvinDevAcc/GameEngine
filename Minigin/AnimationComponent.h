@@ -15,7 +15,6 @@ namespace dae
         void Stop();
         void SetRenderScale(float scaleX, float scaleY);
         void FlipSprite(bool flipHorizontally, bool flipVertically) const;
-
         std::type_info const& GetComponentType() const override { return typeid(AnimationComponent); }
 
     private:

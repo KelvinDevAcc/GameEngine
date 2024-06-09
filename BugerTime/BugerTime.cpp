@@ -15,6 +15,7 @@
 #include "TextComponent.h"
 #include "GameObject.h"
 #include "Command.h"
+#include "GameData.h"
 #include "InputManager.h"
 #include "HealthComponent.h"
 #include "HighScores.h"
@@ -166,47 +167,118 @@ void LoadResources()
         11,  // rowCount
         15,  // colCount
         {
-            { "PickleIdle", { { { 1, 4 }}, 1 } },
-            { "PickleWalk_Right", { { { 2, 4 }, { 3, 4 } }, 2 } },
-            { "PickleWalk_Left", { { { 2, 4 }, { 3, 4 } }, 2 } },
-            { "PickleWalk_Up", { { { 4, 4 }, { 5, 4 } }, 2 } },
-            { "PickleWalk_Down", { { { 0, 4 }, { 1, 4 } }, 2 } },
-            { "PickleDying", { { { 0, 5 }, { 1, 5 }, { 2, 5 }, { 3, 5 } }, 1 } },
-            { "PickleStunned", { { { 4, 5 }, { 5, 5 } }, 1 } }
+            { "Idle", { { { 1, 4 }}, 1 } },
+            { "Walk_Right", { { { 2, 4 }, { 3, 4 } }, 2 } },
+            { "Walk_Left", { { { 2, 4 }, { 3, 4 } }, 2 } },
+            { "Walk_Up", { { { 4, 4 }, { 5, 4 } }, 2 } },
+            { "Walk_Down", { { { 0, 4 }, { 1, 4 } }, 2 } },
+            { "Dying", { { { 0, 5 }, { 1, 5 }, { 2, 5 }, { 3, 5 } }, 1 } },
+            { "Stunned", { { { 4, 5 }, { 5, 5 } }, 1 } }
+        });
+
+    dae::ResourceManager::LoadSprite("Pepper",
+        "Arcade - Burger Time - Characters & Objects-white.png",
+        11,  // rowCount
+        15,  // colCount
+        {
+            { "ShakeCloud", { { { 11, 1 }, {12,1}, {13,1}, {14,1}}, 1 } },
         });
 
 }
 
-void HandlePlayerInput(dae::InputManager& inputManager, int playerId, int controllerIndex = 0)
-{
-    if (playerId == 0) {
-        // Player 1: Keyboard
-        inputManager.BindCommand(SDL_SCANCODE_W, KeyState::Pressed, std::make_unique<MoveCommand>(0, 0.0f, -1.5f), InputType::Keyboard);
-        inputManager.BindCommand(SDL_SCANCODE_S, KeyState::Pressed, std::make_unique<MoveCommand>(0, 0.0f, 1.5f), InputType::Keyboard);
-        inputManager.BindCommand(SDL_SCANCODE_A, KeyState::Pressed, std::make_unique<MoveCommand>(0, -1.5f, 0.0f), InputType::Keyboard);
-        inputManager.BindCommand(SDL_SCANCODE_D, KeyState::Pressed, std::make_unique<MoveCommand>(0, 1.5f, 0.0f), InputType::Keyboard);
-        inputManager.BindCommand(SDL_SCANCODE_X, KeyState::Up, std::make_unique<ScorePointCommand>(0), InputType::Keyboard);
-        inputManager.BindCommand(SDL_SCANCODE_Z, KeyState::Up, std::make_unique<ScorePointCommand>(0), InputType::Keyboard);
-        inputManager.BindCommand(SDL_SCANCODE_C, KeyState::Up, std::make_unique<DamageCommand>(0), InputType::Keyboard);
+void BindKeyboardCommands(dae::InputManager& inputManager, int playerId) {
+    inputManager.BindCommand(SDL_SCANCODE_W, KeyState::Pressed, std::make_unique<MoveCommand>(playerId, 0.0f, -1.5f), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_S, KeyState::Pressed, std::make_unique<MoveCommand>(playerId, 0.0f, 1.5f), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_A, KeyState::Pressed, std::make_unique<MoveCommand>(playerId, -1.5f, 0.0f), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_D, KeyState::Pressed, std::make_unique<MoveCommand>(playerId, 1.5f, 0.0f), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_X, KeyState::Up, std::make_unique<ScorePointCommand>(playerId), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_Z, KeyState::Up, std::make_unique<ScorePointCommand>(playerId), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_C, KeyState::Up, std::make_unique<DamageCommand>(playerId), InputType::Keyboard);
+}
 
-        // Player 1: Controller
-        inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadUp), KeyState::Pressed, std::make_unique<MoveCommand>(0, 0.0f, -1.5f), InputType::Controller, controllerIndex);
-        inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadDown), KeyState::Pressed, std::make_unique<MoveCommand>(0, 0.0f, 1.5f), InputType::Controller, controllerIndex);
-        inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadLeft), KeyState::Pressed, std::make_unique<MoveCommand>(0, -1.5f, 0.0f), InputType::Controller, controllerIndex);
-        inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadRight), KeyState::Pressed, std::make_unique<MoveCommand>(0, 1.5f, 0.0f), InputType::Controller, controllerIndex);
-        inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::A), KeyState::Up, std::make_unique<ScorePointCommand>(0), InputType::Controller, controllerIndex);
-        inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::B), KeyState::Up, std::make_unique<ScorePointCommand>(0), InputType::Controller, controllerIndex);
-        inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::X), KeyState::Up, std::make_unique<DamageCommand>(0), InputType::Controller, controllerIndex);
+void BindControllerCommands(dae::InputManager& inputManager, int playerId, int controllerIndex) {
+    inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadUp), KeyState::Pressed, std::make_unique<MoveCommand>(playerId, 0.0f, -1.5f), InputType::Controller, controllerIndex);
+    inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadDown), KeyState::Pressed, std::make_unique<MoveCommand>(playerId, 0.0f, 1.5f), InputType::Controller, controllerIndex);
+    inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadLeft), KeyState::Pressed, std::make_unique<MoveCommand>(playerId, -1.5f, 0.0f), InputType::Controller, controllerIndex);
+    inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadRight), KeyState::Pressed, std::make_unique<MoveCommand>(playerId, 1.5f, 0.0f), InputType::Controller, controllerIndex);
+    inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::A), KeyState::Up, std::make_unique<ScorePointCommand>(playerId), InputType::Controller, controllerIndex);
+    inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::B), KeyState::Up, std::make_unique<ScorePointCommand>(playerId), InputType::Controller, controllerIndex);
+    inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::X), KeyState::Up, std::make_unique<DamageCommand>(playerId), InputType::Controller, controllerIndex);
+}
+void HandlePlayerInput(dae::InputManager& inputManager, int playerId)
+{
+	
+    const int numControllers = inputManager.GetConnectedControllerCount();
+
+    // Bind keyboard commands for Player 0 (always)
+    if (playerId == 0)
+    {
+        BindKeyboardCommands(inputManager, 0);
     }
-    else if (playerId == 1) {
-        // Player 2: Controller
-        inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadUp), KeyState::Pressed, std::make_unique<MoveCommand>(1, 0.0f, -1.5f), InputType::Controller, controllerIndex);
-        inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadDown), KeyState::Pressed, std::make_unique<MoveCommand>(1, 0.0f, 1.5f), InputType::Controller, controllerIndex);
-        inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadLeft), KeyState::Pressed, std::make_unique<MoveCommand>(1, -1.5f, 0.0f), InputType::Controller, controllerIndex);
-        inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadRight), KeyState::Pressed, std::make_unique<MoveCommand>(1, 1.5f, 0.0f), InputType::Controller, controllerIndex);
-        inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::A), KeyState::Up, std::make_unique<ScorePointCommand>(1), InputType::Controller, controllerIndex);
-        inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::B), KeyState::Up, std::make_unique<ScorePointCommand>(1), InputType::Controller, controllerIndex);
-        inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::X), KeyState::Up, std::make_unique<DamageCommand>(1), InputType::Controller, controllerIndex);
+
+    // Handle controller binding based on the number of controllers
+    if (numControllers == 1)
+    {
+        if (playerId == 0)
+        {
+            // Player 0: Can use both keyboard and controller 0
+            BindControllerCommands(inputManager, 0, 0);
+        }
+        else if (playerId == 1)
+        {
+            // Player 1: Can use controller 0
+            BindControllerCommands(inputManager, 1, 0);
+        }
+    }
+    else if (numControllers >= 2)
+    {
+        if (playerId == 0)
+        {
+            // Player 0: Can use keyboard and controller 0
+            BindControllerCommands(inputManager, 0, 0);
+        }
+        else if (playerId == 1)
+        {
+            // Player 1: Can use controller 1
+            BindControllerCommands(inputManager, 1, 1);
+        }
+    }
+   
+
+}
+
+
+void BindKeyBordNameCommands(dae::InputManager& inputManager, int playerId, InputType inputType) {
+    inputManager.BindCommand(SDL_SCANCODE_W, KeyState::Up, std::make_unique<NavigateUpLetterCommand>(playerId), inputType);
+    inputManager.BindCommand(SDL_SCANCODE_S, KeyState::Up, std::make_unique<NavigateDownLetterCommand>(playerId), inputType);
+    inputManager.BindCommand(SDL_SCANCODE_D, KeyState::Up, std::make_unique<SelectOptionLetterCommand>(playerId), inputType);
+    inputManager.BindCommand(SDL_SCANCODE_RETURN, KeyState::Up, std::make_unique<saveScoreCommand>(playerId), inputType);
+}
+
+void BindControllerNameCommands(dae::InputManager& inputManager, int playerId, int controllerId = 0) {
+    inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadUp), KeyState::Up, std::make_unique<NavigateUpLetterCommand>(playerId), InputType::Controller, controllerId);
+    inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadDown), KeyState::Up, std::make_unique<NavigateDownLetterCommand>(playerId), InputType::Controller, controllerId);
+    inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::X), KeyState::Up, std::make_unique<SelectOptionLetterCommand>(playerId), InputType::Controller, controllerId);
+    inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::Y), KeyState::Up, std::make_unique<saveScoreCommand>(playerId), InputType::Controller, controllerId);
+}
+
+void BindNameCommands(dae::InputManager& inputManager)
+{
+    const int numControllers = inputManager.GetConnectedControllerCount();
+    const int numPlayers = GameData::GetInstance().GetNumberOfPlayers();
+
+    BindKeyBordNameCommands(inputManager, 0, InputType::Keyboard);
+
+	for (int playerId = 0; playerId < numPlayers; ++playerId) {
+        // Bind keyboard commands
+
+        // Bind controller commands
+        if (numControllers > 1) {
+            BindControllerNameCommands(inputManager, playerId, playerId);
+        }
+        else {
+            BindControllerNameCommands(inputManager, playerId);
+        }
     }
 }
 
@@ -221,7 +293,10 @@ void BindMenuCommands(dae::InputManager& inputManager)
     inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadUp), KeyState::Up, std::make_unique<NavigateUpCommand>(), InputType::Controller);
     inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadDown), KeyState::Up, std::make_unique<NavigateDownCommand>(), InputType::Controller);
     inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::Y), KeyState::Up, std::make_unique<SelectOptionCommand>(), InputType::Controller);
+}
 
+void BindExtraControlls(dae::InputManager& inputManager)
+{
     // Additional keyboard commands
     inputManager.BindCommand(SDL_SCANCODE_F1, KeyState::Up, std::make_unique<GoToNextSceneCommand>(), InputType::Keyboard);
     inputManager.BindCommand(SDL_SCANCODE_G, KeyState::Up, std::make_unique<MuteCommand>(&servicelocator::get_sound_system()), InputType::Keyboard);
@@ -234,24 +309,8 @@ void BindMenuCommands(dae::InputManager& inputManager)
     inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::Back), KeyState::Up, std::make_unique<MuteCommand>(&servicelocator::get_sound_system()), InputType::Controller);
     inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::LeftBumper), KeyState::Up, std::make_unique<IncreaseVolumeCommand>(&servicelocator::get_sound_system()), InputType::Controller);
     inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::RightBumper), KeyState::Up, std::make_unique<DecreaseVolumeCommand>(&servicelocator::get_sound_system()), InputType::Controller);
-}
-
-void BindNameCommands(dae::InputManager& inputManager)
-{
-    // Bind keyboard commands
-    inputManager.BindCommand(SDL_SCANCODE_W, KeyState::Up, std::make_unique<NavigateUpLetterCommand>(), InputType::Keyboard);
-    inputManager.BindCommand(SDL_SCANCODE_S, KeyState::Up, std::make_unique<NavigateDownLetterCommand>(), InputType::Keyboard);
-    inputManager.BindCommand(SDL_SCANCODE_D, KeyState::Up, std::make_unique<SelectOptionLetterCommand>(), InputType::Keyboard);
-    inputManager.BindCommand(SDL_SCANCODE_RETURN, KeyState::Up, std::make_unique<saveScoreCommand>(), InputType::Keyboard);
-
-    // Bind controller commands
-    inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadUp), KeyState::Up, std::make_unique<NavigateUpLetterCommand>(), InputType::Controller);
-    inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadDown), KeyState::Up, std::make_unique<NavigateDownLetterCommand>(), InputType::Controller);
-    inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::X), KeyState::Up, std::make_unique<SelectOptionLetterCommand>(), InputType::Controller);
-    inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::A), KeyState::Up, std::make_unique<saveScoreCommand>(), InputType::Controller);
 
 }
-
 void UnBindMenuCommands(dae::InputManager& inputManager)
 {
     // Unbind keyboard commands
@@ -263,7 +322,23 @@ void UnBindMenuCommands(dae::InputManager& inputManager)
     inputManager.UnbindCommand(GameController::GetButtonMapping(GameController::Button::DPadUp), KeyState::Up, InputType::Controller);
     inputManager.UnbindCommand(GameController::GetButtonMapping(GameController::Button::DPadDown), KeyState::Up, InputType::Controller);
     inputManager.UnbindCommand(GameController::GetButtonMapping(GameController::Button::X), KeyState::Up, InputType::Controller);
-    inputManager.UnbindCommand(GameController::GetButtonMapping(GameController::Button::A), KeyState::Up, InputType::Controller);
+    inputManager.UnbindCommand(GameController::GetButtonMapping(GameController::Button::Y), KeyState::Up, InputType::Controller);
+
+}
+
+void UnBindNameCommands(dae::InputManager& inputManager)
+{
+    // Unbind keyboard commands
+    inputManager.UnbindCommand(SDL_SCANCODE_W, KeyState::Up, InputType::Keyboard);
+    inputManager.UnbindCommand(SDL_SCANCODE_S, KeyState::Up, InputType::Keyboard);
+    inputManager.UnbindCommand(SDL_SCANCODE_D, KeyState::Up, InputType::Keyboard);
+    inputManager.UnbindCommand(SDL_SCANCODE_RETURN, KeyState::Up, InputType::Keyboard);
+
+    // Unbind controller commands
+    inputManager.UnbindCommand(GameController::GetButtonMapping(GameController::Button::DPadUp), KeyState::Up, InputType::Controller);
+    inputManager.UnbindCommand(GameController::GetButtonMapping(GameController::Button::DPadDown), KeyState::Up, InputType::Controller);
+    inputManager.UnbindCommand(GameController::GetButtonMapping(GameController::Button::X), KeyState::Up, InputType::Controller);
+    inputManager.UnbindCommand(GameController::GetButtonMapping(GameController::Button::Y), KeyState::Up, InputType::Controller);
 
 }
 
@@ -291,6 +366,8 @@ void UnBindPlayerCommands(dae::InputManager& inputManager)
 void LoadUi(dae::Scene* scene)
 {
     auto& highScoresInstance = HighScores::GetInstance();
+    const std::vector<dae::GameObject*> players = dae::SceneData::GetInstance().GetPlayers();
+
 
     auto HighScoretextObject = std::make_unique<dae::GameObject>();
 
@@ -301,7 +378,7 @@ void LoadUi(dae::Scene* scene)
         SDL_Color{ 255, 0, 0, 255 },
         *HighScoretextObject
     );
-    HighScoretextObject->SetLocalPosition(glm::vec3(530, 5, 0.f));
+    HighScoretextObject->SetLocalPosition(glm::vec3(630, 5, 0.f));
     HighScoretextObject->AddComponent(std::move(titleTextComponent02));
 
     scene->Add(std::move(HighScoretextObject));
@@ -313,43 +390,54 @@ void LoadUi(dae::Scene* scene)
 
     // Create the high score value text component using the string
     auto scoreTextComponent = std::make_unique<dae::TextComponent>(topScoreStr, dae::ResourceManager::GetFont("arcade"), SDL_Color{ 255, 255, 255, 255 }, *HighScoreObject);
-    HighScoreObject->SetLocalPosition(glm::vec3(540, 33, 0.f));
+    HighScoreObject->SetLocalPosition(glm::vec3(640, 33, 0.f));
     HighScoreObject->AddComponent(std::move(scoreTextComponent));
 
     // Add HighScoreObject to the scene (assuming 'this' is a scene class)
     scene->Add(std::move(HighScoreObject));
 
 
+    glm::vec3 initialPositionPepper(100, 170, 0.f);
+    // Define the distance between points display objects
+    float distanceBetweenPepper = 150.0f;
 
-    auto PepertextObject = std::make_unique<dae::GameObject>();
+    for (size_t i = 0; i < players.size(); ++i) {
+        auto player = players[i];
+        if (auto scoreComponent = player->GetComponent<dae::PointComponent>()) {
+            auto PepertextObject = std::make_unique<dae::GameObject>();
 
-    auto PeperComponent = std::make_unique<dae::TextComponent>(
-        "PEPPER",
-        dae::ResourceManager::GetFont("arcade"),
-        SDL_Color{ 0, 255, 0, 255 },
-        *PepertextObject
-    );
-    PepertextObject->SetLocalPosition(glm::vec3(930, 5, 0.f));
-    PepertextObject->AddComponent(std::move(PeperComponent));
+            auto PeperComponent = std::make_unique<dae::TextComponent>(
+                "PEPPER",
+                dae::ResourceManager::GetFont("arcade"),
+                SDL_Color{ 0, 255, 0, 255 },
+                *PepertextObject
+            );
+            glm::vec3 position = initialPositionPepper + glm::vec3(0.0f, i * distanceBetweenPepper, 0.0f);
+            PepertextObject->SetLocalPosition(glm::vec3(position));
+            PepertextObject->AddComponent(std::move(PeperComponent));
 
-    scene->Add(std::move(PepertextObject));
+            scene->Add(std::move(PepertextObject));
 
-    auto PeperscoretextObject = std::make_unique<dae::GameObject>();
+            auto PeperscoretextObject = std::make_unique<dae::GameObject>();
 
-    auto PeperscoreComponent = std::make_unique<dae::TextComponent>(
-        "4",
-        dae::ResourceManager::GetFont("arcade"),
-        SDL_Color{ 255, 255, 255, 255 },
-        *PeperscoretextObject
-    );
-    PeperscoretextObject->SetLocalPosition(glm::vec3(975, 30, 0.f));
-    PeperscoretextObject->AddComponent(std::move(PeperscoreComponent));
+            auto PeperscoreComponent = std::make_unique<dae::TextComponent>(
+                "4",
+                dae::ResourceManager::GetFont("arcade"),
+                SDL_Color{ 255, 255, 255, 255 },
+                *PeperscoretextObject
+            );
+            glm::vec3 positionscore = initialPositionPepper + glm::vec3(0.0f, i * distanceBetweenPepper + 20, 0.0f);
+            PeperscoretextObject->SetLocalPosition(positionscore);
+            PeperscoretextObject->AddComponent(std::move(PeperscoreComponent));
 
-    scene->Add(std::move(PeperscoretextObject));
+            scene->Add(std::move(PeperscoretextObject));
+        }
+    }
 
-    const std::vector<dae::GameObject*> players = dae::SceneData::GetInstance().GetPlayers();
+   
 
-    glm::vec3 initialPositionpoints(100, 270, 0.f);
+
+    glm::vec3 initialPositionpoints(100, 235, 0.f);
     // Define the distance between points display objects
     float distanceBetweenPoints = 50.0f;
 
@@ -373,7 +461,7 @@ void LoadUi(dae::Scene* scene)
     }
 
 
-    glm::vec3 initialPositionHealth(100, 250, 0.f);
+    glm::vec3 initialPositionHealth(100, 215, 0.f);
     // Define the distance between lives display objects
     float distanceBetweenLives = 50.0f;
 
@@ -400,20 +488,23 @@ void LoadUi(dae::Scene* scene)
 void LoadStartMenu(dae::Scene* startMenuScene)
 {
     auto& inputManager = dae::InputManager::GetInstance();
-    UnBindPlayerCommands(inputManager);
-    BindMenuCommands(inputManager);
+    UnBindMenuCommands(inputManager);
 
     std::vector<std::string> options = { "single player", "multiplayer", "versus Mode", "scoreBoard" };
     std::vector<std::function<void()>> callbacks =
     {
         []() {
+
+            GameData::GetInstance().SetGameState(GameData::GameState::SINGLE_PLAYER);
             dae::SceneManager::GetInstance().SetActiveScene("Scene4");
         },
         []() {
-            dae::SceneManager::GetInstance().SetActiveScene("Scene5");
+            GameData::GetInstance().SetGameState(GameData::GameState::MULTIPLAYER);
+            dae::SceneManager::GetInstance().SetActiveScene("Scene4");
         },
         []() {
-            dae::SceneManager::GetInstance().SetActiveScene("Scene6");
+            GameData::GetInstance().SetGameState(GameData::GameState::VERSUS);
+            dae::SceneManager::GetInstance().SetActiveScene("Scene4");
         },
         []() {
             dae::SceneManager::GetInstance().SetActiveScene("ScoreboardScene");
@@ -452,10 +543,16 @@ void LoadStartMenu(dae::Scene* startMenuScene)
     startMenuScene->Add(std::move(Infocharacter2Txt02));
 
     startMenuScene->SetBackgroundMusic(11);
+    BindMenuCommands(inputManager);
+
 }
 
 void LoadScoreboard(dae::Scene* ScoreBoardScene)
 {
+    auto& inputManager = dae::InputManager::GetInstance();
+    UnBindNameCommands(inputManager);
+    UnBindMenuCommands(inputManager);
+
     auto& highscore = HighScores::GetInstance();
 
     // Get the loaded scores
@@ -506,28 +603,29 @@ void LoadScoreboard(dae::Scene* ScoreBoardScene)
     menuObject->AddComponent(std::move(menuComponent));
     ScoreBoardScene->Add(std::move(menuObject));
 
+    BindMenuCommands(inputManager);
 }
 
 
-void loadInputScore(dae::Scene* scene, uint32_t score)
+void loadInputScore(dae::Scene* scene)
 {
-
     auto& inputManager = dae::InputManager::GetInstance();
     UnBindPlayerCommands(inputManager);
-    BindNameCommands(inputManager);
 
-    // Create the GameObject for the name input
-    auto nameInputObject = std::make_unique<dae::GameObject>();
-    nameInputObject->SetLocalPosition(glm::vec3(635, 350, 0.f));
+    const glm::vec3 initialPosition(630, 300, 0.f);
+    // Define the distance between lives display objects
+    const float distanceBetween = 150.0f;
 
-    // Create the SelectNameComponent
-    std::unique_ptr<SelectNameComponent> nameInputComponent = std::make_unique<SelectNameComponent>(nameInputObject.get(), 6, dae::ResourceManager::GetFont("arcadeBig"), SDL_Color{ 255, 255, 255, 255 });
+    for (int i = 0; i  < GameData::GetInstance().GetNumberOfPlayers(); ++i)
+    {
+        auto nameInputObject = std::make_unique<dae::GameObject>();
+        glm::vec3 position = initialPosition + glm::vec3(0.0f, i * distanceBetween, 0.0f);
+        nameInputObject->SetLocalPosition(position);
 
-    // Add the SelectNameComponent to the nameInputObject
-    nameInputObject->AddComponent(std::move(nameInputComponent));
-
-    // Add the nameInputObject to the scene
-    scene->Add(std::move(nameInputObject));
+        std::unique_ptr<SelectNameComponent> nameInputComponent = std::make_unique<SelectNameComponent>(nameInputObject.get(), 6, dae::ResourceManager::GetFont("arcadeBig"), SDL_Color{ 255, 255, 255, 255 }, i);
+        nameInputObject->AddComponent(std::move(nameInputComponent));
+        scene->Add(std::move(nameInputObject));
+    }
 
     auto TitleObject02 = std::make_unique<dae::GameObject>();
     auto titleTextComponent02 = std::make_unique<dae::TextComponent>("BURGERTIME", dae::ResourceManager::GetFont("Lingua"), SDL_Color{ 255, 0, 0, 255 }, *TitleObject02); // Pass the GameObject reference here
@@ -536,31 +634,59 @@ void loadInputScore(dae::Scene* scene, uint32_t score)
     scene->Add(std::move(TitleObject02));
 
     auto ScoreObject = std::make_unique<dae::GameObject>();
-    auto Scoretextcomponent = std::make_unique<dae::TextComponent>(std::to_string(score), dae::ResourceManager::GetFont("arcadeBig"), SDL_Color{ 255, 0, 0, 255 }, *ScoreObject); // Specify color here
+    auto Scoretextcomponent = std::make_unique<dae::TextComponent>(std::to_string(GameData::GetInstance().GetPlayerData(0).score), dae::ResourceManager::GetFont("arcadeBig"), SDL_Color{ 255, 0, 0, 255 }, *ScoreObject); // Specify color here
     Scoretextcomponent->SetColor(SDL_Color{ 255, 255, 0, 255 });
 	ScoreObject->AddComponent(std::move(Scoretextcomponent));
     ScoreObject->SetLocalPosition(glm::vec3(635, 150, 0.f));
     scene->Add(std::move(ScoreObject));
 
-
     scene->SetBackgroundMusic(11);
+
+    BindNameCommands(inputManager);
 }
 
-void Scene4(dae::Scene* scene, dae::InputManager& inputManager)
+void Scene4(dae::Scene* scene)
 {
-    UnBindPlayerCommands(inputManager);
+    auto& inputManager = dae::InputManager::GetInstance();
+    UnBindMenuCommands(inputManager);
+
     // Load the map
     constexpr glm::vec3 startPos(335, 70, 0.0f);
     constexpr glm::vec2 mapScale(40, 26.f);
 
-    const LoadMap loadMap("../Data/maps/map1.map", "../Data/maps/map1.ingmap");
+    std::string Ingrediantmap = "";
+    switch (GameData::GetInstance().GetGameState()) {
+    case GameData::GameState::SINGLE_PLAYER:
+        Ingrediantmap = "map1.ingmap";
+        break;
+    case GameData::GameState::MULTIPLAYER:
+        Ingrediantmap = "map1.2.ingmap";
+       
+        break;
+    case GameData::GameState::VERSUS:
+        Ingrediantmap = "map1.3.ingmap";
+        break;
+    default:
+        Ingrediantmap = "map1.ingmap";
+        break;
+    }
+    const LoadMap loadMap("../Data/maps/map1.map", "../Data/maps/" + Ingrediantmap);
     SceneHelpers::LoadMapIntoScene(loadMap, scene, startPos, mapScale);
 
     SceneHelpers::LoadIngMapIntoScene(loadMap, scene, startPos, mapScale);
 
+    if (GameData::GetInstance().GetGameState() == GameData::GameState::SINGLE_PLAYER)
+    {
+        HandlePlayerInput(inputManager, 0); // Single player uses player 0
+    }
+    else
+    {
+        HandlePlayerInput(inputManager, 0); // Single player uses player 0
+        HandlePlayerInput(inputManager, 1); // Single player uses player 0
+    }
+
     scene->SetBackgroundMusic(19);
 
-    HandlePlayerInput(inputManager, 0); // Single player uses player 0
 }
 
 void Scene5(dae::Scene* scene)
@@ -568,17 +694,40 @@ void Scene5(dae::Scene* scene)
     auto& inputManager = dae::InputManager::GetInstance();
     UnBindPlayerCommands(inputManager);
 
-    constexpr glm::vec3 startPos(335, 50, 0.0f);
-    constexpr glm::vec2 Mapscale(35, 25.5f);
+    constexpr glm::vec3 startPos(335, 90, 0.0f);
+    constexpr glm::vec2 mapScale(40, 26.f);
 
-    const LoadMap loadMap("../Data/maps/map1.map", "../Data/maps/map1.2.ingmap");
-    SceneHelpers::LoadMapIntoScene(loadMap, scene, startPos, Mapscale);
+    std::string Ingrediantmap = "";
+    switch (GameData::GetInstance().GetGameState()) {
+    case GameData::GameState::SINGLE_PLAYER:
+        Ingrediantmap = "map2.ingmap";
+        break;
+    case GameData::GameState::MULTIPLAYER:
+        Ingrediantmap = "map2.2.ingmap";
+        
+        break;
+    case GameData::GameState::VERSUS:
+        Ingrediantmap = "map2.3.ingmap";
+        break;
+    default:
+        Ingrediantmap = "map2.ingmap";
+        break;
+    }
 
-    SceneHelpers::LoadIngMapIntoScene(loadMap, scene, startPos, Mapscale);
+    const LoadMap loadMap("../Data/maps/map2.map", "../Data/maps/" + Ingrediantmap);
+    SceneHelpers::LoadMapIntoScene(loadMap, scene, startPos, mapScale);
 
-    HandlePlayerInput(inputManager, 0, 0); // Player 1 with controller index 0
-    HandlePlayerInput(inputManager, 1, 1); // Player 2 with controller index 1
-	
+    SceneHelpers::LoadIngMapIntoScene(loadMap, scene, startPos, mapScale);
+
+    if (GameData::GetInstance().GetGameState() == GameData::GameState::SINGLE_PLAYER)
+    {
+        HandlePlayerInput(inputManager, 0); // Single player uses player 0
+    }
+    else
+    {
+        HandlePlayerInput(inputManager, 0); // Single player uses player 0
+        HandlePlayerInput(inputManager, 1); // Single player uses player 0
+    }
 }
 
 void Scene6(dae::Scene* scene)
@@ -586,25 +735,50 @@ void Scene6(dae::Scene* scene)
     auto& inputManager = dae::InputManager::GetInstance();
     UnBindPlayerCommands(inputManager);
 
-    constexpr glm::vec3 startPos(335, 50, 0.0f);
-    constexpr glm::vec2 Mapscale(35, 25.5f);
+    constexpr glm::vec3 startPos(270, 80, 0.0f);
+    constexpr glm::vec2 mapScale(40, 26.f);
 
-    const LoadMap loadMap("../Data/maps/map3.map", "../Data/maps/map3.ingmap");
-    SceneHelpers::LoadMapIntoScene(loadMap, scene, startPos, Mapscale);
+    std::string Ingrediantmap = "";
+    switch (GameData::GetInstance().GetGameState()) {
+    case GameData::GameState::SINGLE_PLAYER:
+        Ingrediantmap = "map3.ingmap";
+        break;
+    case GameData::GameState::MULTIPLAYER:
+        Ingrediantmap = "map3.2.ingmap";
+        break;
+    case GameData::GameState::VERSUS:
+        Ingrediantmap = "map3.3.ingmap";
+        break;
+    default:
+        Ingrediantmap = "map3.ingmap";
+        break;
+    }
+    const LoadMap loadMap("../Data/maps/map3.map", "../Data/maps/" + Ingrediantmap);
+    SceneHelpers::LoadMapIntoScene(loadMap, scene, startPos, mapScale);
 
-    SceneHelpers::LoadIngMapIntoScene(loadMap, scene, startPos, Mapscale);
+    SceneHelpers::LoadIngMapIntoScene(loadMap, scene, startPos, mapScale);
 
-    HandlePlayerInput(inputManager, 0, 0); // Player 1 with controller index 0
-    HandlePlayerInput(inputManager, 1, 1); // Player 2 with controller index 1
+    if (GameData::GetInstance().GetGameState() == GameData::GameState::SINGLE_PLAYER)
+    {
+        HandlePlayerInput(inputManager, 0); // Single player uses player 0
+    }
+    else
+    {
+        HandlePlayerInput(inputManager, 0); // Single player uses player 0
+        HandlePlayerInput(inputManager, 1); // Single player uses player 0
+    }
+
 }
 
 void load()
 {
     LoadResources();
-
     auto& sceneManager = dae::SceneManager::GetInstance();
-    auto& inputManager = dae::InputManager::GetInstance();
+    auto& inputmanager = dae::InputManager::GetInstance();
     auto& highscore = HighScores::GetInstance();
+
+    BindExtraControlls(inputmanager);
+
 
     highscore.loadScores();
 
@@ -619,10 +793,10 @@ void load()
 
     startMenuScene->SetOnActivateCallback([startMenuScene]() { LoadStartMenu(startMenuScene); });
     ScoreBoardScene->SetOnActivateCallback([ScoreBoardScene]() {LoadScoreboard(ScoreBoardScene); });
-    scene4->SetOnActivateCallback([scene4, &inputManager]() { Scene4(scene4, inputManager); LoadUi(scene4); });
+    scene4->SetOnActivateCallback([scene4]() { Scene4(scene4); LoadUi(scene4); });
     scene5->SetOnActivateCallback([scene5]() { Scene5(scene5); LoadUi(scene5); });
-    scene6->SetOnActivateCallback([scene6]() { Scene6(scene6); });
-    SaveSoreScene->SetOnActivateCallback([SaveSoreScene]() { loadInputScore(SaveSoreScene,2000 ); });
+    scene6->SetOnActivateCallback([scene6]() { Scene6(scene6); LoadUi(scene6); });
+    SaveSoreScene->SetOnActivateCallback([SaveSoreScene]() { loadInputScore(SaveSoreScene); });
 
 
     sceneManager.SetActiveScene("StartMenu");

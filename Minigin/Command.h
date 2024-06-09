@@ -3,11 +3,9 @@
 #include "GameObject.h"
 #include "HealthComponent.h"
 #include "MenuComponent.h"
-#include "PointComponent.h"
 #include "SceneManager.h"
 #include "SelectNameComponent.h"
 #include "sound_system.h"
-#include "../BugerTime/Player.h"
 
 
 class Command 
@@ -34,10 +32,10 @@ public:
     void Execute() override;
 
 private:
-    dae::GameObject* m_gameObject;
+    dae::GameObject* m_gameObject{};
     float m_deltaX;
     float m_deltaY;
-    int m_playernum;
+    int m_playerNum{};
 };
 
 
@@ -49,7 +47,7 @@ public:
     virtual void Execute() override;
 
 private:
-    dae::GameObject* m_gameObject;
+    dae::GameObject* m_gameObject{};
 };
 
 
@@ -61,7 +59,7 @@ public:
     virtual void Execute() override;
 
 private:
-    dae::GameObject* m_gameObject;
+    dae::GameObject* m_gameObject{};
 };
 
 class GoToNextSceneCommand final : public Command {
@@ -144,38 +142,47 @@ private:
 class NavigateUpLetterCommand : public Command
 {
 public:
+    NavigateUpLetterCommand(int playerId) : m_PlayerId(playerId) {}
     void Execute() override;
 
 private:
-    static SelectNameComponent* FindSelectNameComponent();
+    int m_PlayerId;
+    SelectNameComponent* FindSelectNameComponent();
 };
 
+// NavigateDownLetterCommand.h
 class NavigateDownLetterCommand : public Command
 {
 public:
+    NavigateDownLetterCommand(int playerId) : m_PlayerId(playerId) {}
     void Execute() override;
 
 private:
-    static SelectNameComponent* FindSelectNameComponent();
+    int m_PlayerId;
+    SelectNameComponent* FindSelectNameComponent();
 };
 
+// SelectOptionLetterCommand.h
 class SelectOptionLetterCommand : public Command
 {
 public:
+    SelectOptionLetterCommand(int playerId) : m_PlayerId(playerId) {}
     void Execute() override;
 
 private:
-    static SelectNameComponent* FindSelectNameComponent();
+    int m_PlayerId;
+    SelectNameComponent* FindSelectNameComponent();
 };
 
+// saveScoreCommand.h
 class saveScoreCommand : public Command
 {
 public:
+    saveScoreCommand(int playerId) : m_PlayerId(playerId) {}
     void Execute() override;
 
 private:
-    static SelectNameComponent* FindSelectNameComponent();
-
-    std::string m_currentname;
-
+    int m_PlayerId;
+    std::string m_CurrentName;
+    SelectNameComponent* FindSelectNameComponent(int playerId);
 };

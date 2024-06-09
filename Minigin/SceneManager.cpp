@@ -6,6 +6,7 @@
 
 #include "SceneData.h"
 #include "servicelocator.h"
+#include "../BugerTime/GameData.h"
 
 
 namespace dae
@@ -29,7 +30,7 @@ namespace dae
         {
             if ((*it)->GetName() == name)
             {
-
+                GameData::GetInstance().FindAndStorePlayerData();
                 m_activeSceneIterator = it;
 
                 (*m_activeSceneIterator)->RemoveAll();
@@ -72,7 +73,7 @@ namespace dae
 
     void SceneManager::GoToNextScene()
     {
-            
+        GameData::GetInstance().FindAndStorePlayerData();
             m_previousActiveSceneIterator = m_activeSceneIterator;
         // Advance to the next scene
             ++m_activeSceneIterator;
@@ -81,6 +82,7 @@ namespace dae
             SceneData::GetInstance().RemoveAllGameObjects();
             (*m_activeSceneIterator)->RemoveAll();
             (*m_activeSceneIterator)->Activate();
+
 
             auto& soundSystem = servicelocator::get_sound_system();
             const sound_id soundID = (*m_activeSceneIterator)->GetBackgroundMusicID();

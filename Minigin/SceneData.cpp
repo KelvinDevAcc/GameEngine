@@ -21,6 +21,7 @@ namespace dae {
         case GameObjectType::enemy: m_enemys.push_back(gameObject); break;
         case GameObjectType::BurgerPart: m_burgerParts.push_back(gameObject); break;
         case GameObjectType::Basket: m_baskets.push_back(gameObject); break;
+        case GameObjectType::enemyPlayers: m_enemyPlayers.push_back(gameObject);break;
         }
     }
 
@@ -32,9 +33,39 @@ namespace dae {
         m_ladderUpDown.clear();
         m_solidLadders.clear();
         m_players.clear();
+        m_enemyPlayers.clear();
         m_enemys.clear();
         m_burgerParts.clear();
         m_baskets.clear();
+    }
+
+    void SceneData::RemoveGameObject(GameObject* gameObject, GameObjectType type)
+    {
+        switch (type)
+        {
+        case GameObjectType::Player:
+            RemoveGameObjectFromList(gameObject, m_players);
+            break;
+        case GameObjectType::enemy:
+            RemoveGameObjectFromList(gameObject, m_enemys);
+            break;
+        case GameObjectType::enemyPlayers:
+            RemoveGameObjectFromList(gameObject, m_enemyPlayers);
+            break;
+        default:
+            std::cerr << "Error: Unsupported game object type\n";
+            break;
+        }
+    }
+
+    template<typename T>
+    void SceneData::RemoveGameObjectFromList(GameObject* gameObject, std::vector<T>& list)
+    {
+        auto it = std::find(list.begin(), list.end(), gameObject);
+        if (it != list.end())
+        {
+            list.erase(it);
+        }
     }
 
     void SceneData::Update()
@@ -71,7 +102,7 @@ namespace dae {
         const float minX = SceneHelpers::GetMinCoordinates().x;
         const float minY = SceneHelpers::GetMinCoordinates().y;
         const float maxX = SceneHelpers::GetMaxCoordinates().x;
-        const float maxY = SceneHelpers::GetMaxCoordinates().y - (SceneHelpers::GetCellSize().y*4 + 5);
+        const float maxY = SceneHelpers::GetMaxCoordinates().y;
 
         // Check if the given position is within the defined bounds
         return x >= minX && x < maxX && y >= minY && y < maxY;
@@ -141,6 +172,10 @@ namespace dae {
 
     const std::vector<GameObject*>& SceneData::GetBurgerParts() const {
         return m_burgerParts;
+    }
+
+    const std::vector<GameObject*>& SceneData::GetBasket() const {
+        return m_baskets;
     }
 
     bool SceneData::IsOnFloor(GameObject& player) const {

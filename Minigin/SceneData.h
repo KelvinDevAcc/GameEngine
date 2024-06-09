@@ -13,6 +13,7 @@ namespace dae {
         SolidLadder,
         BurgerPart,
         Player,
+        enemyPlayers,
         enemy,
         Basket
     };
@@ -26,11 +27,15 @@ namespace dae {
         void AddGameObject(GameObject* gameObject, GameObjectType type);
         void RemoveAllGameObjects();
 
+        void RemoveGameObject(GameObject* gameObject, GameObjectType type);
+
         void Update();
 
         GameObject* GetPlayer() const;
         std::vector<GameObject*> GetPlayers() const {return m_players;}
+        std::vector<GameObject*> GetenemyPlayers() const {return m_enemyPlayers;}
         const std::vector<GameObject*>& GetBurgerParts() const;
+        const std::vector<GameObject*>& GetBasket()const;
         GameObject* GetFloorAt(const glm::vec3& position) const;
 
         bool IsOnFloor(GameObject& player) const;
@@ -53,12 +58,16 @@ namespace dae {
     private:
         SceneData() = default;
 
+        template<typename T>
+        void RemoveGameObjectFromList(GameObject* gameObject, std::vector<T>& list);
+
         std::vector<GameObject*> m_floors;
         std::vector<GameObject*> m_ladderUp;
         std::vector<GameObject*> m_ladderUpDown;
         std::vector<GameObject*> m_ladderDown;
         std::vector<GameObject*> m_solidLadders;
         std::vector<GameObject*> m_players;
+        std::vector<GameObject*> m_enemyPlayers;
         std::vector<GameObject*> m_enemys;
         std::vector<GameObject*> m_burgerParts;
         std::vector<GameObject*> m_baskets;

@@ -57,9 +57,10 @@ namespace dae
 
         if (auto* animation = m_spriteRenderer->GetSprite()->GetAnimation(name))
         {
+           
 	        if (m_activeAnimation == animation)
                 return;
-	     
+
             m_playingAnimation = true;
             m_LoopingAnimation = looping;
             m_frameTime = startFrameTime;
@@ -72,6 +73,7 @@ namespace dae
             std::cerr << "Animation does not exist: " << name << std::endl;
         }
     }
+
 
     void AnimationComponent::Stop()
     {
