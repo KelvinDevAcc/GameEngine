@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include "Component.h"
-#include "Font.h"
 #include "Observer.h"
 #include "PointComponent.h"
 #include "TextComponent.h"
@@ -9,18 +8,24 @@
 
 namespace dae
 {
-    class PointsDisplayComponent : public Component, public Observer
+    class PointsDisplayComponent final: public Component, public Observer
     {
     public:
-        PointsDisplayComponent(std::unique_ptr<Font> font, GameObject& gameObject);
+        PointsDisplayComponent(Font* font, GameObject& gameObject);
         ~PointsDisplayComponent() override = default;
+
+        PointsDisplayComponent(const PointsDisplayComponent& other) = delete;
+        PointsDisplayComponent(PointsDisplayComponent&& other) noexcept = delete;
+        PointsDisplayComponent& operator=(const PointsDisplayComponent& other) = delete;
+        PointsDisplayComponent& operator=(PointsDisplayComponent&& other) noexcept = delete;
 
         void Render() const override;
         void Update() override;
 
         void AttachToPointComponent(PointComponent* pointComponent);
 
-        const char* GetComponentType() const override { return "PointsDisplay"; }
+        std::type_info const& GetComponentType() const override { return typeid(PointsDisplayComponent); }
+
 
     private:
         PointComponent* m_pointComponent;

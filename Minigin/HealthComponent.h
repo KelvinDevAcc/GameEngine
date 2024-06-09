@@ -1,17 +1,20 @@
 #pragma once
-
 #include <list>
-
 #include "Component.h"
 #include "Subject.h"
 
 namespace dae
 {
-    class HealthComponent final : public Component, public Subject // Inherit from Subject interface
+    class HealthComponent final : public Component, public Subject
     {
     public:
         HealthComponent(int initialHealth, int initialLives);
         ~HealthComponent() override = default;
+
+        HealthComponent(const HealthComponent& other) = delete;
+        HealthComponent(HealthComponent&& other) noexcept = delete;
+        HealthComponent& operator=(const HealthComponent& other) = delete;
+        HealthComponent& operator=(HealthComponent&& other) noexcept = delete;
 
         int GetHealth() const { return m_Health; }
         void SetHealth(int health);
@@ -20,7 +23,7 @@ namespace dae
         void SetLives(int lives);
 
         void Update() override;
-        const char* GetComponentType() const override;
+        std::type_info const& GetComponentType() const override { return typeid(HealthComponent); }
 
         // Implementations for Subject interface
         void Attach(Observer* observer) override { m_observers.push_back(observer); }

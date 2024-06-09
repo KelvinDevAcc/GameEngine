@@ -2,17 +2,21 @@
 
 #include <memory>
 #include <vector>
-
 #include "Component.h"
 #include "Texture2D.h"
 
 namespace dae
 {
-    class RenderComponent : public Component
+    class RenderComponent final : public Component
     {
     public:
-        RenderComponent();
+        RenderComponent(GameObject* gameObject);
         ~RenderComponent() override = default;
+
+        RenderComponent(const RenderComponent& other) = delete;
+        RenderComponent(RenderComponent&& other) noexcept = delete;
+        RenderComponent& operator=(const RenderComponent& other) = delete;
+        RenderComponent& operator=(RenderComponent&& other) noexcept = delete;
 
         void Update() override;
         void Render() const override;
@@ -20,16 +24,19 @@ namespace dae
         void SetTexture(const std::unique_ptr<Texture2D> texture);
         void SetDimensions(float width, float height);
 
-        void SetAnimationFrames(const std::vector<std::unique_ptr<Texture2D>> frames);
+        void SetAnimationFrames(int frameWidth, int frameHeight, int numFrames);
         void SetAnimationSpeed(float framesPerSecond);
 
-        const char* GetComponentType() const override { return "Render"; }
+        std::type_info const& GetComponentType() const override { return typeid(RenderComponent); }
+
 
     private:
         enum class RenderMode {
             Static,
             Animated
         };
+
+        GameObject* m_GameObject;
 
         RenderMode m_renderMode;
 
@@ -41,6 +48,9 @@ namespace dae
         // For animations
         std::vector<std::unique_ptr<Texture2D>> m_animationFrames;
         float m_animationSpeed;
-        float m_currentFrame;
+        int m_currentFrame;
+
+        float m_animationTimer = 0.0f;
+        float m_frameDuration = 0.1f;
     };
 }

@@ -92,7 +92,6 @@ void dae::Renderer::RenderTexture(const Texture2D& texture, const float x, const
 
 void dae::Renderer::RenderTexture(const Texture2D& texture, float pos_x, float pos_y, float width, float height, float rotation_angle) const
 {
-	// Destination rectangle
 	SDL_Rect dst{};
 	dst.x = static_cast<int>(pos_x);
 	dst.y = static_cast<int>(pos_y);
@@ -103,6 +102,63 @@ void dae::Renderer::RenderTexture(const Texture2D& texture, float pos_x, float p
 	SDL_RenderCopyEx(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst, rotation_angle, nullptr, SDL_FLIP_NONE);
 }
 
+void dae::Renderer::RenderTexture(const Texture2D& texture, float x, float y, const glm::vec2& cellSize,
+	int pixelsPerUnit) const
+{
+	SDL_Rect destRect{
+		static_cast<int>(x),
+		static_cast<int>(y),
+		static_cast<int>(cellSize.x * static_cast<float>(pixelsPerUnit)),
+		static_cast<int>(cellSize.y * static_cast<float>(pixelsPerUnit))
+	};
 
+	SDL_RenderCopy(m_renderer, texture.GetSDLTexture(), nullptr, &destRect);
+}
+
+void dae::Renderer::RenderTexture(const dae::Texture2D& texture, glm::vec2 drawLocation,
+	glm::vec2 srcLocation, glm::ivec2 cellSize, float width, float height, bool flipX, bool flipY)
+{
+	SDL_Renderer* sdlRenderer = GetInstance().GetSDLRenderer();
+
+	if (sdlRenderer == nullptr || texture.GetSDLTexture() == nullptr)
+		return; 
+
+	SDL_Rect srcRect;
+	srcRect.x = static_cast<int>(srcLocation.x * cellSize.x);
+	srcRect.y = static_cast<int>(srcLocation.y * cellSize.y);
+	srcRect.w = static_cast<int>(cellSize.x);
+	srcRect.h = static_cast<int>(cellSize.y);
+
+	SDL_Rect dstRect;
+	dstRect.x = static_cast<int>(drawLocation.x);
+	dstRect.y = static_cast<int>(drawLocation.y);
+	dstRect.w = static_cast<int>(width);
+	dstRect.h = static_cast<int>(height);
+
+	SDL_RendererFlip flip = SDL_FLIP_NONE;
+	if (flipX and flipY)
+		flip = static_cast<SDL_RendererFlip>(SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
+	else if (flipX)
+		flip = SDL_FLIP_HORIZONTAL;
+	else if (flipY)
+		flip = SDL_FLIP_VERTICAL;
+
+	const SDL_Point center{};
+
+	SDL_RenderCopyEx(sdlRenderer, texture.GetSDLTexture(), &srcRect, &dstRect, 0.0f, &center, flip);
+}
+
+void dae::Renderer::RenderRect(const SDL_Rect& rect, SDL_Color color, bool filled) const
+{
+	const SDL_Rect centeredRect = rect;
+
+	SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
+	if (filled) {
+		SDL_RenderFillRect(m_renderer, &centeredRect);
+	}
+	else {
+		SDL_RenderDrawRect(m_renderer, &centeredRect);
+	}
+}
 
 SDL_Renderer* dae::Renderer::GetSDLRenderer() const { return m_renderer; }

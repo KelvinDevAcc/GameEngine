@@ -3,16 +3,15 @@
 
 namespace dae
 {
-    PointsDisplayComponent::PointsDisplayComponent(std::unique_ptr<Font> font, GameObject& gameObject)
+    PointsDisplayComponent::PointsDisplayComponent(Font* font, GameObject& gameObject)
         : m_pointComponent(nullptr), m_textComponent(nullptr)
     {
-        m_textComponent = std::make_unique<TextComponent>("ss ", std::move(font), SDL_Color{ 255, 255, 255, 255 }, gameObject); // Initialize TextComponent
+        m_textComponent = std::make_unique<TextComponent>("ss ", font, SDL_Color{ 255, 255, 255, 255 }, gameObject); 
     }
 
     void PointsDisplayComponent::Update()
     {
         m_textComponent->Update();
-        // Update the text to display current score
         if (m_pointComponent)
         {
 	        const std::string text = "Points: " + std::to_string(m_pointComponent->GetScore());
@@ -22,7 +21,7 @@ namespace dae
 
     void PointsDisplayComponent::Render() const
     {
-        m_textComponent->Render(); // Render the TextComponent
+        m_textComponent->Render(); 
     }
    
     void PointsDisplayComponent::AttachToPointComponent(PointComponent* pointComponent)

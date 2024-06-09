@@ -1,5 +1,4 @@
 #include "GameObject.h"
-
 #include "ResourceManager.h"
 #include "Renderer.h"
 
@@ -34,10 +33,14 @@ namespace dae
         m_height = height;
     }
 
+    std::pair<float, float> GameObject::GetDimensions() const
+    {
+        return { m_width, m_height };
+    }
+
     void GameObject::AddComponent(std::unique_ptr<Component> component)
     {
         m_components.push_back(std::move(component));
-        m_components.back()->SetGameObject(this);
     }
 
     void GameObject::RemoveComponent(Component* component)
@@ -72,12 +75,6 @@ namespace dae
     {
         m_localPosition.SetPosition(pos);
         SetPositionDirty();
-        for (const auto& component : m_components)
-        {
-            component->SetPosition(pos.x, pos.y);
-        }
-       
-
     }
 
     const glm::vec3& GameObject::GetWorldPosition()
@@ -96,11 +93,11 @@ namespace dae
     {
         if (m_positionIsDirty)
         {
-            if (m_parent == nullptr)
+            if (m_parent == nullptr) {
                 m_worldPosition = m_localPosition;
+            }
             else
                 m_worldPosition.SetPosition(m_parent->GetWorldPosition() + m_localPosition.GetPosition());
-
         }
         m_positionIsDirty = false;
     }

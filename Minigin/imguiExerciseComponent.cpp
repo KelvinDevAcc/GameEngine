@@ -13,11 +13,6 @@ namespace dae
         RenderExercise2Window();
     }
 
-    const char* imguiExerciseComponent::GetComponentType() const
-    {
-        return "imguiExerciseComponent";
-    }
-
     void imguiExerciseComponent::RenderExercise1Window() const
     {
         ImGui::Begin("Exercise 1");

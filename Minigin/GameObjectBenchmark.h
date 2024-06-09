@@ -23,7 +23,7 @@ public:
     int ID;
 };
 
-class GameObjectBenchmark {
+class GameObjectBenchmark final{
 public:
     static void RunIntBenchmark(int inputValue, int buffer_size, std::vector<float>& timings);
 

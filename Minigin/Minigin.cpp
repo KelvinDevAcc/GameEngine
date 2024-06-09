@@ -6,20 +6,16 @@
 #include <SDL_ttf.h>
 #include "Minigin.h"
 
-#include <iomanip>
-#include <iostream>
-#include <sstream>
 #include <thread>
 
-#include "FPSCounterComponent.h"
 #include "InputManager.h"
 #include "SceneManager.h"
 #include "Renderer.h"
 #include "ResourceManager.h"
-#include "Scene.h"
-#include "TextComponent.h"
 #include "GameObject.h"
 #include "GameTime.h"
+#include "EnventQueue.h"
+#include "SceneData.h"
 
 SDL_Window* g_window{};
 
@@ -98,31 +94,20 @@ void dae::Minigin::Run(const std::function<void()>& load)
 
 	while (true)
 	{
-		GameTime::Update();
 		const bool doContinue = input.ProcessInput();
 		if (!doContinue)
 			break;
 
+		GameTime::Update();
+
 		sceneManager.Update();
+
+		SceneData::GetInstance().Update();
 
 		renderer.Render();
 
-		// Update FPS display
-		const auto& activeScene = sceneManager.GetActiveScene();
-		for (const auto& gameObject : activeScene->GetObjects())
-		{
-			if (const auto fpsCounterComponent = gameObject->GetComponent<FPSCounterComponent>())
-			{
-				if (const auto fpsTextObject = gameObject->GetComponent<TextComponent>())
-				{
-					// Format FPS string with one decimal point
-					std::stringstream ss;
-					ss << "FPS: " << std::fixed << std::setprecision(1) << fpsCounterComponent->GetFPS();
-					fpsTextObject->SetText(ss.str());
-					break;
-				}
-			}
-		}
+		EventQueue::Process();
+
 
 		// Sleep to maintain frame rate
 		const auto sleepTime = GameTime::m_LastTime + std::chrono::milliseconds(1000/m_FrameRate) - std::chrono::high_resolution_clock::now();

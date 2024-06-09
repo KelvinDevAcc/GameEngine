@@ -1,26 +1,49 @@
 #include "Sprite.h"
-
+#include <algorithm>
 #include <stdexcept>
+#include "Texture2D.h"
 
-namespace dae
+
+dae::SpriteAnimation::SpriteAnimation(const std::vector<glm::ivec2>& cellFrames, int framesPerSecond) :
+    cellFrames(cellFrames),
+    frameCount(static_cast<int>(cellFrames.size())),
+    framesPerSecond(framesPerSecond)
+{}
+
+const glm::ivec2& dae::SpriteAnimation::GetCellFromNormalizedTime(float time) const
 {
-    Sprite::Sprite(const Texture2D* texturePtr, int pixelsPerUnit, int rowCount,
-        int colCount, const std::map<std::string, std::vector<glm::ivec2>>& animations)
-        : m_texturePtr(texturePtr), m_pixelsPerUnit(pixelsPerUnit), m_cellSize(texturePtr->GetSize().x / colCount, texturePtr->GetSize().y / rowCount), m_animations(animations)
-    {
-    }
+    int frame = static_cast<int>(time * static_cast<float>(frameCount));
+    frame = std::clamp(frame, 0, frameCount - 1);
+    return cellFrames[frame];
+}
 
-    const std::vector<glm::ivec2>& Sprite::GetAnimation(const std::string& name) const
-    {
-        auto it = m_animations.find(name);
-        if (it != m_animations.end())
-            return it->second;
-        else
-            throw std::runtime_error("Animation not found: " + name);
+const dae::SpriteAnimation* dae::Sprite::GetAnimation(const std::string& name) const
+{
+	const auto animationIt = animations.find(name);
+    if (animationIt == animations.end()) {
+        throw std::invalid_argument("Animation does not exist");
     }
+    return &animationIt->second;
+}
 
-    const Texture2D& Sprite::GetTexture() const
+dae::Sprite::Sprite(dae::Texture2D* texturePtr, int rowCount, int colCount,
+                    const std::map<std::string, SpriteAnimation>& animations) :
+
+	m_texture(texturePtr),
+	cellSize(texturePtr->GetSize().x / colCount, texturePtr->GetSize().y / rowCount),
+    animations(animations)
+{
+}
+
+dae::Sprite::~Sprite()
+{
+    if (m_texture)
     {
-        return *m_texturePtr;
+        m_texture = nullptr;
     }
+}
+
+dae::Texture2D& dae::Sprite::GetTexture() const
+{
+    return *m_texture;
 }

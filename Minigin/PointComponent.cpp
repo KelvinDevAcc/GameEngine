@@ -2,7 +2,7 @@
 
 namespace dae
 {
-	PointComponent::PointComponent(const int initalscore): m_Score(initalscore)
+	PointComponent::PointComponent(const int initialScore): m_Score(initialScore)
 	{
 	}
 
@@ -16,8 +16,5 @@ namespace dae
     {
     }
 
-    const char* PointComponent::GetComponentType() const
-    {
-        return "PointComponent";
-    }
+   
 }

@@ -2,17 +2,16 @@
 
 namespace dae
 {
-    LivesDisplayComponent::LivesDisplayComponent(std::unique_ptr<Font> font, GameObject& gameObject)
+    LivesDisplayComponent::LivesDisplayComponent(Font* font, GameObject& gameObject)
         : m_textComponent(nullptr), m_healthComponent(nullptr)
     {
-        m_textComponent = std::make_unique<TextComponent>("ss ", std::move(font),SDL_Color{ 255, 255, 255, 255 },gameObject); // Initialize TextComponent
+        m_textComponent = std::make_unique<TextComponent>("ss ", font,SDL_Color{ 255, 255, 255, 255 },gameObject);
     }
 
     void LivesDisplayComponent::Update()
     {
         m_textComponent->Update();
 
-        // Update the text to display current lives
         if (m_healthComponent)
         {
 	        const std::string text = "Lives: " + std::to_string(m_healthComponent->GetLives());
@@ -22,7 +21,7 @@ namespace dae
 
     void LivesDisplayComponent::Render() const
     {
-        m_textComponent->Render(); // Render the TextComponent
+        m_textComponent->Render(); 
     }
 
     void LivesDisplayComponent::AttachToHealthComponent(HealthComponent* healthComponent)

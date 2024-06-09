@@ -1,8 +1,9 @@
 ﻿#pragma once
+#include <typeinfo>
 
 namespace dae
 {
-    class GameObject; // Forward declaration
+    class GameObject; 
 
     class Component
     {
@@ -11,15 +12,14 @@ namespace dae
         virtual ~Component() = default;
 
         virtual void Initialize() {}
-        virtual void Update() = 0; // Pure virtual function for updating component logic
-        virtual void Render() const {} // Render component if needed
-        virtual const char* GetComponentType() const = 0; // Pure virtual function for component type identification
-        virtual void SetPosition(float x, float y) { (void)x; (void)y; }
+        virtual void Update() = 0; 
+        virtual void Render() const {} 
+        virtual const std::type_info& GetComponentType() const = 0; 
 
-        void SetGameObject(GameObject* gameObject) { m_pGameObject = gameObject; }
+        void SetGameObject(GameObject* pGameObject) { m_pGameObject = pGameObject; }
         GameObject* GetGameObject() const { return m_pGameObject; }
 
-    protected:
+    private:
         GameObject* m_pGameObject;
     };
 }

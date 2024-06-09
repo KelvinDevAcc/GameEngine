@@ -2,7 +2,6 @@
 
 #include <memory>
 #include "Component.h"
-#include "Font.h"
 #include "HealthComponent.h"
 #include "Observer.h"
 #include "TextComponent.h"
@@ -10,18 +9,24 @@
 
 namespace dae
 {
-    class LivesDisplayComponent : public Component, public Observer
+    class LivesDisplayComponent final : public Component, public Observer
     {
     public:
-        LivesDisplayComponent(std::unique_ptr<Font> font, GameObject& gameObject);
+        LivesDisplayComponent(Font* font, GameObject& gameObject);
         ~LivesDisplayComponent() override = default;
+
+        LivesDisplayComponent(const LivesDisplayComponent& other) = delete;
+        LivesDisplayComponent(LivesDisplayComponent&& other) noexcept = delete;
+        LivesDisplayComponent& operator=(const LivesDisplayComponent& other) = delete;
+        LivesDisplayComponent& operator=(LivesDisplayComponent&& other) noexcept = delete;
 
         void Render() const override;
         void Update() override;
 
         void AttachToHealthComponent(HealthComponent* healthComponent);
 
-        const char* GetComponentType() const override { return "LivesDisplay"; }
+        std::type_info const& GetComponentType() const override { return typeid(LivesDisplayComponent); }
+
 
     private:
         std::unique_ptr<TextComponent> m_textComponent;
