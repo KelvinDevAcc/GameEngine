@@ -1,6 +1,4 @@
 #include "SceneData.h"
-#include <iostream>
-
 #include "SceneHelpers.h"
 #include "../BugerTime/Player.h"
 
@@ -53,7 +51,6 @@ namespace dae {
             RemoveGameObjectFromList(gameObject, m_enemyPlayers);
             break;
         default:
-            std::cerr << "Error: Unsupported game object type\n";
             break;
         }
     }
@@ -68,24 +65,21 @@ namespace dae {
         }
     }
 
-    void SceneData::Update()
+    void SceneData::Update() const
     {
-        // Loop through each player
         for (GameObject* player : GetPlayers()) {
-            // Check if the player is colliding with an enemy
             if (player && isOnEnemy(*player)) {
-                // Handle player-enemy collision
-                player->GetComponent<game::Player>()->Die(); // Example function to handle player taking damage
+                player->GetComponent<game::Player>()->Die(); 
             }
         }
     }
 
-    bool SceneData::IsOnSpecificObjectType(GameObject& object, const std::vector<GameObject*>& objects) const {
+    bool SceneData::IsOnSpecificObjectType(GameObject& object, const std::vector<GameObject*>& objects)
+    {
         const auto hitBox = object.GetComponent<HitBox>();
         if (!hitBox) return false;
 
         for (const auto& gameObject : objects) {
-            // Skip the object itself
             if (gameObject == &object) continue;
 
             const auto otherHitBox = gameObject->GetComponent<HitBox>();
@@ -97,48 +91,40 @@ namespace dae {
         return false;
     }
 
-    bool SceneData::IsWithinBounds(float x, float y) const {
-        // Define the boundaries of the game world
+    bool SceneData::IsWithinBounds(float x, float y)
+    {
         const float minX = SceneHelpers::GetMinCoordinates().x;
         const float minY = SceneHelpers::GetMinCoordinates().y;
         const float maxX = SceneHelpers::GetMaxCoordinates().x;
         const float maxY = SceneHelpers::GetMaxCoordinates().y;
 
-        // Check if the given position is within the defined bounds
         return x >= minX && x < maxX && y >= minY && y < maxY;
     }
 
     bool SceneData::CanEntityMove(float moveX, float moveY, GameObject& entity) const {
-        // Get the current position of the entity
         const glm::vec3 currentPosition = entity.GetWorldPosition();
 
-        // Calculate the new position after applying the movement
         const glm::vec3 newPosition = currentPosition + glm::vec3(moveX, moveY, 0.0f);
 
-        // Check if the new position is within the bounds of the game world
         if (!IsWithinBounds(newPosition.x, newPosition.y)) 
         {
-            return false; // Movement would go out of bounds
+            return false; 
         }
 
-        // Check for collisions with obstacles
         return  IsNextObject(newPosition.x, newPosition.y);
     }
 
     GameObject* SceneData::GetFloorAt(const glm::vec3& position) const
     {
-        // Iterate through all floor objects
         for (const auto& floor : m_floors) {
 	        if (const auto hitBox = floor->GetComponent<HitBox>()) {
                 const SDL_Rect rect = hitBox->GetRect();
-                // Check if the position is within the bounds of the current floor
                 if (position.x >= rect.x && position.x < rect.x + rect.w &&
                     position.y >= rect.y && position.y < rect.y + rect.h) {
                     return floor;
                 }
             }
         }
-        // If no floor is found at the given position, return nullptr
         return nullptr;
     }
 
@@ -149,21 +135,20 @@ namespace dae {
                     const SDL_Rect rect = hitBox->GetRect();
                     if (x >= rect.x && x < rect.x + rect.w &&
                         y >= rect.y && y < rect.y + rect.h) {
-                        return true; // Collision detected
+                        return true; 
                     }
                 }
             }
-            return false; // No collision detected
+            return false; 
             };
 
-        // Check collisions with different types of objects
         if (checkCollisionsWithObjects(m_solidLadders)) return true;
         if (checkCollisionsWithObjects(m_floors)) return true;
         if (checkCollisionsWithObjects(m_ladderUp)) return true;
         if (checkCollisionsWithObjects(m_ladderUpDown)) return true;
         if (checkCollisionsWithObjects(m_ladderDown)) return true;
 
-        return false; // No collision detected with any object
+        return false; 
     }
 
     GameObject* SceneData::GetPlayer() const {

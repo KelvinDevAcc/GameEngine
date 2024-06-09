@@ -2,9 +2,7 @@
 #include <algorithm>
 #include <iostream>
 #include <memory>
-
 #include "sound_system.h"
-
 
 class null_sound_system final : public sound_system
 {

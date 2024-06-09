@@ -1,4 +1,3 @@
-//made with help of julian Rijken
 #pragma once
 #include <string>
 #include <memory>
@@ -15,7 +14,6 @@ namespace dae
 		static void Init(const std::string& data);
 
 		static Font* LoadFont(const std::string& name, const std::string& file, unsigned int size);
-
 
 		static Texture2D* LoadTexture(const std::string& fileName);
 		static Sprite* LoadSprite(const std::string& name, const std::string& fileName, int rowCount = 1, int colCount = 1,const std::map<std::string, SpriteAnimation>& animations = {});

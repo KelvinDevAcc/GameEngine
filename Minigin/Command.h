@@ -1,5 +1,4 @@
 #pragma once
-
 #include "GameObject.h"
 #include "HealthComponent.h"
 #include "MenuComponent.h"
@@ -28,7 +27,7 @@ enum class MovementDirection
 class MoveCommand : public Command
 {
 public:
-    MoveCommand(int playerNumber ,float deltaX, float deltaY); // Include MovementDirection parameter
+    MoveCommand(int playerNumber ,float deltaX, float deltaY);
     void Execute() override;
 
 private:
@@ -138,7 +137,6 @@ private:
 
 
 //select name commands
-
 class NavigateUpLetterCommand : public Command
 {
 public:
@@ -147,7 +145,7 @@ public:
 
 private:
     int m_PlayerId;
-    SelectNameComponent* FindSelectNameComponent();
+    SelectNameComponent* FindSelectNameComponent() const;
 };
 
 // NavigateDownLetterCommand.h
@@ -159,7 +157,7 @@ public:
 
 private:
     int m_PlayerId;
-    SelectNameComponent* FindSelectNameComponent();
+    SelectNameComponent* FindSelectNameComponent() const;
 };
 
 // SelectOptionLetterCommand.h
@@ -171,7 +169,7 @@ public:
 
 private:
     int m_PlayerId;
-    SelectNameComponent* FindSelectNameComponent();
+    SelectNameComponent* FindSelectNameComponent() const;
 };
 
 // saveScoreCommand.h
@@ -184,5 +182,5 @@ public:
 private:
     int m_PlayerId;
     std::string m_CurrentName;
-    SelectNameComponent* FindSelectNameComponent(int playerId);
+    static SelectNameComponent* FindSelectNameComponent(int playerId);
 };

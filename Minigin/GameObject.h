@@ -1,5 +1,4 @@
 #pragma once
-
 #include <memory>
 #include <vector>
 #include "Component.h"
@@ -14,16 +13,20 @@ namespace dae
         GameObject();
         ~GameObject() = default;
 
+        GameObject(const GameObject& other) = delete;
+        GameObject(GameObject&& other) noexcept = delete;
+        GameObject& operator=(const GameObject& other) = delete;
+        GameObject& operator=(GameObject&& other) noexcept = delete;
+
         void Update() const;
         void Render() const;
 
-        // Function to set rotation
         void SetRotation(float rotation) { m_worldPosition.SetRotation(rotation); }
 
         void SetDimensions(float width, float height);
         std::pair<float, float> GetDimensions() const;
         void AddComponent(std::unique_ptr<Component> component);
-        void RemoveComponent(Component* component); // Pass raw pointer instead of shared_ptr
+        void RemoveComponent(Component* component); 
         void SetParent(GameObject* parent, bool keepWorldPosition = false);
 
         void SetLocalPosition(const glm::vec3& pos);

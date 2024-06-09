@@ -9,11 +9,16 @@
 
 namespace dae
 {
-    class LivesDisplayComponent : public Component, public Observer
+    class LivesDisplayComponent final : public Component, public Observer
     {
     public:
         LivesDisplayComponent(Font* font, GameObject& gameObject);
         ~LivesDisplayComponent() override = default;
+
+        LivesDisplayComponent(const LivesDisplayComponent& other) = delete;
+        LivesDisplayComponent(LivesDisplayComponent&& other) noexcept = delete;
+        LivesDisplayComponent& operator=(const LivesDisplayComponent& other) = delete;
+        LivesDisplayComponent& operator=(LivesDisplayComponent&& other) noexcept = delete;
 
         void Render() const override;
         void Update() override;

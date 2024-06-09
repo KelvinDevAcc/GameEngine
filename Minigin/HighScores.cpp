@@ -1,5 +1,4 @@
 #include "HighScores.h"
-
 #include <algorithm>
 #include <ranges>
 
@@ -14,7 +13,7 @@ void HighScores::loadScores() {
         return;
     }
 
-    highScores.clear(); // Clear the existing scores before loading
+    highScores.clear(); 
 
     for (size_t i = 0; i < NUM_HIGH_SCORES; ++i) {
         std::array<char, PLAYER_NAME_SIZE> playerName;

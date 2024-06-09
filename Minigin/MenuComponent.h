@@ -3,17 +3,22 @@
 #include <functional>
 #include <string>
 #include <memory>
-#include <SDL.h>
 #include "GameObject.h"
 #include "TextComponent.h"
 #include "Font.h"
 
 namespace dae
 {
-    class MenuComponent : public Component
+    class MenuComponent final : public Component
     {
     public:
         MenuComponent(GameObject* owner, const std::vector<std::string>& options, const std::vector<std::function<void()>>& callbacks, Font* font, float textspace);
+        ~MenuComponent() override = default; 
+
+        MenuComponent(const MenuComponent& other) = default;
+        MenuComponent& operator=(const MenuComponent& other) = default;
+        MenuComponent(MenuComponent&& other) noexcept = default;
+        MenuComponent& operator=(MenuComponent&& other) noexcept = default;
 
         void Render() const override;
         void Update()override;

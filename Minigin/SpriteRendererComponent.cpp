@@ -23,7 +23,6 @@ void dae::SpriteRendererComponent::SetSprite(const Sprite* spritePtr)
 
     if (m_spritePtr)
     {
-        // Retrieve the width and height of the texture
         const auto size = m_spritePtr->GetTexture().GetSize();
         m_width = static_cast<float>(size.x);
         m_height = static_cast<float>(size.y);

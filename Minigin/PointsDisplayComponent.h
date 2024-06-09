@@ -8,11 +8,16 @@
 
 namespace dae
 {
-    class PointsDisplayComponent : public Component, public Observer
+    class PointsDisplayComponent final: public Component, public Observer
     {
     public:
         PointsDisplayComponent(Font* font, GameObject& gameObject);
         ~PointsDisplayComponent() override = default;
+
+        PointsDisplayComponent(const PointsDisplayComponent& other) = delete;
+        PointsDisplayComponent(PointsDisplayComponent&& other) noexcept = delete;
+        PointsDisplayComponent& operator=(const PointsDisplayComponent& other) = delete;
+        PointsDisplayComponent& operator=(PointsDisplayComponent&& other) noexcept = delete;
 
         void Render() const override;
         void Update() override;

@@ -1,6 +1,4 @@
-//with help from julian
 #pragma once
-
 #include <map>
 #include <string>
 #include <vector>

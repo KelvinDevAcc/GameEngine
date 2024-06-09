@@ -12,6 +12,12 @@ namespace game {
         EnemyComponent(dae::GameObject* owner, dae::Scene* scene);
         ~EnemyComponent() override = default;
 
+        EnemyComponent(const EnemyComponent& other) = delete;
+        EnemyComponent& operator=(const EnemyComponent& other) = delete;
+        EnemyComponent(EnemyComponent&& other) noexcept = delete;
+        EnemyComponent& operator=(EnemyComponent&& other) noexcept = delete;
+
+
         void Update() override;
         void Die();
 
@@ -19,7 +25,7 @@ namespace game {
 
     private:
 
-        void UpdateAnimation();
+        void UpdateAnimation() const;
 
         dae::SpriteRendererComponent* m_spriteRenderer;
         dae::AnimationComponent* m_animationComponent;

@@ -3,7 +3,7 @@
 #include "Scene.h" 
 #include <glm/vec3.hpp>
 
-class SceneHelpers
+class SceneHelpers final
 {
 public:
     static void LoadMapIntoScene(const LoadMap& loadMap, dae::Scene* scene, const glm::vec3& startPos, glm::vec2 scale);

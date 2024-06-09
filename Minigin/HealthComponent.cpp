@@ -1,5 +1,4 @@
 #include "HealthComponent.h"
-
 #include "EnventQueue.h"
 #include "sound_system.h"
 
@@ -15,16 +14,14 @@ namespace dae
         if (m_Health <= 0)
         {
             m_Lives--;
-            m_Health = 100; // Reset health
-            //if (m_DeathCallback) // Invoke death callback if set
-            //    m_DeathCallback();
+            m_Health = 100; 
             if (m_Lives == 0)
             {
                 dae::Message message;
 
-                message.type = dae::PlaySoundMessageType::deathSound;
+                message.type = dae::PlaySoundMessageType::Sound;
 
-                message.arguments.emplace_back(static_cast<sound_id>(1)); // sound ID
+                message.arguments.emplace_back(static_cast<sound_id>(1));
 
                 dae::EventQueue::Broadcast(message);
             }

@@ -23,6 +23,6 @@ namespace dae
 		SDL_Texture* m_texture;
 		int m_width;
 		int m_height;
-		SDL_Rect m_sourceRect; // New member to store the source rectangle
+		SDL_Rect m_sourceRect; 
 	};
 }

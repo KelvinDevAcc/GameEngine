@@ -53,10 +53,6 @@ namespace dae
     {
         auto& soundSystem = servicelocator::get_sound_system();
         m_backgroundMusicID = soundSystem.get_sound_id_for_file_path(musicFilePath);
-        if (m_backgroundMusicID == 0)
-        {
-            std::cerr << "Failed to load background music for scene '" << m_name << "' from file: " << musicFilePath << std::endl;
-        }
     }
 
     void Scene::SetBackgroundMusic(int musicid)
@@ -70,10 +66,6 @@ namespace dae
         {
             auto& soundSystem = servicelocator::get_sound_system();
             soundSystem.play(m_backgroundMusicID);
-        }
-        else
-        {
-            std::cerr << "No background music set for scene '" << m_name << "'" << std::endl;
         }
     }
 

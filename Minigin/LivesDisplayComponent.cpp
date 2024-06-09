@@ -12,7 +12,6 @@ namespace dae
     {
         m_textComponent->Update();
 
-        // Update the text to display current lives
         if (m_healthComponent)
         {
 	        const std::string text = "Lives: " + std::to_string(m_healthComponent->GetLives());
@@ -22,7 +21,7 @@ namespace dae
 
     void LivesDisplayComponent::Render() const
     {
-        m_textComponent->Render(); // Render the TextComponent
+        m_textComponent->Render(); 
     }
 
     void LivesDisplayComponent::AttachToHealthComponent(HealthComponent* healthComponent)

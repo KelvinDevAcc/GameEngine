@@ -3,7 +3,6 @@
 #include <windows.h>
 #include <Xinput.h>
 
-#pragma comment(lib, "xinput.lib")
 
 class XInputController
 {

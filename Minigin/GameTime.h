@@ -4,7 +4,7 @@
 
 namespace dae
 {
-    class GameTime
+    class GameTime final
     {
         friend class Minigin;
 

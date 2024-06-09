@@ -1,7 +1,5 @@
 #include "MenuComponent.h"
-
 #include <iostream>
-
 #include "ResourceManager.h"
 
 namespace dae
@@ -14,10 +12,8 @@ namespace dae
         {
             auto optionObject = std::make_unique<GameObject>();
             auto textComponent = std::make_unique<TextComponent>(option, font, m_NormalColor, *optionObject);
-           // textComponent->SetGameObject(optionObject.get());
             optionObject->AddComponent(std::move(textComponent));
 
-            // Adjust the y-coordinate of the local position based on the parent's position
             optionObject->SetLocalPosition(glm::vec3(m_owner->GetWorldPosition().x, yPos, 0.f));
 
             yPos += m_TextSpace;
@@ -64,7 +60,6 @@ namespace dae
 
     void MenuComponent::SetTextColor(const SDL_Color& color)
     {
-        // Set the text color of the menu objects
         for (const auto& optionObject : m_OptionObjects)
         {
 	        if (const auto textComponent = optionObject->GetComponent<TextComponent>())

@@ -11,7 +11,6 @@ dae::RotatorComponent::RotatorComponent(GameObject* gameObject, float rotationSp
 
 void dae::RotatorComponent::Update()
 {
-    // Update rotation based on rotation speed and delta time
     m_CurrentRotation += m_RotationSpeed * GameTime::GetDeltaTime();
 
     // Wrap the angle within the range [0, 2π]
@@ -22,11 +21,9 @@ void dae::RotatorComponent::Update()
     // Apply rotation around the specified center point
     if (m_GameObject)
     {
-        // Calculate the new positions after rotation
         float newX = m_CenterX + m_Radius * std::cos(m_CurrentRotation);
         float newY = m_CenterY + m_Radius * std::sin(m_CurrentRotation);
 
-        // Set the new position of the object
         m_GameObject->SetLocalPosition(glm::vec3(newX, newY, 0.0f));
     }
 }

@@ -2,7 +2,7 @@
 #include <iostream>
 
 SelectNameComponent::SelectNameComponent(dae::GameObject* owner, size_t maxLength, dae::Font* font, const SDL_Color& color, int playerId)
-	: m_PlayerId(playerId), m_MaxLength(maxLength), m_CurrentIndex(0), m_CurrentLetter('A'), m_Color(color), m_owner(owner)
+	: m_PlayerId(playerId), m_MaxLength(maxLength), m_CurrentLetter('A'), m_Color(color), m_owner(owner)
 {
 	const float yPos = m_owner->GetWorldPosition().y;
 	if (m_owner)
@@ -80,13 +80,11 @@ void SelectNameComponent::SubtractLetter() {
 void SelectNameComponent::ConfirmLetter() {
     if (m_CurrentName.size() < m_MaxLength) {
         m_CurrentName += m_CurrentLetter;
-        m_CurrentLetter = 'A'; // Reset to 'A' for next input
+        m_CurrentLetter = 'A'; 
     }
 }
 
-void SelectNameComponent::FinishName() {
-   // m_OnComplete(m_CurrentName);
-}
+
 
 std::string SelectNameComponent::GetCurrentName() const {
     return m_CurrentName;

@@ -2,29 +2,39 @@
 #include "AnimationComponent.h"
 #include "HitBox.h"
 
-class Pepper : public dae::Component
+namespace game
 {
-public:
-    Pepper(dae::GameObject* owner, const glm::vec3& direction, float speed, float lifetime);
+    class Pepper final : public dae::Component
+    {
+    public:
+        Pepper(dae::GameObject* owner, const glm::vec3& direction, float speed, float lifetime);
 
-    void Update() override;
-    void Render() const override;
+        ~Pepper() override = default;
 
-    void Activate();
-    void Deactivate();
+        Pepper(const Pepper& other) = delete;
+        Pepper(Pepper&& other) noexcept = delete;
+        Pepper& operator=(const Pepper& other) = delete;
+        Pepper& operator=(Pepper&& other) noexcept = delete;
 
-    const std::type_info& GetComponentType() const override { return typeid(Pepper); }
+        void Update() override;
+        void Render() const override;
 
-private:
-    glm::vec3 m_Direction;
-    float m_Speed;
-    float m_Lifetime;
-    bool m_IsActive;
-    HitBox* m_HitBox;
-    dae::AnimationComponent* m_AnimationComponent;
+        void Activate();
+        void Deactivate();
 
-    dae::GameObject* m_owner;
+        const std::type_info& GetComponentType() const override { return typeid(Pepper); }
 
-    std::unique_ptr<dae::GameObject> m_PerperObject;
-};
+    private:
+        glm::vec3 m_direction;
+        float m_speed;
+        float m_lifetime;
+        bool m_isActive;
+        HitBox* m_hitBox;
+        dae::AnimationComponent* m_animationComponent;
+
+        dae::GameObject* m_owner;
+
+        std::unique_ptr<dae::GameObject> m_perperObject;
+    };
+}
 

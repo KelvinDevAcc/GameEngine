@@ -18,18 +18,19 @@ namespace dae {
         Basket
     };
 
-    class SceneData : public Singleton<SceneData> {
+    class SceneData final : public Singleton<SceneData> {
     public:
         static SceneData& GetInstance();
         SceneData(const SceneData&) = delete;
-        void operator=(const SceneData&) = delete;
+        SceneData(SceneData&&) noexcept = delete;
+        SceneData& operator=(SceneData&&) noexcept = delete;
 
         void AddGameObject(GameObject* gameObject, GameObjectType type);
         void RemoveAllGameObjects();
 
         void RemoveGameObject(GameObject* gameObject, GameObjectType type);
 
-        void Update();
+        void Update() const;
 
         GameObject* GetPlayer() const;
         std::vector<GameObject*> GetPlayers() const {return m_players;}
@@ -49,11 +50,11 @@ namespace dae {
 
         bool CanEntityMove(float moveX, float moveY, GameObject& entity) const;
 
-        bool IsWithinBounds(float x, float y) const;
+        static bool IsWithinBounds(float x, float y);
 
         bool IsNextObject(float x, float y) const;
 
-        bool IsOnSpecificObjectType(GameObject& player, const std::vector<GameObject*>& objects) const;
+        static bool IsOnSpecificObjectType(GameObject& object, const std::vector<GameObject*>& objects);
 
     private:
         SceneData() = default;
@@ -72,8 +73,6 @@ namespace dae {
         std::vector<GameObject*> m_burgerParts;
         std::vector<GameObject*> m_baskets;
 
-        //void CheckPlayerCollisions();
-        //void OnCollision(GameObject* a, GameObject* b, GameObjectType type);
 
     };
 }

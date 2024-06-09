@@ -42,6 +42,9 @@
     <ClCompile Include="MrPickleAIComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Minigin\BurgerComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Player.h">
@@ -64,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="MrPickleAIComponent.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Minigin\BurgerComponent.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

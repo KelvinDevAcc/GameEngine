@@ -27,8 +27,8 @@ namespace dae {
         static bool IsPressed(SDL_Scancode button);
         static int  GetConnectedControllerCount();
 
-        void BindCommand(unsigned int button, KeyState state, std::unique_ptr<Command> command, InputType type, int controllerIndex = 0);
-        void UnbindCommand(unsigned int button, KeyState state, InputType type);
+        static void BindCommand(unsigned int button, KeyState state, std::unique_ptr<Command> command, InputType type, int controllerIndex = 0);
+        static void UnbindCommand(unsigned int button, KeyState state, InputType type);
 
     private:
         static void HandleKeyInput();
@@ -39,8 +39,8 @@ namespace dae {
         static std::array<std::unordered_map<std::pair<unsigned int, KeyState>, std::unique_ptr<Command>>, 4> m_controllerBindings;
         static std::unordered_map<std::pair<unsigned int, KeyState>, std::unique_ptr<Command>> m_keyboardBindings;
 
-        static const Uint8* m_PreviousState;
-        static const Uint8* m_CurrentState;
+        static const Uint8* m_previousState;
+        static const Uint8* m_currentState;
     };
 }
 

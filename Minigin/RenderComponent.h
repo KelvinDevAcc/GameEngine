@@ -2,17 +2,21 @@
 
 #include <memory>
 #include <vector>
-
 #include "Component.h"
 #include "Texture2D.h"
 
 namespace dae
 {
-    class RenderComponent : public Component
+    class RenderComponent final : public Component
     {
     public:
         RenderComponent(GameObject* gameObject);
         ~RenderComponent() override = default;
+
+        RenderComponent(const RenderComponent& other) = delete;
+        RenderComponent(RenderComponent&& other) noexcept = delete;
+        RenderComponent& operator=(const RenderComponent& other) = delete;
+        RenderComponent& operator=(RenderComponent&& other) noexcept = delete;
 
         void Update() override;
         void Render() const override;

@@ -5,7 +5,7 @@
 #include "GameObject.h"
 #include "Renderer.h"
 
-class HitBox : public dae::Component {
+class HitBox final : public dae::Component {
 public:
     HitBox(const glm::vec2& size)
 	    : m_position(0,0), m_size(size)
@@ -48,12 +48,6 @@ public:
         if (const auto parent = GetGameObject()) {
             m_position = parent->GetWorldPosition();
         }
-    }
-
-    void Render() const override
-    {
-		/*const SDL_Rect rect = GetRect();
-    	dae::Renderer::GetInstance().RenderRect(rect, { 255, 0, 0, 255 }, false);*/
     }
 
     const std::type_info& GetComponentType() const override {

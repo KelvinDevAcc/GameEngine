@@ -6,73 +6,72 @@
 
 #include "ResourceManager.h"
 
-Pepper::Pepper(dae::GameObject* owner, const glm::vec3& direction, float speed, float lifetime)
-	: m_Direction(direction), m_Speed(speed), m_Lifetime(lifetime), m_IsActive(false), m_HitBox(nullptr),
-	  m_AnimationComponent(nullptr), m_owner(owner)
+namespace game
 {
-		//float yPos = m_owner->GetWorldPosition().y;
-		auto PeperObject = std::make_unique<dae::GameObject>();
-        auto spriterenderComponent = std::make_unique<dae::SpriteRendererComponent>(PeperObject.get(), dae::ResourceManager::GetSprite("sausage"));
-        spriterenderComponent->SetDimensions(40, 40);
-        PeperObject->AddComponent(std::move(spriterenderComponent));
+    Pepper::Pepper(dae::GameObject* owner, const glm::vec3& direction, float speed, float lifetime)
+        : m_direction(direction), m_speed(speed), m_lifetime(lifetime), m_isActive(false), m_hitBox(nullptr),
+        m_animationComponent(nullptr), m_owner(owner)
+    {
+        auto peperObject = std::make_unique<dae::GameObject>();
+        auto spriteRenderComponent = std::make_unique<dae::SpriteRendererComponent>(peperObject.get(), dae::ResourceManager::GetSprite("Pepper"));
+        spriteRenderComponent->SetDimensions(40, 40);
+        peperObject->AddComponent(std::move(spriteRenderComponent));
 
-        auto animationComponent = std::make_unique<dae::AnimationComponent>(PeperObject.get(), PeperObject->GetComponent<dae::SpriteRendererComponent>(), "Walk_Right");
-        //animationComponent->Play("Walk_Right", true);
-        m_AnimationComponent = animationComponent.get();
-        PeperObject->AddComponent(std::move(animationComponent));
+        auto animationComponent = std::make_unique<dae::AnimationComponent>(peperObject.get(), peperObject->GetComponent<dae::SpriteRendererComponent>(), "ShakeCloud");
+        m_animationComponent = animationComponent.get();
+        peperObject->AddComponent(std::move(animationComponent));
 
 
         auto  hitBox = std::make_unique<HitBox>(glm::vec2(m_owner->GetDimensions().first, m_owner->GetDimensions().second));
-		PeperObject->AddComponent(std::move(hitBox));
-		// Adjust the y-coordinate of the local position based on the parent's position
-        PeperObject->SetLocalPosition(glm::vec3(100, 100, 0.f));
+        peperObject->AddComponent(std::move(hitBox));
+        peperObject->SetLocalPosition(glm::vec3(10, 0, 0.f));
 
-        //PeperObject->SetParent(m_owner);
-        m_PerperObject = std::move(PeperObject);
-}
+        peperObject->SetParent(m_owner);
+        m_perperObject = std::move(peperObject);
+    }
 
-void Pepper::Update()
-{
-   /* if (!m_IsActive)
-        return;*/
-
-    if (!m_HitBox)
+    void Pepper::Update()
     {
-        m_HitBox = m_PerperObject->GetComponent<HitBox>();
-        if (!m_HitBox)
-        {
-            std::cerr << "Error: Pepper Attack HitBox is nullptr\n";
+        if (!m_isActive)
             return;
+
+        if (!m_hitBox)
+        {
+            m_hitBox = m_perperObject->GetComponent<HitBox>();
+            if (!m_hitBox)
+            {
+                std::cerr << "Error: Pepper Attack HitBox is nullptr\n";
+                return;
+            }
+        }
+
+        m_perperObject->Update();
+
+        m_lifetime -= dae::GameTime::GetDeltaTime();
+        if (m_lifetime <= 0.0f)
+        {
+            Deactivate();
         }
     }
 
-    m_PerperObject->Update();
-
-    m_Lifetime -= dae::GameTime::GetDeltaTime();
-    if (m_Lifetime <= 0.0f)
+    void Pepper::Render() const
     {
-        Deactivate();
+        if (!m_isActive)
+            return;
+
+        m_perperObject->Render();
+    }
+
+    void Pepper::Activate()
+    {
+        m_isActive = true;
+        m_lifetime = 1.0f;
+        m_animationComponent->Play("ShakeCloud2", true);
+    }
+
+    void Pepper::Deactivate()
+    {
+        m_isActive = false;
     }
 }
-
-void Pepper::Render() const
-{
-  /*  if (!m_IsActive)
-        return;*/
-
-    m_PerperObject->Render();
-}
-
-void Pepper::Activate()
-{
-   // m_IsActive = true;
-    m_Lifetime = 1.0f; // Reset lifetime
-    m_AnimationComponent->Play("Walk_Right", true);
-}
-
-void Pepper::Deactivate()
-{
-    m_IsActive = false;
-}
-
   

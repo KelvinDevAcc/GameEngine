@@ -1,10 +1,8 @@
 #pragma once
-#include <functional>
 #include <string>
 #include <memory>
 #include "TextComponent.h"
 #include "GameObject.h"
-#include "Scene.h"
 #include "Font.h"
 #include "SDL.h"
 
@@ -18,7 +16,6 @@ public:
     void AddLetter();
     void SubtractLetter();
     void ConfirmLetter();
-    void FinishName();
 
     int GetPlayerId() const;
 
@@ -30,10 +27,8 @@ public:
 private:
     int m_PlayerId;
     size_t m_MaxLength;
-    size_t m_CurrentIndex;
     char m_CurrentLetter;
-    std::string m_CurrentName = "";
-    //std::function<void(const std::string&)> m_OnComplete;
+    std::string m_CurrentName;
 
     static constexpr char FIRST_LETTER = 'A';
     static constexpr char LAST_LETTER = 'Z';

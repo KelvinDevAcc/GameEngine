@@ -1,5 +1,4 @@
 #include "Player.h"
-
 #include "GameTime.h"
 #include "Pepper.h"
 #include "SceneData.h"
@@ -100,7 +99,6 @@ namespace game
 
         bool hasMoved = false;
 
-        // On ladder up or up-down
         if (isOnLadderUp && deltaY < 0 && sceneData.CanEntityMove(m_deltaX, m_deltaY, *m_GameObject)) {
             MoveVertically(m_deltaY);
             hasMoved = true;
@@ -121,13 +119,11 @@ namespace game
             hasMoved = true;
         }
 
-        // On ladder up-down or on floor
         if ((isOnLadderUp || isOnLadderDown || isOnLadderUpDown || isOnFloor) && sceneData.CanEntityMove(m_deltaX, 0.0f, *m_GameObject)) {
             MoveHorizontally(m_deltaX);
             hasMoved = true;
         }
 
-        // If no movement was performed, set the player to idle
         if (!hasMoved) {
             SetState(m_idleState.get());
         }
@@ -136,7 +132,7 @@ namespace game
     void Player::MoveHorizontally(float deltaX)
     {
         glm::vec3 currentPosition = m_GameObject->GetWorldPosition();
-        currentPosition.x += deltaX ; // deltaTime represents the time elapsed since the last frame
+        currentPosition.x += deltaX ; 
         m_GameObject->SetLocalPosition(currentPosition);
         SetState(m_walkingState.get());
     }
@@ -144,7 +140,7 @@ namespace game
     void Player::MoveVertically(float deltaY)
     {
         glm::vec3 currentPosition = m_GameObject->GetWorldPosition();
-        currentPosition.y += deltaY; // deltaTime represents the time elapsed since the last frame
+        currentPosition.y += deltaY; 
         m_GameObject->SetLocalPosition(currentPosition);
         SetState(m_walkingState.get());
     }

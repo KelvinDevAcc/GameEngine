@@ -1,8 +1,4 @@
-// made with the help of julian rijken
 #pragma once
-#ifndef DAE_MESSAGE_QUEUE_H
-#define DAE_MESSAGE_QUEUE_H
-
 #include <any>
 #include <functional>
 #include <queue>
@@ -12,15 +8,7 @@
 namespace dae {
 
     enum class PlaySoundMessageType {
-        deathSound,
-        LevelIntro,
-        Main,
-        win,
-        pepper,
-        steppingOnBurger,
-        bugerMenu,
-        menuSelect,
-        menuMove
+        Sound,
     };
 
     enum class PointsMessageType {
@@ -75,7 +63,6 @@ namespace dae {
 
                 auto range = EventQueue::listeners.equal_range(message.type);
                 for (auto it = range.first; it != range.second; ++it) {
-                    // Call the listener function with the message
                     const auto& listener = it->second;
                     listener.second(message);
                 }
@@ -88,8 +75,4 @@ namespace dae {
         static inline std::unordered_multimap<std::variant<PlaySoundMessageType, PointsMessageType>, Listener> listeners{};
         static inline std::queue<Message> messages{};
     };
-
-    
 }
-
-#endif  // DAE_MESSAGE_QUEUE_H

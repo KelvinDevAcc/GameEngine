@@ -1,10 +1,10 @@
 #include "EnemyComponent.h"
-
 #include "GameTime.h"
 #include "MrHotDogAIComponent.h"
 #include "MrPickleAIComponent.h"
 #include "Scene.h"
 #include "SceneData.h"
+
 
 namespace game {
 
@@ -43,7 +43,8 @@ namespace game {
     }
 
 
-    void EnemyComponent::UpdateAnimation() {
+    void EnemyComponent::UpdateAnimation() const
+    {
         // Update animation based on movement direction
         if (glm::length(m_direction) > 0.0f) {
             if (m_direction.x > 0.0f) {

@@ -6,11 +6,16 @@
 
 namespace dae
 {
-    class PointComponent final : public Component, public Subject // Inherit from Subject interface
+    class PointComponent final : public Component, public Subject 
     {
     public:
         PointComponent(int initialScore);
         ~PointComponent() override = default;
+
+        PointComponent(const PointComponent& other) = delete;
+        PointComponent(PointComponent&& other) noexcept = delete;
+        PointComponent& operator=(const PointComponent& other) = delete;
+        PointComponent& operator=(PointComponent&& other) noexcept = delete;
 
         int GetScore() const { return m_Score; }
         void SetScore(int score);

@@ -9,8 +9,6 @@
 
 namespace dae
 {
-
-
     class TextComponent final : public Component
     {
     public:

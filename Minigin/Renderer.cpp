@@ -92,7 +92,6 @@ void dae::Renderer::RenderTexture(const Texture2D& texture, const float x, const
 
 void dae::Renderer::RenderTexture(const Texture2D& texture, float pos_x, float pos_y, float width, float height, float rotation_angle) const
 {
-	// Destination rectangle
 	SDL_Rect dst{};
 	dst.x = static_cast<int>(pos_x);
 	dst.y = static_cast<int>(pos_y);
@@ -106,7 +105,6 @@ void dae::Renderer::RenderTexture(const Texture2D& texture, float pos_x, float p
 void dae::Renderer::RenderTexture(const Texture2D& texture, float x, float y, const glm::vec2& cellSize,
 	int pixelsPerUnit) const
 {
-	// Calculate the destination rectangle based on the position and cell size
 	SDL_Rect destRect{
 		static_cast<int>(x),
 		static_cast<int>(y),
@@ -114,24 +112,8 @@ void dae::Renderer::RenderTexture(const Texture2D& texture, float x, float y, co
 		static_cast<int>(cellSize.y * static_cast<float>(pixelsPerUnit))
 	};
 
-	// Render the texture to the screen
 	SDL_RenderCopy(m_renderer, texture.GetSDLTexture(), nullptr, &destRect);
 }
-
-//void dae::Renderer::RenderTexture(const Texture2D& texture, float x, float y, float width, float height, float rotation_angle, const SDL_Rect* srcRect, SDL_RendererFlip flip) const
-//{
-//	// Destination rectangle
-//	SDL_Rect dst{};
-//	dst.x = static_cast<int>(x);
-//	dst.y = static_cast<int>(y);
-//	dst.w = static_cast<int>(width);
-//	dst.h = static_cast<int>(height);
-//
-//	// Render texture with rotation and flipping
-//	SDL_RenderCopyEx(GetSDLRenderer(), texture.GetSDLTexture(), srcRect, &dst, rotation_angle, nullptr, flip);
-//}
-
-
 
 void dae::Renderer::RenderTexture(const dae::Texture2D& texture, glm::vec2 drawLocation,
 	glm::vec2 srcLocation, glm::ivec2 cellSize, float width, float height, bool flipX, bool flipY)
@@ -139,7 +121,7 @@ void dae::Renderer::RenderTexture(const dae::Texture2D& texture, glm::vec2 drawL
 	SDL_Renderer* sdlRenderer = GetInstance().GetSDLRenderer();
 
 	if (sdlRenderer == nullptr || texture.GetSDLTexture() == nullptr)
-		return; // Or throw an error, depending on your error handling strategy
+		return; 
 
 	SDL_Rect srcRect;
 	srcRect.x = static_cast<int>(srcLocation.x * cellSize.x);
@@ -168,12 +150,7 @@ void dae::Renderer::RenderTexture(const dae::Texture2D& texture, glm::vec2 drawL
 
 void dae::Renderer::RenderRect(const SDL_Rect& rect, SDL_Color color, bool filled) const
 {
-	//int centeredX = rect.x - (rect.w / 2);
-	//int centeredY = rect.y - (rect.h / 2);
-
-	SDL_Rect centeredRect = rect;
-	//centeredRect.x = centeredX;
-	//centeredRect.y = centeredY;
+	const SDL_Rect centeredRect = rect;
 
 	SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
 	if (filled) {

@@ -1,5 +1,4 @@
 #include "AnimationComponent.h"
-#include <iostream>
 #include "GameTime.h"
 
 namespace dae
@@ -9,15 +8,7 @@ namespace dae
         m_activeAnimationName(defaultAnimation), m_playingAnimation(false), m_LoopingAnimation(false),
         m_frameTime(0.0f), m_renderScaleX(1.0f), m_renderScaleY(1.0f)
     {
-
-        if (m_spriteRenderer->GetSprite()->GetAnimation(defaultAnimation) == nullptr)
-        {
-            std::cerr << "Default animation does not exist: " << defaultAnimation << std::endl;
-        }
-        else
-        {
-            m_activeAnimation = m_spriteRenderer->GetSprite()->GetAnimation(defaultAnimation);
-        }
+        m_activeAnimation = m_spriteRenderer->GetSprite()->GetAnimation(defaultAnimation);
     }
 
     void AnimationComponent::Update()
@@ -49,11 +40,6 @@ namespace dae
 
     void AnimationComponent::Play(const std::string& name, bool looping, float startFrameTime)
     {
-        if (!m_spriteRenderer)
-        {
-            std::cerr << "SpriteRendererComponent is null" << std::endl;
-            return;
-        }
 
         if (auto* animation = m_spriteRenderer->GetSprite()->GetAnimation(name))
         {
@@ -67,10 +53,6 @@ namespace dae
             m_activeAnimationName = name;
             m_activeAnimation = animation;
 
-        }
-        else
-        {
-            std::cerr << "Animation does not exist: " << name << std::endl;
         }
     }
 

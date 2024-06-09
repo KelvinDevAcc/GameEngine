@@ -70,12 +70,12 @@ namespace game
         float m_timeSinceLastAction;
         float m_inactivityThreshold;
 
-        const LoadMap* m_gameMap; // Reference to the map
+        const LoadMap* m_gameMap;
 
         void CheckAndMove(float deltaX, float deltaY);
 
         void MoveHorizontally(float deltaX);
         void MoveVertically(float deltaY);
     };
-} // namespace 
+}
 

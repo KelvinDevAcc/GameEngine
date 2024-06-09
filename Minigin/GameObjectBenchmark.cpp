@@ -1,10 +1,9 @@
 #include "GameObjectBenchmark.h"
-
 #include <chrono>
 #include <iostream>
 
 void GameObjectBenchmark::RunIntBenchmark(int inputValue, int buffer_size, std::vector<float>& timings) {
-    int* intBuffer = new int[buffer_size]; // Allocate intBuffer outside the loop
+    int* intBuffer = new int[buffer_size]; 
 
     for (int i = 1; i <= 1024; i *= 2) {
         long long duration{ 0 };
@@ -22,11 +21,11 @@ void GameObjectBenchmark::RunIntBenchmark(int inputValue, int buffer_size, std::
         timings.push_back(static_cast<float>(duration));
     }
 
-    delete[] intBuffer; // Delete intBuffer after the loop finishes
+    delete[] intBuffer; 
 }
 
 void GameObjectBenchmark::RunGameObjectaltBenchmark(int inputValue, int buffer_size, std::vector<float>& timings) {
-	auto* GameObject = new GameObject3DAlt[buffer_size]; // Allocate intBuffer outside the loop
+	auto* GameObject = new GameObject3DAlt[buffer_size]; 
 
     for (int i = 1; i <= 1024; i *= 2) {
         long long duration{ 0 };
@@ -44,11 +43,11 @@ void GameObjectBenchmark::RunGameObjectaltBenchmark(int inputValue, int buffer_s
         timings.push_back(static_cast<float>(duration));
     }
 
-    delete[] GameObject; // Delete intBuffer after the loop finishes
+    delete[] GameObject; 
 }
 
 void GameObjectBenchmark::RunGameObjectBenchmark(int inputValue, int buffer_size, std::vector<float>& timings) {
-    auto* GameObject = new GameObject3D[buffer_size]; // Allocate intBuffer outside the loop
+    auto* GameObject = new GameObject3D[buffer_size]; 
 
     for (int i = 1; i <= 1024; i *= 2) {
         long long duration{ 0 };
@@ -66,5 +65,5 @@ void GameObjectBenchmark::RunGameObjectBenchmark(int inputValue, int buffer_size
         timings.push_back(static_cast<float>(duration));
     }
 
-    delete[] GameObject; // Delete intBuffer after the loop finishes
+    delete[] GameObject; 
 }

@@ -14,6 +14,9 @@ namespace dae
         SceneManager() = default;
         ~SceneManager() override = default;
 
+        SceneManager(SceneManager&&) noexcept = delete;
+        SceneManager& operator=(SceneManager&&) noexcept = delete;
+
 
         Scene* CreateScene(const std::string& name);
         Scene* GetActiveScene() const;

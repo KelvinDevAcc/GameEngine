@@ -1,12 +1,10 @@
 #include "MrPickleAIComponent.h"
 #include <random>
 #include <unordered_set>
-
 #include "GameObject.h"
 #include "GameTime.h"
 #include "SceneData.h"
 #include "SceneHelpers.h"
-
 #include <glm/gtx/rotate_vector.hpp>
 
 MrPickleAIComponent::MrPickleAIComponent(dae::GameObject* owner, std::vector<std::vector<char>>& loadMap)
@@ -130,23 +128,18 @@ void MrPickleAIComponent::Update()
 {
     const auto position = m_gameObject->GetWorldPosition();
 
-    // Calculate the shortest path to Peter using a pathfinding algorithm
     const auto pathToPeter = CalculatePathToPeter(position);
 
-    // Convert raw pointers to unique_ptr and store them in m_path
     for (SDL_Rect* rectPtr : pathToPeter)
     {
         m_path.push_back(std::make_unique<SDL_Rect>(*rectPtr));
     }
 
-    // Move along the path
     if (!m_path.empty())
     {
-        // Get the next position in the path
         SDL_Rect* nextPosition = m_path.front().get();
         glm::vec3 nextPositionWorld(nextPosition->x + nextPosition->w / 2.0f, nextPosition->y + nextPosition->h / 2.0f, 0.0f); // Center of the next position
 
-        // Calculate movement direction
         glm::vec3 direction = glm::normalize(nextPositionWorld - position);
 
         // Introduce randomness to movement direction
@@ -161,31 +154,24 @@ void MrPickleAIComponent::Update()
             glm::vec2 directionXY(direction.x, direction.y);
             directionXY = glm::rotate(directionXY, angle);
 
-            // Update direction vector components
             direction.x = directionXY.x;
             direction.y = directionXY.y;
 
-            // Reset flip timer
             m_flipTimer = m_flipDuration;
         }
 
         m_moveDirection = direction;
 
-        // Calculate the movement amount based on the character's speed and frame time
-        float movementAmount = m_movementSpeed * dae::GameTime::GetDeltaTime(); // Adjust m_movementSpeed as needed
+        const float movementAmount = m_movementSpeed * dae::GameTime::GetDeltaTime();
 
-        // Move the character towards the next position
-        glm::vec3 newPosition = position + direction * movementAmount;
+        const glm::vec3 newPosition = position + direction * movementAmount;
         m_gameObject->SetLocalPosition(newPosition);
 
-        // Check if the character has reached the next position
         if (glm::distance(newPosition, nextPositionWorld) < movementAmount)
         {
-            // Remove the reached position from the path
             m_path.erase(m_path.begin());
         }
 
-        // Decrease flip timer
         m_flipTimer -= dae::GameTime::GetDeltaTime();
     }
 }
@@ -220,7 +206,6 @@ std::vector<std::pair<int, int>> MrPickleAIComponent::GetNeighbors(const std::pa
         const int newX = node.first + dx;
         const int newY = node.second + dy;
 
-        // Check if the neighbor is within bounds and walkable
         if (IsCellWalkable(newX, newY)) {
             neighbors.emplace_back(newX, newY);
         }
@@ -229,7 +214,7 @@ std::vector<std::pair<int, int>> MrPickleAIComponent::GetNeighbors(const std::pa
     return neighbors;
 }
 
-std::vector<SDL_Rect*> MrPickleAIComponent::ReconstructPath(const std::unordered_map<std::pair<int, int>, std::pair<int, int>, PairHash>& cameFrom, const std::pair<int, int>& current)
+std::vector<SDL_Rect*> MrPickleAIComponent::ReconstructPath(const std::unordered_map<std::pair<int, int>, std::pair<int, int>, PairHash>& cameFrom, const std::pair<int, int>& current) const
 {
     std::vector<SDL_Rect*> path;
     std::pair<int, int> currentPair = current;
@@ -246,20 +231,16 @@ std::vector<SDL_Rect*> MrPickleAIComponent::ReconstructPath(const std::unordered
 
 
 float MrPickleAIComponent::GetCost(const std::pair<int, int>& next) const {
-    int x = next.first;
-    int y = next.second;
+	const int x = next.first;
+    const int y = next.second;
 
-    // Get the tile type of the next cell
-    char tile = m_map[y + 1][x]; // Adjust y index for map starting at 1
+    const char tile = m_map[y][x];
 
     // Assign costs based on tile type
-    float baseCost = 1.0f; // Default cost for non-ladder tiles
+    float baseCost = 1.0f; 
     if (tile == 'v' || tile == '^' || tile == '|') {
-        // Lower cost for ladder tiles
-        baseCost = 0.5f; // Adjust as needed
+        baseCost = 0.5f; 
     }
-
-    // Additional cost adjustments can be made based on other factors if needed
 
     return baseCost;
 }

@@ -1,6 +1,4 @@
 #include "SceneHelpers.h"
-#include <ostream>
-
 #include "BurgerComponent.h"
 #include "InputManager.h"
 #include "ResourceManager.h"
@@ -338,11 +336,11 @@ void SceneHelpers::SpawnSauge(dae::Scene* scene, float x, float y, glm::vec2 sca
     dae::SceneData::GetInstance().AddGameObject(SaugeObject.get(), dae::GameObjectType::enemy);
 
 
-   /* auto aiComponent = std::make_unique<MrHotDogAIComponent>(SaugeObject.get(), s_loadMap);
+    auto aiComponent = std::make_unique<MrHotDogAIComponent>(SaugeObject.get(), s_loadMap);
     SaugeObject->AddComponent(std::move(aiComponent));
 
     auto enemyComponent = std::make_unique<game::EnemyComponent>(SaugeObject.get(),scene);
-    SaugeObject->AddComponent(std::move(enemyComponent));*/
+    SaugeObject->AddComponent(std::move(enemyComponent));
 
 
     scene->Add(std::move(SaugeObject));
@@ -428,9 +426,9 @@ void SceneHelpers::SpawnPlayer(dae::Scene* scene, float x, float y, glm::vec2 sc
     auto Character1Health = std::make_unique<dae::HealthComponent>(100, lives);
     PlayerObject->AddComponent(std::move(Character1Health));
 
-    auto spriterenderComponent = std::make_unique<dae::SpriteRendererComponent>(PlayerObject.get(), dae::ResourceManager::GetSprite("chef"));
-    spriterenderComponent->SetDimensions(40, 40);
-    PlayerObject->AddComponent(std::move(spriterenderComponent));
+    auto spriteRenderComponent = std::make_unique<dae::SpriteRendererComponent>(PlayerObject.get(), dae::ResourceManager::GetSprite("chef"));
+    spriteRenderComponent->SetDimensions(40, 40);
+    PlayerObject->AddComponent(std::move(spriteRenderComponent));
 
     auto animationComponent = std::make_unique<dae::AnimationComponent>(PlayerObject.get(), PlayerObject->GetComponent<dae::SpriteRendererComponent>(), "Idle");
     animationComponent->Play("Idle", true);
@@ -444,8 +442,8 @@ void SceneHelpers::SpawnPlayer(dae::Scene* scene, float x, float y, glm::vec2 sc
     auto PlayerComponent = std::make_unique<game::Player>(PlayerObject.get());
     PlayerObject->AddComponent(std::move(PlayerComponent));
 
-    auto Pepercomponent = std::make_unique<Pepper>(PlayerObject.get(), glm::vec3(1.f,0.f,0.f),10.f,12.f);
-    PlayerObject->AddComponent(std::move(Pepercomponent));
+    auto pepercomponent = std::make_unique<game::Pepper>(PlayerObject.get(), glm::vec3(1.f,0.f,0.f),10.f,12.f);
+    PlayerObject->AddComponent(std::move(pepercomponent));
 
     dae::SceneData::GetInstance().AddGameObject(PlayerObject.get(), dae::GameObjectType::Player);
 
@@ -628,7 +626,7 @@ glm::vec2 SceneHelpers::GetGridSize()
 {
     glm::vec2 maxCoord = GetMaxCoordinates();
     glm::vec2 minCoord = GetMinCoordinates();
-    return glm::vec2(maxCoord.x - minCoord.x, maxCoord.y - minCoord.y);
+    return {maxCoord.x - minCoord.x, maxCoord.y - minCoord.y};
 }
 
 std::vector<std::vector<char>> SceneHelpers::GetLoadMap()

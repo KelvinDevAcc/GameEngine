@@ -42,9 +42,9 @@ void LoadResources()
 
     auto& ss = servicelocator::get_sound_system();
 
-    ss.setVolume(0.f);
+    ss.setVolume(10.f);
 
-    // Register the sound files with their corresponding IDs
+     //Register the sound files with their corresponding IDs
     ss.register_sound_file("../Data/Sounds/0_burger_going_down.mp3");
     ss.register_sound_file("../Data/Sounds/1_burger_touching_floor.mp3");
     ss.register_sound_file("../Data/Sounds/2_die.mp3");
@@ -57,7 +57,6 @@ void LoadResources()
     ss.register_sound_file("../Data/Sounds/9_pepper_up.mp3");
     ss.register_sound_file("../Data/Sounds/10_level_intro.mp3");
     ss.register_sound_file("../Data/Sounds/11_main.mp3");
-    ss.register_sound_file("../Data/Sounds/12_main_bip.mp3");
     ss.register_sound_file("../Data/Sounds/13_new_ingredient.mp3");
     ss.register_sound_file("../Data/Sounds/14_pepper.mp3");
     ss.register_sound_file("../Data/Sounds/15_peppered.mp3");
@@ -80,7 +79,6 @@ void LoadResources()
     ss.load_sound(9, "../Data/Sounds/9_pepper_up.mp3");
     ss.load_sound(10, "../Data/Sounds/10_level_intro.mp3");
     ss.load_sound(11, "../Data/Sounds/11_main.mp3", true);
-    ss.load_sound(12, "../Data/Sounds/12_main_bip.mp3");
     ss.load_sound(13, "../Data/Sounds/13_new_ingredient.mp3");
     ss.load_sound(14, "../Data/Sounds/14_pepper.mp3");
     ss.load_sound(15, "../Data/Sounds/15_peppered.mp3");
@@ -182,6 +180,7 @@ void LoadResources()
         15,  // colCount
         {
             { "ShakeCloud", { { { 11, 1 }, {12,1}, {13,1}, {14,1}}, 1 } },
+            { "ShakeCloud2", { { { 11, 2 }, {12,2}, {13,2}, {14,2}}, 1 } }
         });
 
 }
@@ -202,7 +201,6 @@ void BindControllerCommands(dae::InputManager& inputManager, int playerId, int c
     inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadLeft), KeyState::Pressed, std::make_unique<MoveCommand>(playerId, -1.5f, 0.0f), InputType::Controller, controllerIndex);
     inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::DPadRight), KeyState::Pressed, std::make_unique<MoveCommand>(playerId, 1.5f, 0.0f), InputType::Controller, controllerIndex);
     inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::A), KeyState::Up, std::make_unique<ScorePointCommand>(playerId), InputType::Controller, controllerIndex);
-    inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::B), KeyState::Up, std::make_unique<ScorePointCommand>(playerId), InputType::Controller, controllerIndex);
     inputManager.BindCommand(GameController::GetButtonMapping(GameController::Button::X), KeyState::Up, std::make_unique<DamageCommand>(playerId), InputType::Controller, controllerIndex);
 }
 void HandlePlayerInput(dae::InputManager& inputManager, int playerId)
@@ -299,7 +297,7 @@ void BindExtraControlls(dae::InputManager& inputManager)
 {
     // Additional keyboard commands
     inputManager.BindCommand(SDL_SCANCODE_F1, KeyState::Up, std::make_unique<GoToNextSceneCommand>(), InputType::Keyboard);
-    inputManager.BindCommand(SDL_SCANCODE_G, KeyState::Up, std::make_unique<MuteCommand>(&servicelocator::get_sound_system()), InputType::Keyboard);
+    inputManager.BindCommand(SDL_SCANCODE_M, KeyState::Up, std::make_unique<MuteCommand>(&servicelocator::get_sound_system()), InputType::Keyboard);
     inputManager.BindCommand(SDL_SCANCODE_P, KeyState::Up, std::make_unique<PlaySoundCommand>(), InputType::Keyboard);
     inputManager.BindCommand(SDL_SCANCODE_MINUS, KeyState::Up, std::make_unique<DecreaseVolumeCommand>(&servicelocator::get_sound_system()), InputType::Keyboard);
     inputManager.BindCommand(SDL_SCANCODE_EQUALS, KeyState::Up, std::make_unique<IncreaseVolumeCommand>(&servicelocator::get_sound_system()), InputType::Keyboard);
@@ -555,28 +553,21 @@ void LoadScoreboard(dae::Scene* ScoreBoardScene)
 
     auto& highscore = HighScores::GetInstance();
 
-    // Get the loaded scores
     const auto& scores = highscore.getHighScores();
 
-    // Create GameObjects with TextComponents to display scores
     for (size_t i = 0; i < scores.size(); ++i) {
         const auto& playerName = scores[i].first;
         const auto score = scores[i].second;
 
-        // Create GameObject
         auto gameObject = std::make_unique<dae::GameObject>();
 
-        // Create TextComponent to display player name and score
         std::string text = playerName.data() + std::string(": ") + std::to_string(score);
         auto textComponent = std::make_unique<dae::TextComponent>(text, dae::ResourceManager::GetFont("arcadeBig"), SDL_Color{ 255, 0, 0, 255 }, *gameObject);
 
-        // Adjust position based on index to avoid overlapping
         gameObject->SetLocalPosition(glm::vec3(635, 190 + i * 50, 0.f));
 
-        // Add TextComponent to GameObject
         gameObject->AddComponent(std::move(textComponent));
 
-        // Add GameObject to the active scene
         ScoreBoardScene->Add(std::move(gameObject));
     }
 
@@ -612,19 +603,29 @@ void loadInputScore(dae::Scene* scene)
     auto& inputManager = dae::InputManager::GetInstance();
     UnBindPlayerCommands(inputManager);
 
-    const glm::vec3 initialPosition(630, 300, 0.f);
-    // Define the distance between lives display objects
-    const float distanceBetween = 150.0f;
+    const glm::vec3 initialPositionNameInput(630, 300, 0.f);
+    const glm::vec3 initialPositionScore(635, 150, 0.f);
+
+	const float distanceBetweenInput = 150.0f;
+    const float distanceBetweenScore = 150.0f;
 
     for (int i = 0; i  < GameData::GetInstance().GetNumberOfPlayers(); ++i)
     {
         auto nameInputObject = std::make_unique<dae::GameObject>();
-        glm::vec3 position = initialPosition + glm::vec3(0.0f, i * distanceBetween, 0.0f);
-        nameInputObject->SetLocalPosition(position);
+        glm::vec3 positionInput = initialPositionNameInput + glm::vec3(0.0f, i * distanceBetweenInput, 0.0f);
+        nameInputObject->SetLocalPosition(positionInput);
 
         std::unique_ptr<SelectNameComponent> nameInputComponent = std::make_unique<SelectNameComponent>(nameInputObject.get(), 6, dae::ResourceManager::GetFont("arcadeBig"), SDL_Color{ 255, 255, 255, 255 }, i);
         nameInputObject->AddComponent(std::move(nameInputComponent));
         scene->Add(std::move(nameInputObject));
+
+        auto ScoreObject = std::make_unique<dae::GameObject>();
+        auto ScoreTextcomponent = std::make_unique<dae::TextComponent>(std::to_string(GameData::GetInstance().GetPlayerData(i).score), dae::ResourceManager::GetFont("arcadeBig"), SDL_Color{ 255, 0, 0, 255 }, *ScoreObject); // Specify color here
+        ScoreTextcomponent->SetColor(SDL_Color{ 255, 255, 0, 255 });
+        ScoreObject->AddComponent(std::move(ScoreTextcomponent));
+        glm::vec3 position = initialPositionScore + glm::vec3(0.0f, i * distanceBetweenScore, 0.0f);
+        ScoreObject->SetLocalPosition(position);
+        scene->Add(std::move(ScoreObject));
     }
 
     auto TitleObject02 = std::make_unique<dae::GameObject>();
@@ -633,12 +634,7 @@ void loadInputScore(dae::Scene* scene)
     TitleObject02->AddComponent(std::move(titleTextComponent02));
     scene->Add(std::move(TitleObject02));
 
-    auto ScoreObject = std::make_unique<dae::GameObject>();
-    auto Scoretextcomponent = std::make_unique<dae::TextComponent>(std::to_string(GameData::GetInstance().GetPlayerData(0).score), dae::ResourceManager::GetFont("arcadeBig"), SDL_Color{ 255, 0, 0, 255 }, *ScoreObject); // Specify color here
-    Scoretextcomponent->SetColor(SDL_Color{ 255, 255, 0, 255 });
-	ScoreObject->AddComponent(std::move(Scoretextcomponent));
-    ScoreObject->SetLocalPosition(glm::vec3(635, 150, 0.f));
-    scene->Add(std::move(ScoreObject));
+   
 
     scene->SetBackgroundMusic(11);
 
@@ -650,7 +646,6 @@ void Scene4(dae::Scene* scene)
     auto& inputManager = dae::InputManager::GetInstance();
     UnBindMenuCommands(inputManager);
 
-    // Load the map
     constexpr glm::vec3 startPos(335, 70, 0.0f);
     constexpr glm::vec2 mapScale(40, 26.f);
 
@@ -677,12 +672,12 @@ void Scene4(dae::Scene* scene)
 
     if (GameData::GetInstance().GetGameState() == GameData::GameState::SINGLE_PLAYER)
     {
-        HandlePlayerInput(inputManager, 0); // Single player uses player 0
+        HandlePlayerInput(inputManager, 0); 
     }
     else
     {
-        HandlePlayerInput(inputManager, 0); // Single player uses player 0
-        HandlePlayerInput(inputManager, 1); // Single player uses player 0
+        HandlePlayerInput(inputManager, 0); 
+        HandlePlayerInput(inputManager, 1); 
     }
 
     scene->SetBackgroundMusic(19);
@@ -721,12 +716,12 @@ void Scene5(dae::Scene* scene)
 
     if (GameData::GetInstance().GetGameState() == GameData::GameState::SINGLE_PLAYER)
     {
-        HandlePlayerInput(inputManager, 0); // Single player uses player 0
+        HandlePlayerInput(inputManager, 0); 
     }
     else
     {
-        HandlePlayerInput(inputManager, 0); // Single player uses player 0
-        HandlePlayerInput(inputManager, 1); // Single player uses player 0
+        HandlePlayerInput(inputManager, 0); 
+        HandlePlayerInput(inputManager, 1); 
     }
 }
 
@@ -760,12 +755,12 @@ void Scene6(dae::Scene* scene)
 
     if (GameData::GetInstance().GetGameState() == GameData::GameState::SINGLE_PLAYER)
     {
-        HandlePlayerInput(inputManager, 0); // Single player uses player 0
+        HandlePlayerInput(inputManager, 0); 
     }
     else
     {
-        HandlePlayerInput(inputManager, 0); // Single player uses player 0
-        HandlePlayerInput(inputManager, 1); // Single player uses player 0
+        HandlePlayerInput(inputManager, 0); 
+        HandlePlayerInput(inputManager, 1); 
     }
 
 }

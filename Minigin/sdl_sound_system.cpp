@@ -16,7 +16,7 @@ sdl_sound_system::sdl_sound_system() : m_running(true),m_muted(false), m_volume(
 
     m_thread = std::make_unique<std::jthread>([this] { process_events(); });
 
-    dae::EventQueue::AddListener(dae::PlaySoundMessageType::deathSound, this, &sdl_sound_system::onPlaySoundMessage);
+    dae::EventQueue::AddListener(dae::PlaySoundMessageType::Sound, this, &sdl_sound_system::onPlaySoundMessage);
 }
 
 sdl_sound_system::~sdl_sound_system() {

@@ -12,6 +12,13 @@ public:
     static constexpr size_t PLAYER_NAME_SIZE = 20;
 
     HighScores();
+    ~HighScores() override = default;
+
+    HighScores(const HighScores&) = delete;
+    HighScores& operator=(const HighScores&) = delete;
+    HighScores(HighScores&&) noexcept = delete;
+    HighScores& operator=(HighScores&&) noexcept = delete;
+
     void loadScores();
     void createDefaultScores() const;
     bool isHighScore(uint32_t score) const;

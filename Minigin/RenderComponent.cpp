@@ -68,16 +68,16 @@ namespace dae
     void RenderComponent::SetAnimationFrames(int frameWidth, int frameHeight, int numFrames) {
         m_animationFrames.clear();
         m_animationFrames.reserve(numFrames);
-        // Assuming the sprite sheet is loaded as a single texture
+
         if (m_texture) {
             for (int i = 0; i < numFrames; ++i) {
                 // Calculate source rectangle for each frame
                 SDL_Rect srcRect;
-                srcRect.x = i * frameWidth; // Assuming frames are arranged horizontally
-                srcRect.y = 0; // Assuming all frames are in the same row
+                srcRect.x = i * frameWidth; 
+                srcRect.y = 0; 
                 srcRect.w = frameWidth;
                 srcRect.h = frameHeight;
-                // Create a texture for each frame using the calculated source rectangle
+                
                 auto frameTexture = std::make_unique<Texture2D>(m_texture->GetSDLTexture(), srcRect);
                 m_animationFrames.push_back(std::move(frameTexture));
             }

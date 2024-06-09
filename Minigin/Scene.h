@@ -37,13 +37,11 @@ namespace dae
         sound_id GetBackgroundMusicID() const { return  m_backgroundMusicID; }
 
 
-        // New function for setting activate callback
         void SetOnActivateCallback(ActivateCallback callback)
         {
             m_onActivateCallback = std::move(callback);
         }
 
-        // New function for invoking activate callback
         void Activate()
         {
             if (m_onActivateCallback)
@@ -58,7 +56,6 @@ namespace dae
         std::vector<std::unique_ptr<GameObject>> m_objects{};
         sound_id m_backgroundMusicID{ 0 };
 
-        // New member variable for activate callback
         ActivateCallback m_onActivateCallback;
     };
 }

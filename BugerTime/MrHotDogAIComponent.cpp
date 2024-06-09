@@ -1,9 +1,6 @@
 #include "MrHotDogAIComponent.h"
-
-#include <iostream>
 #include <queue>
 #include <unordered_set>
-
 #include "GameObject.h"
 #include "SceneData.h"
 #include "SceneHelpers.h"
@@ -50,6 +47,7 @@ MrHotDogAIComponent::MrHotDogAIComponent(dae::GameObject* owner, std::vector<std
 
 }
 
+
 std::vector<SDL_Rect*> MrHotDogAIComponent::CalculatePathToPeter(const glm::vec3& position)
 {
     m_path.clear();
@@ -78,47 +76,57 @@ std::vector<SDL_Rect*> MrHotDogAIComponent::CalculatePathToPeter(const glm::vec3
     std::unordered_set<std::pair<int, int>, PairHash> openSet;
     std::unordered_set<std::pair<int, int>, PairHash> closedSet;
     std::unordered_map<std::pair<int, int>, std::pair<int, int>, PairHash> cameFrom;
-    std::unordered_map<std::pair<int, int>, float, PairHash> gScore;
-    std::unordered_map<std::pair<int, int>, float, PairHash> fScore;
+    std::unordered_map<std::pair<int, int>, float, PairHash> actualCost;
+    std::unordered_map<std::pair<int, int>, float, PairHash> estimatedCost;
 
     for (int y = 0; y < m_numCellsY; ++y) {
         for (int x = 0; x < m_numCellsX; ++x) {
-            gScore[{x, y}] = std::numeric_limits<float>::infinity();
-            fScore[{x, y}] = std::numeric_limits<float>::infinity();
+            actualCost[{x, y}] = std::numeric_limits<float>::infinity();
+            estimatedCost[{x, y}] = std::numeric_limits<float>::infinity();
         }
     }
 
-    gScore[{startX, startY}] = 0;
-    fScore[{startX, startY}] = GetHeuristicCost({ startX, startY }, { goalX, goalY });
+    actualCost[{startX, startY}] = 0;
+    estimatedCost[{startX, startY}] = GetHeuristicCost({ startX, startY }, { goalX, goalY });
 
     openSet.insert({ startX, startY });
 
     while (!openSet.empty()) {
+        // Find the node in the open set with the lowest f-score
         auto currentNode = *std::ranges::min_element(openSet,
-                                                     [&](const auto& a, const auto& b) { return fScore[a] < fScore[b]; });
+            [&](const auto& a, const auto& b) { return estimatedCost[a] < estimatedCost[b]; });
 
+        // Check if the current node is the goal node
         if (currentNode == std::make_pair(goalX, goalY)) {
+            // Reconstruct the path from the start node to the goal node
             path = ReconstructPath(cameFrom, { goalX, goalY });
-            break;
+            break; // Exit the loop since we found the goal node
         }
 
+        // Remove the current node from the open set and add it to the closed set
         openSet.erase(currentNode);
         closedSet.insert(currentNode);
 
+        // Iterate through the neighbors of the current node
         for (auto neighbor : GetNeighbors(currentNode)) {
+            // Skip if the neighbor is in the closed set or is not walkable
             if (closedSet.contains(neighbor) || !IsCellWalkable(neighbor.first, neighbor.second))
                 continue;
 
-            float tentativeGScore = gScore[currentNode] + GetCost(neighbor);
+            // Calculate the tentative g-score for reaching the neighbor through the current node
+            float tentativeGScore = actualCost[currentNode] + GetCost(neighbor);
 
+            // If the neighbor is not in the open set, add it
             if (!openSet.contains(neighbor))
                 openSet.insert(neighbor);
-            else if (tentativeGScore >= gScore[neighbor])
+            // If the neighbor is already in the open set and the tentative g-score is not better, skip
+            else if (tentativeGScore >= actualCost[neighbor])
                 continue;
 
+            // Update the cameFrom map, g-score, and f-score for the neighbor
             cameFrom[neighbor] = currentNode;
-            gScore[neighbor] = tentativeGScore;
-            fScore[neighbor] = gScore[neighbor] + GetHeuristicCost(neighbor, { goalX, goalY });
+            actualCost[neighbor] = tentativeGScore;
+            estimatedCost[neighbor] = actualCost[neighbor] + GetHeuristicCost(neighbor, { goalX, goalY });
         }
     }
 
@@ -129,31 +137,27 @@ void MrHotDogAIComponent::Update()
 {
     const auto position = m_gameObject->GetWorldPosition();
 
-    // Calculate the shortest path to Peter using a pathfinding algorithm
     const auto pathToPeter = CalculatePathToPeter(position);
 
-    // Convert raw pointers to unique_ptr and store them in m_path
     for (SDL_Rect* rectPtr : pathToPeter)
     {
         m_path.push_back(std::make_unique<SDL_Rect>(*rectPtr));
     }
 
-    // Move along the path
    if (!m_path.empty())
    {
        // Get the next position in the path
-       SDL_Rect* nextPosition = m_path.front().get();
-       glm::vec3 nextPositionWorld(nextPosition->x + nextPosition->w / 2.0f, nextPosition->y + nextPosition->h / 2.0f, 0.0f); // Center of the next position
+       const SDL_Rect* nextPosition = m_path.front().get();
+       const glm::vec3 nextPositionWorld(nextPosition->x + nextPosition->w / 2.0f, nextPosition->y + nextPosition->h / 2.0f, 0.0f); // Center of the next position
 
        // Calculate movement direction
-       glm::vec3 direction = glm::normalize(nextPositionWorld - position);
+       const glm::vec3 direction = glm::normalize(nextPositionWorld - position);
 
-       // Calculate the movement amount based on the character's speed and frame time
-       float movementAmount = m_movementSpeed * dae::GameTime::GetDeltaTime(); // Adjust m_movementSpeed as needed
+       const float movementAmount = m_movementSpeed * dae::GameTime::GetDeltaTime();
 
        m_moveDirection = direction;
-       // Move the character towards the next position
-       glm::vec3 newPosition = position + direction * movementAmount;
+
+       const glm::vec3 newPosition = position + direction * movementAmount;
        m_gameObject->SetLocalPosition(newPosition);
 
        // Check if the character has reached the next position
@@ -164,6 +168,11 @@ void MrHotDogAIComponent::Update()
        }
    }
        
+}
+
+glm::vec3 MrHotDogAIComponent::GetMoveDirection() const
+{
+    return m_moveDirection;
 }
 
 bool MrHotDogAIComponent::IsCellWalkable(int x, int y) const {
@@ -196,7 +205,6 @@ std::vector<std::pair<int, int>> MrHotDogAIComponent::GetNeighbors(const std::pa
         const int newX = node.first + dx;
         const int newY = node.second + dy;
 
-        // Check if the neighbor is within bounds and walkable
         if (IsCellWalkable(newX, newY)) {
             neighbors.emplace_back(newX, newY);
         }
@@ -205,7 +213,7 @@ std::vector<std::pair<int, int>> MrHotDogAIComponent::GetNeighbors(const std::pa
     return neighbors;
 }
 
-std::vector<SDL_Rect*> MrHotDogAIComponent::ReconstructPath(const std::unordered_map<std::pair<int, int>, std::pair<int, int>, PairHash>& cameFrom, const std::pair<int, int>& current)
+std::vector<SDL_Rect*> MrHotDogAIComponent::ReconstructPath(const std::unordered_map<std::pair<int, int>, std::pair<int, int>, PairHash>& cameFrom, const std::pair<int, int>& current) const
 {
     std::vector<SDL_Rect*> path;
     std::pair<int, int> currentPair = current;
@@ -226,24 +234,21 @@ float MrHotDogAIComponent::GetCost(const std::pair<int, int>& next) const {
     int y = next.second;
 
     // Get the tile type of the next cell
-    char tile = m_map[y + 1][x]; // Adjust y index for map starting at 1
+    char tile = m_map[y][x];
 
     // Assign costs based on tile type
     float baseCost = 1.0f; // Default cost for non-ladder tiles
     if (tile == 'v' || tile == '^' || tile == '|') {
-        // Lower cost for ladder tiles
-        baseCost = 0.5f; // Adjust as needed
+        baseCost = 0.5f;
     }
-
-    // Additional cost adjustments can be made based on other factors if needed
 
     return baseCost;
 }
 
 float MrHotDogAIComponent::GetHeuristicCost(const std::pair<int, int>& pNodeA, const std::pair<int, int>& pNodeB)
 {
-    int dx = abs(pNodeA.first - pNodeB.first);
-    int dy = abs(pNodeA.second - pNodeB.second);
+	const int dx = abs(pNodeA.first - pNodeB.first);
+	const int dy = abs(pNodeA.second - pNodeB.second);
     return static_cast<float>(dx + dy);
 }
 

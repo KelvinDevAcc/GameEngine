@@ -60,7 +60,7 @@ class logging_sound_system final : public sound_system {
 public:
     logging_sound_system(std::unique_ptr<sound_system>&& ss) : _real_ss(std::move(ss))
     {
-        dae::EventQueue::AddListener(dae::PlaySoundMessageType::deathSound, this, &logging_sound_system::onPlaySoundMessage);
+        dae::EventQueue::AddListener(dae::PlaySoundMessageType::Sound, this, &logging_sound_system::onPlaySoundMessage);
     }
 
     ~logging_sound_system() override = default;

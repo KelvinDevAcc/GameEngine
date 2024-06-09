@@ -1,10 +1,6 @@
 #include "InputManager.h"
 
-#include <chrono>
-#include <iostream>
-#include <ostream>
 #include <SDL.h>
-#include <thread>
 
 #include "backends/imgui_impl_sdl2.h"
 
@@ -14,8 +10,8 @@ std::array<GameController, 4> InputManager::m_gameControllers = { GameController
 std::array<std::unordered_map<std::pair<unsigned int, KeyState>, std::unique_ptr<Command>>, 4> InputManager::m_controllerBindings;
 std::unordered_map<std::pair<unsigned int, KeyState>, std::unique_ptr<Command>> InputManager::m_keyboardBindings;
 
-const Uint8* InputManager::m_PreviousState = SDL_GetKeyboardState(nullptr);
-const Uint8* InputManager::m_CurrentState = SDL_GetKeyboardState(nullptr);
+const Uint8* InputManager::m_previousState = SDL_GetKeyboardState(nullptr);
+const Uint8* InputManager::m_currentState = SDL_GetKeyboardState(nullptr);
 
 bool InputManager::ProcessInput()
 {
@@ -24,8 +20,8 @@ bool InputManager::ProcessInput()
         controller.UpdateState();
     }
 
-    m_PreviousState = m_CurrentState;
-    m_CurrentState = SDL_GetKeyboardState(nullptr);
+    m_previousState = m_currentState;
+    m_currentState = SDL_GetKeyboardState(nullptr);
 
     SDL_Event e;
     while (SDL_PollEvent(&e))
@@ -56,17 +52,17 @@ bool InputManager::ProcessInput()
 
 bool InputManager::IsDownThisFrame(SDL_Scancode button)
 {
-    return m_CurrentState[button] && !m_PreviousState[button];
+    return m_currentState[button] && !m_previousState[button];
 }
 
 bool InputManager::IsUpThisFrame(SDL_Scancode button)
 {
-    return !m_CurrentState[button] && m_PreviousState[button];
+    return !m_currentState[button] && m_previousState[button];
 }
 
 bool InputManager::IsPressed(SDL_Scancode button) 
 {
-    return m_CurrentState[button];
+    return m_currentState[button];
 }
 
 void InputManager::BindCommand(unsigned int button, KeyState state, std::unique_ptr<Command> command, InputType type, int controllerIndex)
@@ -91,7 +87,7 @@ void InputManager::UnbindCommand(unsigned int button, KeyState state, InputType 
         for (auto& bindings : m_controllerBindings)
         {
             if (bindings.empty()) {
-                continue; // Skip this iteration if no bindings or controller not connected
+                continue; 
             }
 
             for (auto it = bindings.begin(); it != bindings.end();)
@@ -118,7 +114,6 @@ void InputManager::UnbindCommand(unsigned int button, KeyState state, InputType 
 
 void InputManager::HandleKeyInput()
 {
-    // Process keyboard bindings
     for (const auto& binding : m_keyboardBindings)
     {
         const auto keyCode = static_cast<SDL_Scancode>(binding.first.first);
@@ -160,24 +155,24 @@ int InputManager::GetConnectedControllerCount()
 void InputManager::HandleControllerInput() {
     for (int i = 0; i <static_cast<int>(m_gameControllers.size()); ++i) {
         if (!m_gameControllers[i].IsConnected()) {
-            continue; // Skip disconnected controllers
+            continue; 
         }
 
         for (const auto& binding : m_controllerBindings[i]) {
             const auto button = binding.first.first;
 
             switch (const auto state = binding.first.second) {
-            case KeyState::Down: // Added namespace qualifier
+            case KeyState::Down: 
                 if (m_gameControllers[i].IsButtonDown(button)) {
                     binding.second->Execute();
                 }
                 break;
-            case KeyState::Up: // Added namespace qualifier
+            case KeyState::Up:
                 if (m_gameControllers[i].IsButtonUp(button)) {
                     binding.second->Execute();
                 }
                 break;
-            case KeyState::Pressed: // Added namespace qualifier
+            case KeyState::Pressed: 
                 if (m_gameControllers[i].IsButtonPressed(button)) {
                     binding.second->Execute();
                 }

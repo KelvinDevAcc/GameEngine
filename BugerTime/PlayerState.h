@@ -41,7 +41,6 @@ namespace game
     {
     public:
         void OnEnterState(Player& player) override;
-        void Update(Player& player) override;
         void OnExitState(Player& player) override;
     };
 

@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-
 #include "EnventQueue.h"
 
 using sound_id = unsigned short;

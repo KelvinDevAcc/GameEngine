@@ -1,12 +1,11 @@
 #include "BurgerComponent.h"
 
-#include <iostream>
-
+#include "EnventQueue.h"
 #include "SceneData.h"
 #include "HitBox.h"
 #include "PointComponent.h"
+#include "sound_system.h"
 #include "SpriteRendererComponent.h"
-#include "../BugerTime/Player.h"
 
 namespace game
 {
@@ -25,7 +24,7 @@ void BurgerComponent::Update() {
     }
     else if (!m_IsDropping) {
         if (IsPlayerOverComponent()) {
-            m_IsDropping = true; // Start dropping
+            m_IsDropping = true;
             if (m_DroppingPlayer)
             {
                 const int score = m_DroppingPlayer->GetComponent<dae::PointComponent>()->GetScore();
@@ -34,7 +33,7 @@ void BurgerComponent::Update() {
             }
         }
         else {
-            m_PlayerWalkedDistance = 0.0f; // Reset if player steps off
+            m_PlayerWalkedDistance = 0.0f; 
         }
     }
 }
@@ -71,10 +70,9 @@ bool BurgerComponent::IsPlayerOverComponent()
 
 float BurgerComponent::GetPlayerMovementOverComponent() const
 {
-    auto& sceneData = dae::SceneData::GetInstance();
+	const auto& sceneData = dae::SceneData::GetInstance();
     const auto player = sceneData.GetPlayer();
     if (!player) {
-        std::cout << "Error: Player is nullptr\n";
         return 0.0f;
     }
 
@@ -83,22 +81,14 @@ float BurgerComponent::GetPlayerMovementOverComponent() const
     const auto burgerHitBox = GetGameObject()->GetComponent<HitBox>();
 
     if (!playerHitBox) {
-        std::cout << "Error: Player HitBox is nullptr\n";
         return 0.0f;
     }
     if (!burgerHitBox) {
-        std::cout << "Error: Burger HitBox is nullptr\n";
         return 0.0f;
     }
 
-    // Log the positions and sizes of the hitbox rectangles
-    std::cout << "Player HitBox: x=" << playerHitBox->GetRect().x << ", y=" << playerHitBox->GetRect().y << ", w=" << playerHitBox->GetRect().w << ", h=" << playerHitBox->GetRect().h << "\n";
-    std::cout << "Burger HitBox: x=" << burgerHitBox->GetRect().x<< ", y=" << burgerHitBox->GetRect().y << ", w=" << burgerHitBox->GetRect().w << ", h=" << burgerHitBox->GetRect().h << "\n";
-
-    // Check if the hitboxes are colliding
     if (playerHitBox->IsColliding(*burgerHitBox)) {
-        std::cout << "Collision detected!\n";
-        return glm::length(playerMovement); // Length of the movement vector
+        return glm::length(playerMovement); 
     }
 
     return 0.0f;
@@ -107,27 +97,30 @@ float BurgerComponent::GetPlayerMovementOverComponent() const
 
 void BurgerComponent::StartDropping() {
     m_IsDropping = true;
+
+}
+
+bool BurgerComponent::GetFalling() const
+{
+    return m_IsDropping;
 }
 
 
 void BurgerComponent::DropToNextFloor() {
     const auto& sceneData = dae::SceneData::GetInstance();
     auto* burger = GetGameObject();
-    // Retrieve the burger's hitbox
+
     const auto burgerHitBox = burger->GetComponent<HitBox>();
     if (!burgerHitBox) {
-        std::cout << "Error: Burger HitBox is nullptr\n";
         m_IsDropping = false;
         return;
     }
 
-    constexpr glm::vec3 dropVector(0.0f, 20.0f, 0.0f); // Drop step by step by 20 units
+    constexpr glm::vec3 dropVector(0.0f, 20.0f, 0.0f); 
     const glm::vec3 currentPosition = burger->GetWorldPosition();
     const glm::vec3 newPosition = currentPosition + dropVector;
     burger->SetLocalPosition(newPosition);
 
-    // Debug statements
-    std::cout << "Dropping burger. Current Position: (" << currentPosition.x << ", " << currentPosition.y << "), New Position: (" << newPosition.x << ", " << newPosition.y << ")\n";
 
     // Re-check conditions after moving
     const bool isOnFloor = sceneData.IsOnFloor(*burger);
@@ -135,45 +128,42 @@ void BurgerComponent::DropToNextFloor() {
     const bool isOnBurgerParts = sceneData.IsBurgerPartColliding(*burger);
     const bool isOnEnemy = sceneData.isOnEnemy(*burger);
 
+    int enemyCount = 0;
 
-    std::cout << "Checking conditions: IsOnFloor = " << isOnFloor
-        << ", IsOnBurgerParts = " << isOnBurgerParts
-        << ", IsInBasket = " << isInBasket << "\n";
-
-    int enemyCount = 0; // Counter for enemies on the burger
-
-    if (isOnEnemy) {
-        // Increment enemy count
+    if (isOnEnemy)
+    {
+	    // Increment enemy count
         enemyCount++;
     }
 
     if (isInBasket) {
-        // Give points based on the number of enemies
-        int points = 500 * (1 << (enemyCount - 1)); // Using bitwise left shift for exponential calculation
-        std::cout << "Points earned: " << points << std::endl;
+        //int points = 500 * (1 << (enemyCount - 1)); // Using bitwise left shift for exponential calculation
         m_IsDropping = false;
     }
     // Check conditions
     else if (isOnBurgerParts && !isInBasket) {
-        // Drop other burger parts if they are colliding
         const auto& burgerParts = sceneData.GetBurgerParts();
         for (auto part : burgerParts) {
             if (part != burger && sceneData.IsBurgerPartColliding(*part)) {
                 auto* partBurgerComponent = part->GetComponent<BurgerComponent>();
                 if (partBurgerComponent) {
                     partBurgerComponent->StartDropping();
-                   // int points = 500 * (1 << (enemyCount - 1)); // Using bitwise left shift for exponential calculation
+                   // int points = 500 * (1 << (enemyCount - 1)); 
                     m_IsDropping = false;
                 }
             }
         }
     }
     else if (isOnFloor) {
-        // If any condition is met, stop dropping
-       // int points = 500 * (1 << (enemyCount - 1)); // Using bitwise left shift for exponential calculation
+       // int points = 500 * (1 << (enemyCount - 1)); 
         m_IsDropping = false;
+        dae::Message message;
+
+        message.type = dae::PlaySoundMessageType::Sound;
+
+        message.arguments.emplace_back(static_cast<sound_id>(1));
+
+        dae::EventQueue::Broadcast(message);
     }
 
-    // Final debug statement
-    std::cout << "Burger final position: (" << burger->GetWorldPosition().x << ", " << burger->GetWorldPosition().y << ")\n";
 }

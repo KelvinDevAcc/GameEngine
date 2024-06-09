@@ -9,11 +9,16 @@
 
 namespace dae
 {
-    class imguiExerciseComponent : public Component
+    class imguiExerciseComponent final : public Component
     {
     public:
         imguiExerciseComponent();
         ~imguiExerciseComponent() override;
+
+        imguiExerciseComponent(const imguiExerciseComponent& other) = delete;
+        imguiExerciseComponent(imguiExerciseComponent&& other) noexcept = delete;
+        imguiExerciseComponent& operator=(const imguiExerciseComponent& other) = delete;
+        imguiExerciseComponent& operator=(imguiExerciseComponent&& other) noexcept = delete;
 
         void Update() override;
 
@@ -23,13 +28,12 @@ namespace dae
 
 
     private:
-        static constexpr int buffer_size = 1 << 26; // Define buffer_size as a constant
-        static constexpr int inputValueDefault = 10; // Define default value for inputValue
+        static constexpr int buffer_size = 1 << 26; 
+        static constexpr int inputValueDefault = 10; 
 
         void RenderExercise1Window() const;
         void RenderExercise2Window() const;
 
-        // Member variables
         mutable int inputValue = inputValueDefault; // Mutable to allow modification in const methods
         mutable std::vector<float> timingsIntBuffer;
         mutable std::vector<float> timingsGameObject3D;

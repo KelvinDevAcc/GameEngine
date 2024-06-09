@@ -2,7 +2,7 @@
 
 namespace dae
 {
-	PointComponent::PointComponent(const int initalScore): m_Score(initalScore)
+	PointComponent::PointComponent(const int initialScore): m_Score(initialScore)
 	{
 	}
 

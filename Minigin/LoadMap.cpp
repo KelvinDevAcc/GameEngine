@@ -17,7 +17,7 @@ void LoadMap::loadFromFile(const std::string& mapFilePath, const std::string& in
     std::string line;
     while (std::getline(mapFile, line)) {
         std::vector<char> row(line.begin(), line.end());
-        map.push_back(row);
+        m_map.push_back(row);
     }
     mapFile.close();
 
@@ -29,12 +29,13 @@ void LoadMap::loadFromFile(const std::string& mapFilePath, const std::string& in
 
     while (std::getline(ingFile, line)) {
         std::vector<char> row(line.begin(), line.end());
-        ingMap.push_back(row);
+        m_ingMap.push_back(row);
     }
     ingFile.close();
 }
 
-void LoadMap::printMap(const std::vector<std::vector<char>>& mapToPrint) const {
+void LoadMap::printMap(const std::vector<std::vector<char>>& mapToPrint)
+{
     for (const auto& row : mapToPrint) {
         for (const char tile : row) {
             std::cout << tile;
@@ -45,17 +46,17 @@ void LoadMap::printMap(const std::vector<std::vector<char>>& mapToPrint) const {
 
 void LoadMap::printMaps() const {
     std::cout << "Map:" << std::endl;
-    printMap(map);
+    printMap(m_map);
     std::cout << "Ingredients Map:" << std::endl;
-    printMap(ingMap);
+    printMap(m_ingMap);
 }
 
 const std::vector<std::vector<char>>& LoadMap::getMap() const {
-    return map;
+    return m_map;
 }
 
 const std::vector<std::vector<char>>& LoadMap::getIngMap() const {
-    return ingMap;
+    return m_ingMap;
 }
 
 

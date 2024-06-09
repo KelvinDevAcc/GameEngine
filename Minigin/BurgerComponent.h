@@ -1,13 +1,20 @@
 #pragma once
 #include "Component.h"
 
-class BurgerComponent : public dae::Component {
+class BurgerComponent final : public dae::Component {
 public:
     BurgerComponent(float length, float dropDistance);
+    ~BurgerComponent() override = default;
+
+    BurgerComponent(const BurgerComponent& other) = delete;
+    BurgerComponent(BurgerComponent&& other) noexcept = delete;
+    BurgerComponent& operator=(const BurgerComponent& other) = delete;
+    BurgerComponent& operator=(BurgerComponent&& other) noexcept = delete;
+
     void Update() override;
 
     void StartDropping();
-    bool GetFalling() { return m_IsDropping; }
+    bool GetFalling() const;
 
     std::type_info const& GetComponentType() const override { return typeid(BurgerComponent); }
 private:
